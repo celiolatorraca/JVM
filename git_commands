@@ -1,0 +1,4 @@
+CheckOut - $git clone [URL]
+Commit (local) - $git commit -m "[MSG]"
+Push to Repo - $git push origin master
+Update - $git pull
