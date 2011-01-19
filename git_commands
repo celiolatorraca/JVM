@@ -2,3 +2,17 @@ CheckOut - $git clone [URL]
 Commit (local) - $git commit -m "[MSG]"
 Push to Repo - $git push origin master
 Update - $git pull
+
+Para excluir alguns arquivos do git
+
+Edite o arquivo .git/info/exclude e adiciona as seguintes linhas...
+
+# Debug
+Debug
+# Release
+Release
+# .project
+.project
+# .cproject
+.cproject
+
