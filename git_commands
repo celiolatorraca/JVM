@@ -7,6 +7,8 @@ Para excluir alguns arquivos do git
 
 Edite o arquivo .git/info/exclude e adiciona as seguintes linhas...
 
+# Retira os .o
+*.[oa]
 # Debug
 Debug
 # Release
