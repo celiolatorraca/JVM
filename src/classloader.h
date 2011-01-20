@@ -344,7 +344,7 @@ typedef struct SourceFile_attribute
  * FUNCOES
  */
 
-FILE *classfile;
+
 void** constant_pool; 
 struct ClassFile class;
 
@@ -367,7 +367,7 @@ void show_class_file(char* class_name);
 void show_attributes(void ** attributes, u2 attributes_count);
 int read_interfaces();
 int read_fields();
-void * read_attribute_info();
+void *read_attribute_info();
 int read_methods();
 int read_attributes();
 int read_class_file();

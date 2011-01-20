@@ -15,8 +15,11 @@
 #include <strings.h>
 #include "classloader.h"
 #include "mnemonics.h"
+#include <errno.h>
 
 extern int errno;
+
+FILE* classfile;
 
 int read_class_file()
 {
@@ -29,7 +32,7 @@ int read_class_file()
 	
   class.constant_pool_count = read_u2();
 	
-  /* Aloca mem�ria para o array de Constant Pool */
+  /* Aloca memoria para o array de Constant Pool */
   constant_pool = calloc(sizeof(void *), class.constant_pool_count);
   read_constant_pool();
 	
@@ -45,6 +48,10 @@ int read_class_file()
   class.attributes_count = read_u2();
   read_attributes();
 
+  if (errno != 0)
+    return -1;
+
+  return 0;
 }
 
 /*
