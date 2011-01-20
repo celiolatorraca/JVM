@@ -1,10 +1,10 @@
-Disciplina: Software Básico 2010/2
+Disciplina: Software B·sico 2010/2
 Professor: Marcelo Ladeira
 
-Implementação do Class Loader para Java 2.0.
+ImplementaÁ„o do Class Loader para Java 2.0.
 
 Alunos:
-Célio Latorraca - 09/41565
+CÈlio Latorraca - 09/41565
 Daniel Dutra - 09/08436
 Lucas Polonio - 09/12387
 Yuri Maia - 09/16803
@@ -17,4 +17,4 @@ Para compilar e executar:
    gcc -Wall -ansi -pedantic -error -c classloader.c mnemonics.c
    gcc classloader.o mnemonics.o -o classloader.exe
 
-- Execute o arquivo classloader.exe passando como único argumento o endereço do arquivo .class desejado. 
+- Execute o arquivo classloader.exe passando como ˙nico argumento o endereÁo do arquivo .class desejado. 
