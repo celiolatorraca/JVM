@@ -349,6 +349,7 @@ void** constant_pool;
 struct ClassFile class;
 
 int open_file(char* file_name);
+void close_file();
 u1 read_u1();
 u2 read_u2();
 u4 read_u4();
@@ -369,6 +370,6 @@ int read_fields();
 void * read_attribute_info();
 int read_methods();
 int read_attributes();
-
+int read_class_file();
 
 #endif

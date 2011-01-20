@@ -13,45 +13,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
-#include <errno.h>
 #include "classloader.h"
 #include "mnemonics.h"
 
 extern int errno;
 
-int main(int argc, char *argv[])
+int read_class_file()
 {
-  char nome_arq[200];
-  if (argc == 1)
-  {
-	printf("\nDigite o nome do arquivo: ");
-	scanf("%s", nome_arq);
-	getchar();
-  }
-  else if (argc == 2)
-  {
-	strcpy(nome_arq, argv[1]);
-  }
-  else
-  {
-    printf("Usage: ./classloader class_file\n");
-    return EXIT_FAILURE;
-  }
-
-  if (open_file(nome_arq) < 0)
-    return EXIT_FAILURE;
-
   /*!
    * Inicio da leitura
    */
-
   class.magic = read_u4();
   class.minor_version = read_u2();
   class.major_version = read_u2();
 	
   class.constant_pool_count = read_u2();
 	
-  /* Aloca mem—ria para o array de Constant Pool */
+  /* Aloca memï¿½ria para o array de Constant Pool */
   constant_pool = calloc(sizeof(void *), class.constant_pool_count);
   read_constant_pool();
 	
@@ -67,23 +45,6 @@ int main(int argc, char *argv[])
   class.attributes_count = read_u2();
   read_attributes();
 
-  /* Carrega o opcode info para usar o mnemonicos */
-  populate_opcode_info();
-	
-  /*Imprime o ClassFile carregado na tela*/
-  printf("\n\n");
-  show_class_file(argv[1]);
-  printf("\n\n");
-  
-  
-  fclose(classfile);
-  fflush(stdout);
-
-  printf("\nPressione qualquer tecla para sair.\n");
-  getchar();
-  getchar();
-  
-  return 0;
 }
 
 /*
@@ -98,7 +59,7 @@ void show_class_file(char* class_name)
 
   printf("\n\n\t\t\tClass File - Viewer (%s)\n\n", class_name);
 
-  /*Imprime as Informações gerais do ClassFile carregado*/
+  /*Imprime as Informaï¿½ï¿½es gerais do ClassFile carregado*/
   printf("\n---------------- General Information -----------------\n");
   printf("\n\tMagic: %X", class.magic);
   printf("\n\tMinor version: %hu", class.minor_version);
@@ -499,6 +460,11 @@ int open_file(char *file_name)
     return -1;
   }
   return 0;
+}
+
+void close_file()
+{
+	fclose(classfile);
 }
 
 /*
