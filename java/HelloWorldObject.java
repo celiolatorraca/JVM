@@ -35,6 +35,7 @@ public class HelloWorldObject implements HelloWorldInterface {
     System.out.println("HelloWorld\n");
   }
   private int privateMethod(){
+	int methodField = 11;
     this.field = 10;
 	executeMethod();
     return this.field;
