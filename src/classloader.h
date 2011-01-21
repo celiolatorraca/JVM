@@ -5,17 +5,17 @@
  * Access flags
  */
 #define ACC_PUBLIC    0x0001
-#define ACC_PRIVATE   0x0002  
-#define ACC_PROTECTED 0x0004  
-#define ACC_STATIC    0x0008  
+#define ACC_PRIVATE   0x0002
+#define ACC_PROTECTED 0x0004
+#define ACC_STATIC    0x0008
 #define ACC_FINAL     0x0010
 #define ACC_SUPER     0x0020
-#define ACC_VOLATILE  0x0040  
-#define ACC_TRANSIENT 0x0080  
-#define ACC_NATIVE    0x0100  
+#define ACC_VOLATILE  0x0040
+#define ACC_TRANSIENT 0x0080
+#define ACC_NATIVE    0x0100
 #define ACC_INTERFACE 0x0200
 #define ACC_ABSTRACT  0x0400
-#define ACC_STRICT    0x0800  
+#define ACC_STRICT    0x0800
 
 /*!
  * Constant's flags
@@ -68,7 +68,7 @@ typedef struct attribute_info_t
 	u2 attribute_name_index;
 	u4 attribute_length;
 	u2 tag;
-	u1 *info;     
+	u1 *info;
 } attribute_info;
 
 
@@ -79,7 +79,7 @@ typedef struct field_info_t
   u2 name_index;
   u2 descriptor_index;
   u2 attributes_count;
-  void **attributes; 
+  void **attributes;
 } field_info;
 
 typedef struct method_info_t
@@ -98,18 +98,18 @@ struct ClassFile
   u2 			minor_version;
   u2 			major_version;
   u2 			constant_pool_count; /*! if [n]'s long or double, [n+1]'s invalid*/
-  cp_info 		*constant_pool; 
+  cp_info 		*constant_pool;
   u2 			access_flags;
   u2 			this_class;
   u2 			super_class;
   u2 			interfaces_count;
-  u2 			*interfaces; 
+  u2 			*interfaces;
   u2 			fields_count;
   field_info 	*fields;
   u2 			methods_count;
-  method_info   *methods; 
+  method_info   *methods;
   u2 			attributes_count;
-  void 			**attributes; 
+  void 			**attributes;
 };
 
 struct CONSTANT_Class_info
@@ -145,7 +145,7 @@ struct CONSTANT_Utf8_info
 {
   u1 tag;  				/* valor 1*/
   u2 length;
-  u1 *bytes; 
+  u1 *bytes;
 };
 
 struct CONSTANT_Methodref_info
@@ -257,11 +257,11 @@ typedef struct Code_attribute
   u2 max_stack;
   u2 max_locals;
   u4 code_length;
-  u1 *code; 
+  u1 *code;
   u2 exception_table_length;
   exception_tab *exception_table;
   u2 attributes_count;
-  void **attributes; 
+  void **attributes;
 } Code_attribute;
 
 typedef struct Deprecated_attribute
@@ -277,7 +277,7 @@ typedef struct Exceptions_attribute
   u4 attribute_length;
   u2 tag;
   u2 number_of_exceptions;
-  u2 *exception_index_table; 
+  u2 *exception_index_table;
 } Exceptions_attribute;
 
 typedef struct Class_t
@@ -294,7 +294,7 @@ typedef struct InnerClasses_attribute
   u4 attribute_length;
   u2 tag;
   u2 number_of_classes;
-  class_tab *classes; 
+  class_tab *classes;
 } InnerClasses_attribute;
 
 typedef struct LineNum
@@ -309,7 +309,7 @@ typedef struct LineNumberTable_attribute
   u4 attribute_length;
   u2 tag;
   u2 line_number_table_length;
-  line_number_tab *line_number_table; 
+  line_number_tab *line_number_table;
 } LineNumberTable_attribute;
 
 typedef struct local_variable
@@ -321,13 +321,13 @@ typedef struct local_variable
   u2 index;
 } local_variable_tab;
 
-typedef struct LocalVariableTable_attribute 
+typedef struct LocalVariableTable_attribute
 {
 	u2 attribute_name_index;
 	u4 attribute_length;
 	u2 tag;
 	u2 local_variable_table_length;
-	local_variable_tab *local_variable_table; 
+	local_variable_tab *local_variable_table;
 } LocalVariableTable_attribute;
 
 typedef struct SourceFile_attribute
@@ -345,8 +345,8 @@ typedef struct SourceFile_attribute
  */
 
 
-void** constant_pool; 
-struct ClassFile class;
+void** constant_pool;
+struct ClassFile *class;
 
 int open_file(char* file_name);
 void close_file();
@@ -371,5 +371,5 @@ void *read_attribute_info();
 int read_methods();
 int read_attributes();
 int read_class_file();
-
+void free_class_file(struct ClassFile* class_file);
 #endif
