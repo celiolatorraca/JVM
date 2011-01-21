@@ -1,4 +1,5 @@
 CheckOut - $git clone [URL]
+Adicionar novos Arquivos - $git add [ARQ]
 Commit (local) - $git commit -a -m "[MSG]"
 Push to Repo - $git push origin master
 Update - $git pull
