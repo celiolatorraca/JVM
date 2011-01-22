@@ -111,7 +111,7 @@ struct ClassFile * getClassByName(char *class_name){
 			if (strcmp(class_name, getClassName(classArray[i])) == 0)
 				return classArray[i];
 	}
-
+	return NULL;
 }
 
 /*
