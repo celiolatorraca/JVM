@@ -8,10 +8,13 @@
 #ifndef CARREGADOR_H_
 #define CARREGADOR_H_
 
-void carregaClasse(char *classe);
+#include "classloader.h"
 
+int loadClass(char *);
+char *getClassName(struct ClassFile *class);
 
-
+struct ClassFile **classArray = 0;
+int numClasses = 0;
 
 
 
