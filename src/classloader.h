@@ -98,7 +98,7 @@ struct ClassFile
   u2 			minor_version;
   u2 			major_version;
   u2 			constant_pool_count; /*! if [n]'s long or double, [n+1]'s invalid*/
-  cp_info 		**constant_pool;
+  void 		**constant_pool;
   u2 			access_flags;
   u2 			this_class;
   u2 			super_class;
@@ -345,7 +345,6 @@ typedef struct SourceFile_attribute
  */
 
 
-void** constant_pool;
 struct ClassFile *class;
 
 int open_file(char* file_name);
@@ -354,22 +353,16 @@ u1 read_u1();
 u2 read_u2();
 u4 read_u4();
 void read_constant_pool();
-void show_constant_pool();
-void show_interfaces();
-void show_methods();
-void show_fields();
-void print_name(u1 *string, u2 length);
-void print_mnemonics(u1 *bytecode, u2 size);
 void copy_name(char *dest, u2 name_index);
 int read_s();
-void get_access_flags(u2 flags, char* string);
-void show_class_file(char* class_name);
-void show_attributes(void ** attributes, u2 attributes_count);
 int read_interfaces();
 int read_fields();
 void *read_attribute_info();
 int read_methods();
 int read_attributes();
-int read_class_file();
+struct ClassFile * read_class_file(char *nome_arq);
 void free_class_file(struct ClassFile* class_file);
+
+
+
 #endif
