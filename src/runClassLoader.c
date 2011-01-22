@@ -15,7 +15,6 @@
 #include "classloader.h"
 #include "mnemonics.h"
 #include "carregador.h"
-#include "runClassLoader.h"
 
 
 void get_access_flags(u2 flags, char* string);
