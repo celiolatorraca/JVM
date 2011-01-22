@@ -21,7 +21,7 @@ int loadClass(char *class){
 
   /* só chega aqui se precisa carregar a classe */
   numClasses++;
-  classArray = realloc(classArray, ( numClasses*sizeof(struct ClassFile *) ));
+  classArray = realloc(classArray, (numClasses*sizeof(struct ClassFile *)));
 
   classArray[numClasses-1] = NULL;/* TODO chamar classLoader(); */
 

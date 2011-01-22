@@ -98,7 +98,7 @@ struct ClassFile
   u2 			minor_version;
   u2 			major_version;
   u2 			constant_pool_count; /*! if [n]'s long or double, [n+1]'s invalid*/
-  cp_info 		*constant_pool;
+  cp_info 		**constant_pool;
   u2 			access_flags;
   u2 			this_class;
   u2 			super_class;

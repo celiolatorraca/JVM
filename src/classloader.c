@@ -127,7 +127,7 @@ void show_constant_pool()
     {
     case CONSTANT_Class:
 	  printf("CONSTANT_Class_info");
-      printf("\n\t\tClass name index: %hu", ((struct CONSTANT_Class_info*) class->constant_pool[i])->name_index);
+      printf("\n\t\tClass name index: %hu", ((struct CONSTANT_Class_info *) class->constant_pool[i])->name_index);
       break;
     case CONSTANT_Fieldref:
 	  printf("CONSTANT_Fieldref_info");
