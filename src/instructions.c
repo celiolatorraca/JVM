@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "instructions.h"
 
 void initializeInstr()
 {
