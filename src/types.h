@@ -15,14 +15,40 @@
 /*
  * Primitives
  */
-typedef uint8_t u1;
+typedef uint8_t  u1;
 typedef uint16_t u2;
 typedef uint32_t u4;
 typedef uint64_t u8;
 
 
 /*
- * Structs
+ * FIELDS
+ */
+typedef struct field_info_t
+{
+  u2 	access_flags;
+  u2 	name_index;
+  u2 	descriptor_index;
+  u2 	attributes_count;
+  void 	**attributes;
+} field_info;
+
+
+/*
+ * METHODS
+ */
+typedef struct method_info_t
+{
+  u2 	access_flags;
+  u2 	name_index;
+  u2 	descriptor_index;
+  u2 	attributes_count;
+  void 	**attributes;
+} method_info;
+
+
+/*
+ * CLASSFILE
  */
 struct ClassFile
 {
@@ -129,32 +155,6 @@ struct CONSTANT_Double_info
 
 
 /*
- * FIELDS
- */
-typedef struct field_info_t
-{
-  u2 	access_flags;
-  u2 	name_index;
-  u2 	descriptor_index;
-  u2 	attributes_count;
-  void 	**attributes;
-} field_info;
-
-
-/*
- * METHODS
- */
-typedef struct method_info_t
-{
-  u2 	access_flags;
-  u2 	name_index;
-  u2 	descriptor_index;
-  u2 	attributes_count;
-  void 	**attributes;
-} method_info;
-
-
-/*
  * ATTRIBUTES TABS
  */
 typedef struct Exc_tab
@@ -180,11 +180,17 @@ typedef struct LineNum
 } line_number_tab;
 
 
-
-
 /*
  * ATTRIBUTES
  */
+typedef struct attribute_info_t
+{
+  u2 attribute_name_index;
+  u4 attribute_length;
+  u2 tag;
+  u1 *info;
+} attribute_info;
+
 typedef struct ConstantValue_attribute
 {
   u2 attribute_name_index;
@@ -268,5 +274,10 @@ typedef struct SourceFile_attribute
   u2 sourcefile_index;
 } SourceFile_attribute;
 
+
+/*
+ * FUNÇÕES
+ */
+u8 convert_to_64_bits(u4 low, u4 high);
 
 #endif
