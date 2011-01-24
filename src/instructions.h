@@ -1,6 +1,14 @@
+#ifndef INSTRUCTIONS_H_
+#define INSTRUCTIONS_H_
+
+#include "classloader.h" /*por causa dos tipos */
+
+/* todo criei essa funcao pra testes, pode deletar depois se quiserem. vcs q sabem */
+void executeInstruction(u1 opcode);
 
 /* Um array contendo ponteiros para as instruções */
-void *(instr[256]);
+int (*instr[256]) (); /*todo vai retornar algo mesmo ?? pra mim era void */
+
 
 /* Inicializa o array de instruções */
 void initializeInstr();
@@ -210,3 +218,6 @@ int funct_ifnull();
 int funct_ifnonnull();
 int funct_goto_w();
 int funct_jsr_w();
+
+
+#endif /* INSTRUCTIONS_H_ */
