@@ -11,6 +11,8 @@
 
 #include "carregador.h"
 
+#define WHERE "Loader"
+
 
 char *base_path = "";
 
@@ -47,7 +49,8 @@ int loadClass(char *class_name){
 	  sprintf(path, "%s%s.class", base_path, class_name);
 
 	/* lê a nova classe */
-	classArray[numClasses-1] = read_class_file(path);
+	if ((classArray[numClasses-1] = read_class_file(path)) == NULL)
+		fatalErrorMsg(WHERE, "Não foi possível abrir arquivo informado.");
 
 	/* carrega a superclasse da classe carregada*/
 	loadClass(getParentName(classArray[numClasses-1]));
