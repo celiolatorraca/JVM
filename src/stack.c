@@ -31,16 +31,17 @@ u4 pop()
   return stack[stack_top--];
 }
 
-void newFrame()
+void newStackFrame()
 {
   push(frame_base);
-  frame_base = stack_top + 1;
+  frame_base = stack_top;
 }
 
-void freeFrame()
+void freeStackFrame()
 {
   u4 previous_frame;
-  stack_top = frame_base - 1;
+
+  stack_top = frame_base;
   previous_frame = pop();
   if (previous_frame > frame_base)
   {
