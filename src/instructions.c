@@ -6,13 +6,14 @@
 #include "instructions.h"
 #include "mnemonics.h"
 #include "stack.h"
+#include "frame.h"
 
 void execute_instruction(u1 opcode)
 {
 	struct OPCODE_info opcode_tmp = op_info[opcode];
 	printf("Vai executar %s\n", opcode_tmp.desc);
 
-	instr[opcode]();
+	/*instr[opcode]();*/
 }
 
 
@@ -224,72 +225,63 @@ void  initializeInstr()
 
 void funct_nop()
 {
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_aconst_null()
 {
 	push ( CONSTANT_Null );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_m1()
 {
 	push( -1 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_0()
 {
 	push( 0 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_1()
 {
 	push( 1 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_2()
 {
 	push( 2 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_3()
 {
 	push( 3 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_4()
 {
 	push( 4 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iconst_5()
 {
 	push( 5 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_lconst_0()
@@ -297,8 +289,7 @@ void funct_lconst_0()
 	push (0);
 	push (0);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_lconst_1()
@@ -306,8 +297,7 @@ void funct_lconst_1()
 	push (0);
 	push (1);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_fconst_0()
@@ -320,8 +310,7 @@ void funct_fconst_0()
 
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_fconst_1()
@@ -334,8 +323,7 @@ void funct_fconst_1()
 
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_fconst_2()
@@ -348,8 +336,7 @@ void funct_fconst_2()
 
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 
@@ -363,8 +350,7 @@ void funct_dconst_0()
 
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_dconst_1()
@@ -377,89 +363,137 @@ void funct_dconst_1()
 
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 
-void funct_bipush(){	pc++;  }
-void funct_sipush(){ pc++;  }
-void funct_ldc(){ pc++;  }
-void funct_ldc_w(){ pc++;  }
-void funct_ldc2_w(){ pc++;  }
-void funct_iload(){ pc++;  }
-void funct_lload(){ pc++;  }
-void funct_fload(){ pc++;  }
-void funct_dload(){ pc++;  }
-void funct_aload(){ pc++;  }
-void funct_iload_0(){ pc++;  }
-void funct_iload_1(){ pc++;  }
-void funct_iload_2(){ pc++;  }
-void funct_iload_3(){ pc++;  }
-void funct_lload_0(){ pc++;  }
-void funct_lload_1(){ pc++;  }
-void funct_lload_2(){ pc++;  }
-void funct_lload_3(){ pc++;  }
-void funct_fload_0(){ pc++;  }
-void funct_fload_1(){ pc++;  }
-void funct_fload_2(){ pc++;  }
-void funct_fload_3(){ pc++;  }
-void funct_dload_0(){ pc++;  }
-void funct_dload_1(){ pc++;  }
-void funct_dload_2(){ pc++;  }
-void funct_dload_3(){ pc++;  }
-void funct_aload_0(){ pc++;  }
-void funct_aload_1(){ pc++;  }
-void funct_aload_2(){ pc++;  }
-void funct_aload_3(){ pc++;  }
-void funct_iaload(){ pc++;  }
-void funct_laload(){ pc++;  }
-void funct_faload(){ pc++;  }
-void funct_daload(){ pc++;  }
-void funct_aaload(){ pc++;  }
-void funct_baload(){ pc++;  }
-void funct_caload(){ pc++;  }
-void funct_saload(){ pc++;  }
-void funct_istore(){ pc++;  }
-void funct_lstore(){ pc++;  }
-void funct_fstore(){ pc++;  }
-void funct_dstore(){ pc++;  }
-void funct_astore(){ pc++;  }
-void funct_istore_0(){ pc++;  }
-void funct_istore_1(){ pc++;  }
-void funct_istore_2(){ pc++;  }
-void funct_istore_3(){ pc++;  }
-void funct_lstore_0(){ pc++;  }
-void funct_lstore_1(){ pc++;  }
-void funct_lstore_2(){ pc++;  }
-void funct_lstore_3(){ pc++;  }
-void funct_fstore_0(){ pc++;  }
-void funct_fstore_1(){ pc++;  }
-void funct_fstore_2(){ pc++;  }
-void funct_fstore_3(){ pc++;  }
-void funct_dstore_0(){ pc++;  }
-void funct_dstore_1(){ pc++;  }
-void funct_dstore_2(){ pc++;  }
-void funct_dstore_3(){ pc++;  }
-void funct_astore_0(){ pc++;  }
-void funct_astore_1(){ pc++;  }
-void funct_astore_2(){ pc++;  }
-void funct_astore_3(){ pc++;  }
-void funct_iastore(){ pc++;  }
-void funct_lastore(){ pc++;  }
-void funct_fastore(){ pc++;  }
-void funct_dastore(){ pc++;  }
-void funct_aastore(){ pc++;  }
-void funct_bastore(){ pc++;  }
-void funct_castore(){ pc++;  }
-void funct_sastore(){ pc++;  }
+void funct_bipush()
+{
+	current_frame.pc++;
+	push( (u4) current_frame.code[current_frame.pc] );
+
+	current_frame.pc++;
+}
+
+void funct_sipush()
+{
+	u1 low, high;
+	u4 aux;
+
+	current_frame.pc++;
+	low = current_frame.code[current_frame.pc];
+	current_frame.pc++;
+	high = current_frame.code[current_frame.pc];
+
+	aux = convert_2x8_to_32( low, high );
+	push( aux );
+
+	current_frame.pc++;
+}
+
+void funct_ldc()
+{
+	u1 indice;
+	u4 aux;
+
+	current_frame.pc++;
+	indice = current_frame.code[current_frame.pc];
+
+	aux = current_frame.constant_pool[indice]; /* TODO - pode dar erro pq o constant pool é um ponteiro pra void (e talvez não empilhe só u4...)*/
+	push(aux);
+
+	current_frame.pc++;
+}
+
+void funct_ldc_w()
+{
+	u1 ind1, ind2;
+	u4 indice, aux;
+
+	current_frame.pc++;
+	high = current_frame.code[current_frame.pc];
+
+	current_frame.pc++;
+	low = current_frame.code[current_frame.pc];
+
+	indice = convert_2x8_to_32_bits( low, high );
+	aux = current_frame.constant_pool[indice];
+
+	current_frame.pc++;
+}
+void funct_ldc2_w(){ current_frame.pc++;  }
+void funct_iload(){ current_frame.pc++;  }
+void funct_lload(){ current_frame.pc++;  }
+void funct_fload(){ current_frame.pc++;  }
+void funct_dload(){ current_frame.pc++;  }
+void funct_aload(){ current_frame.pc++;  }
+void funct_iload_0(){ current_frame.pc++;  }
+void funct_iload_1(){ current_frame.pc++;  }
+void funct_iload_2(){ current_frame.pc++;  }
+void funct_iload_3(){ current_frame.pc++;  }
+void funct_lload_0(){ current_frame.pc++;  }
+void funct_lload_1(){ current_frame.pc++;  }
+void funct_lload_2(){ current_frame.pc++;  }
+void funct_lload_3(){ current_frame.pc++;  }
+void funct_fload_0(){ current_frame.pc++;  }
+void funct_fload_1(){ current_frame.pc++;  }
+void funct_fload_2(){ current_frame.pc++;  }
+void funct_fload_3(){ current_frame.pc++;  }
+void funct_dload_0(){ current_frame.pc++;  }
+void funct_dload_1(){ current_frame.pc++;  }
+void funct_dload_2(){ current_frame.pc++;  }
+void funct_dload_3(){ current_frame.pc++;  }
+void funct_aload_0(){ current_frame.pc++;  }
+void funct_aload_1(){ current_frame.pc++;  }
+void funct_aload_2(){ current_frame.pc++;  }
+void funct_aload_3(){ current_frame.pc++;  }
+void funct_iaload(){ current_frame.pc++;  }
+void funct_laload(){ current_frame.pc++;  }
+void funct_faload(){ current_frame.pc++;  }
+void funct_daload(){ current_frame.pc++;  }
+void funct_aaload(){ current_frame.pc++;  }
+void funct_baload(){ current_frame.pc++;  }
+void funct_caload(){ current_frame.pc++;  }
+void funct_saload(){ current_frame.pc++;  }
+void funct_istore(){ current_frame.pc++;  }
+void funct_lstore(){ current_frame.pc++;  }
+void funct_fstore(){ current_frame.pc++;  }
+void funct_dstore(){ current_frame.pc++;  }
+void funct_astore(){ current_frame.pc++;  }
+void funct_istore_0(){ current_frame.pc++;  }
+void funct_istore_1(){ current_frame.pc++;  }
+void funct_istore_2(){ current_frame.pc++;  }
+void funct_istore_3(){ current_frame.pc++;  }
+void funct_lstore_0(){ current_frame.pc++;  }
+void funct_lstore_1(){ current_frame.pc++;  }
+void funct_lstore_2(){ current_frame.pc++;  }
+void funct_lstore_3(){ current_frame.pc++;  }
+void funct_fstore_0(){ current_frame.pc++;  }
+void funct_fstore_1(){ current_frame.pc++;  }
+void funct_fstore_2(){ current_frame.pc++;  }
+void funct_fstore_3(){ current_frame.pc++;  }
+void funct_dstore_0(){ current_frame.pc++;  }
+void funct_dstore_1(){ current_frame.pc++;  }
+void funct_dstore_2(){ current_frame.pc++;  }
+void funct_dstore_3(){ current_frame.pc++;  }
+void funct_astore_0(){ current_frame.pc++;  }
+void funct_astore_1(){ current_frame.pc++;  }
+void funct_astore_2(){ current_frame.pc++;  }
+void funct_astore_3(){ current_frame.pc++;  }
+void funct_iastore(){ current_frame.pc++;  }
+void funct_lastore(){ current_frame.pc++;  }
+void funct_fastore(){ current_frame.pc++;  }
+void funct_dastore(){ current_frame.pc++;  }
+void funct_aastore(){ current_frame.pc++;  }
+void funct_bastore(){ current_frame.pc++;  }
+void funct_castore(){ current_frame.pc++;  }
+void funct_sastore(){ current_frame.pc++;  }
 
 void funct_pop()
 {
 	pop();
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_pop2()
@@ -467,8 +501,7 @@ void funct_pop2()
 	pop();
 	pop();
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_dup()
@@ -479,8 +512,7 @@ void funct_dup()
 	push(aux);
 	push(aux);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_dup_x1()
@@ -494,14 +526,13 @@ void funct_dup_x1()
 	push(aux2);
 	push(aux1);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
-void funct_dup_x2(){ pc++;  }
-void funct_dup2(){ pc++;  }
-void funct_dup2_x1(){ pc++;  }
-void funct_dup2_x2(){ pc++;  }
+void funct_dup_x2(){ current_frame.pc++;  }
+void funct_dup2(){ current_frame.pc++;  }
+void funct_dup2_x1(){ current_frame.pc++;  }
+void funct_dup2_x2(){ current_frame.pc++;  }
 
 void funct_swap()
 {
@@ -513,8 +544,7 @@ void funct_swap()
 	push(aux1);
 	push(aux2);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_iadd()
@@ -526,8 +556,7 @@ void funct_iadd()
 
 	push (aux1 + aux2);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_ladd()
@@ -545,8 +574,7 @@ void funct_ladd()
 
 	push(aux1 + aux2);
 
-	pc++;
-
+	current_frame.pc++;
 }
 
 void funct_fadd()
@@ -564,111 +592,110 @@ void funct_fadd()
 
 	push( aux1 );
 
-	pc++;
-
+	current_frame.pc++;
 }
 
-void funct_dadd(){ pc++;  }
-void funct_isub(){ pc++;  }
-void funct_lsub(){ pc++;  }
-void funct_fsub(){ pc++;  }
-void funct_dsub(){ pc++;  }
-void funct_imul(){ pc++;  }
-void funct_lmul(){ pc++;  }
-void funct_fmul(){ pc++;  }
-void funct_dmul(){ pc++;  }
-void funct_idiv(){ pc++;  }
-void funct_ldiv(){ pc++;  }
-void funct_fdiv(){ pc++;  }
-void funct_ddiv(){ pc++;  }
-void funct_irem(){ pc++;  }
-void funct_lrem(){ pc++;  }
-void funct_frem(){ pc++;  }
-void funct_drem(){ pc++;  }
-void funct_ineg(){ pc++;  }
-void funct_lneg(){ pc++;  }
-void funct_fneg(){ pc++;  }
-void funct_dneg(){ pc++;  }
-void funct_ishl(){ pc++;  }
-void funct_lshl(){ pc++;  }
-void funct_ishr(){ pc++;  }
-void funct_lshr(){ pc++;  }
-void funct_iushr(){ pc++;  }
-void funct_lushr(){ pc++;  }
-void funct_iand(){ pc++;  }
-void funct_land(){ pc++;  }
-void funct_ior(){ pc++;  }
-void funct_lor(){ pc++;  }
-void funct_ixor(){ pc++;  }
-void funct_lxor(){ pc++;  }
-void funct_iinc(){ pc++;  }
-void funct_i2l(){ pc++;  }
-void funct_i2f(){ pc++;  }
-void funct_i2d(){ pc++;  }
-void funct_l2i(){ pc++;  }
-void funct_l2f(){ pc++;  }
-void funct_l2d(){ pc++;  }
-void funct_f2i(){ pc++;  }
-void funct_f2l(){ pc++;  }
-void funct_f2d(){ pc++;  }
-void funct_d2i(){ pc++;  }
-void funct_d2l(){ pc++;  }
-void funct_d2f(){ pc++;  }
-void funct_i2b(){ pc++;  }
-void funct_i2c(){ pc++;  }
-void funct_i2s(){ pc++;  }
-void funct_lcmp(){ pc++;  }
-void funct_fcmpl(){ pc++;  }
-void funct_fcmpg(){ pc++;  }
-void funct_dcmpl(){ pc++;  }
-void funct_dcmpg(){ pc++;  }
-void funct_ifeq(){ pc++;  }
-void funct_ifne(){ pc++;  }
-void funct_iflt(){ pc++;  }
-void funct_ifge(){ pc++;  }
-void funct_ifgt(){ pc++;  }
-void funct_ifle(){ pc++;  }
-void funct_if_icmpeq(){ pc++;  }
-void funct_if_icmpne(){ pc++;  }
-void funct_if_icmplt(){ pc++;  }
-void funct_if_icmpge(){ pc++;  }
-void funct_if_icmpgt(){ pc++;  }
-void funct_if_icmple(){ pc++;  }
-void funct_if_acmpeq(){ pc++;  }
-void funct_if_acmpne(){ pc++;  }
-void funct_goto(){ pc++;  }
-void funct_jsr(){ pc++;  }
-void funct_ret(){ pc++;  }
-void funct_tableswitch(){ pc++;  }
-void funct_lookupswitch(){ pc++;  }
-void funct_ireturn(){ pc++;  }
-void funct_lreturn(){ pc++;  }
-void funct_freturn(){ pc++;  }
-void funct_dreturn(){ pc++;  }
-void funct_areturn(){ pc++;  }
-void funct_return(){ pc++;  }
-void funct_getstatic(){ pc++;  }
-void funct_putstatic(){ pc++;  }
-void funct_getfield(){ pc++;  }
-void funct_putfield(){ pc++;  }
-void funct_invokevirtual(){ pc++;  }
-void funct_invokespecial(){ pc++;  }
-void funct_invokestatic(){ pc++;  }
-void funct_invokeinterface(){ pc++;  }
+void funct_dadd(){ current_frame.pc++;  }
+void funct_isub(){ current_frame.pc++;  }
+void funct_lsub(){ current_frame.pc++;  }
+void funct_fsub(){ current_frame.pc++;  }
+void funct_dsub(){ current_frame.pc++;  }
+void funct_imul(){ current_frame.pc++;  }
+void funct_lmul(){ current_frame.pc++;  }
+void funct_fmul(){ current_frame.pc++;  }
+void funct_dmul(){ current_frame.pc++;  }
+void funct_idiv(){ current_frame.pc++;  }
+void funct_ldiv(){ current_frame.pc++;  }
+void funct_fdiv(){ current_frame.pc++;  }
+void funct_ddiv(){ current_frame.pc++;  }
+void funct_irem(){ current_frame.pc++;  }
+void funct_lrem(){ current_frame.pc++;  }
+void funct_frem(){ current_frame.pc++;  }
+void funct_drem(){ current_frame.pc++;  }
+void funct_ineg(){ current_frame.pc++;  }
+void funct_lneg(){ current_frame.pc++;  }
+void funct_fneg(){ current_frame.pc++;  }
+void funct_dneg(){ current_frame.pc++;  }
+void funct_ishl(){ current_frame.pc++;  }
+void funct_lshl(){ current_frame.pc++;  }
+void funct_ishr(){ current_frame.pc++;  }
+void funct_lshr(){ current_frame.pc++;  }
+void funct_iushr(){ current_frame.pc++;  }
+void funct_lushr(){ current_frame.pc++;  }
+void funct_iand(){ current_frame.pc++;  }
+void funct_land(){ current_frame.pc++;  }
+void funct_ior(){ current_frame.pc++;  }
+void funct_lor(){ current_frame.pc++;  }
+void funct_ixor(){ current_frame.pc++;  }
+void funct_lxor(){ current_frame.pc++;  }
+void funct_iinc(){ current_frame.pc++;  }
+void funct_i2l(){ current_frame.pc++;  }
+void funct_i2f(){ current_frame.pc++;  }
+void funct_i2d(){ current_frame.pc++;  }
+void funct_l2i(){ current_frame.pc++;  }
+void funct_l2f(){ current_frame.pc++;  }
+void funct_l2d(){ current_frame.pc++;  }
+void funct_f2i(){ current_frame.pc++;  }
+void funct_f2l(){ current_frame.pc++;  }
+void funct_f2d(){ current_frame.pc++;  }
+void funct_d2i(){ current_frame.pc++;  }
+void funct_d2l(){ current_frame.pc++;  }
+void funct_d2f(){ current_frame.pc++;  }
+void funct_i2b(){ current_frame.pc++;  }
+void funct_i2c(){ current_frame.pc++;  }
+void funct_i2s(){ current_frame.pc++;  }
+void funct_lcmp(){ current_frame.pc++;  }
+void funct_fcmpl(){ current_frame.pc++;  }
+void funct_fcmpg(){ current_frame.pc++;  }
+void funct_dcmpl(){ current_frame.pc++;  }
+void funct_dcmpg(){ current_frame.pc++;  }
+void funct_ifeq(){ current_frame.pc++;  }
+void funct_ifne(){ current_frame.pc++;  }
+void funct_iflt(){ current_frame.pc++;  }
+void funct_ifge(){ current_frame.pc++;  }
+void funct_ifgt(){ current_frame.pc++;  }
+void funct_ifle(){ current_frame.pc++;  }
+void funct_if_icmpeq(){ current_frame.pc++;  }
+void funct_if_icmpne(){ current_frame.pc++;  }
+void funct_if_icmplt(){ current_frame.pc++;  }
+void funct_if_icmpge(){ current_frame.pc++;  }
+void funct_if_icmpgt(){ current_frame.pc++;  }
+void funct_if_icmple(){ current_frame.pc++;  }
+void funct_if_acmpeq(){ current_frame.pc++;  }
+void funct_if_acmpne(){ current_frame.pc++;  }
+void funct_goto(){ current_frame.pc++;  }
+void funct_jsr(){ current_frame.pc++;  }
+void funct_ret(){ current_frame.pc++;  }
+void funct_tableswitch(){ current_frame.pc++;  }
+void funct_lookupswitch(){ current_frame.pc++;  }
+void funct_ireturn(){ current_frame.pc++;  }
+void funct_lreturn(){ current_frame.pc++;  }
+void funct_freturn(){ current_frame.pc++;  }
+void funct_dreturn(){ current_frame.pc++;  }
+void funct_areturn(){ current_frame.pc++;  }
+void funct_return(){ current_frame.pc++;  }
+void funct_getstatic(){ current_frame.pc++;  }
+void funct_putstatic(){ current_frame.pc++;  }
+void funct_getfield(){ current_frame.pc++;  }
+void funct_putfield(){ current_frame.pc++;  }
+void funct_invokevirtual(){ current_frame.pc++;  }
+void funct_invokespecial(){ current_frame.pc++;  }
+void funct_invokestatic(){ current_frame.pc++;  }
+void funct_invokeinterface(){ current_frame.pc++;  }
 /*void funct_nao_utilizada;*/
-void funct_new(){ pc++;  }
-void funct_newarray(){ pc++;  }
-void funct_anewarray(){ pc++;  }
-void funct_arraylength(){ pc++;  }
-void funct_athrow(){ pc++;  }
-void funct_checkcast(){ pc++;  }
-void funct_instanceof(){ pc++;  }
-void funct_monitorenter(){ pc++;  }
-void funct_monitorexit(){ pc++;  }
-void funct_wide(){ pc++;  }
-void funct_multianewarray(){ pc++;  }
-void funct_ifnull(){ pc++;  }
-void funct_ifnonnull(){ pc++;  }
-void funct_goto_w(){ pc++;  }
-void funct_jsr_w(){ pc++;  }
+void funct_new(){ current_frame.pc++;  }
+void funct_newarray(){ current_frame.pc++;  }
+void funct_anewarray(){ current_frame.pc++;  }
+void funct_arraylength(){ current_frame.pc++;  }
+void funct_athrow(){ current_frame.pc++;  }
+void funct_checkcast(){ current_frame.pc++;  }
+void funct_instanceof(){ current_frame.pc++;  }
+void funct_monitorenter(){ current_frame.pc++;  }
+void funct_monitorexit(){ current_frame.pc++;  }
+void funct_wide(){ current_frame.pc++;  }
+void funct_multianewarray(){ current_frame.pc++;  }
+void funct_ifnull(){ current_frame.pc++;  }
+void funct_ifnonnull(){ current_frame.pc++;  }
+void funct_goto_w(){ current_frame.pc++;  }
+void funct_jsr_w(){ current_frame.pc++;  }
 
