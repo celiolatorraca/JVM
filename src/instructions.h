@@ -1,7 +1,7 @@
 #ifndef INSTRUCTIONS_H_
 #define INSTRUCTIONS_H_
 
-#include "classloader.h" /*por causa dos tipos */
+#include "types.h"
 
 /* todo criei essa funcao pra testes, pode deletar depois se quiserem. vcs q sabem */
 void executeInstruction(u1 opcode);
