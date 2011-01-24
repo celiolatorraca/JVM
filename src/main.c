@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 
 	loadClass(main_class);
 
-	if ((main = getInitMethod(main_class)) == NULL)
+	if ((main = getMainMethod()) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível localizar método main.");
 
 	initializeInstr();
