@@ -14,7 +14,6 @@ Para compilar e executar:
 - Digite "make"  para compilar automaticamente em sistemas que possuem suporte a Makefile.
 
 - Alternativamente, compile da seguinte maneira:
-   gcc -Wall -ansi -pedantic -error -c runClassLoader.c classloader.c mnemonics.c
-   gcc runClassLoader.o classloader.o mnemonics.o -o classloader.exe
+   gcc gcc classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c -o jvm
 
 - Execute o arquivo classloader.exe passando como único argumento o endereço do arquivo .class desejado. 
