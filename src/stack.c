@@ -9,7 +9,6 @@ void newStack()
 {
   stack_top = -1;
   frame_base = 0;
-  previous_frame = -1;
 }
 
 void push(u4 value)

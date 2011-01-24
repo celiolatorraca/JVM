@@ -2,6 +2,7 @@
 #define FRAME_H
 
 #include "stack.h"
+#include "types.h"
 
 /**
  Frame. Modificar de void para os tipos corretos.
@@ -11,6 +12,10 @@ struct frame
 {
 	void *fields;
 	void **constant_pool;
+	u4 max_stack;
+	u4 max_locals;
+	u4 code_length;
+	u1 *code;
 }
 
 /**
