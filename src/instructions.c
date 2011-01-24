@@ -12,7 +12,7 @@ void execute_instruction(u1 opcode)
 	struct OPCODE_info opcode_tmp = op_info[opcode];
 	printf("Vai executar %s\n", opcode_tmp.desc);
 
-	instr[opcode]();
+	/*instr[opcode]();*/
 }
 
 
