@@ -102,7 +102,6 @@ char *getParentName(struct ClassFile *class){
 /*!
  * Retorna ponteiro pra ClassFile a partir de string \a class_name.
  */
-
 struct ClassFile * getClassByName(char *class_name){
 
 	int i;
@@ -115,7 +114,7 @@ struct ClassFile * getClassByName(char *class_name){
 }
 
 /*
- * NÃ£o consegui colocar essas definicoes no .h, nao sei o motivo.
+ * N‹o consegui colocar essas definicoes no .h, nao sei o motivo.
  * Entao tive q fazer esses dois getters.
  */
 struct ClassFile * getClassByIndex(int index){

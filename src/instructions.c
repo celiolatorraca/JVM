@@ -1,6 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
 #include "constants.h"
+#include "instructions.h"
+#include "mnemonics.h"
+#include "stack.h"
+
+void execute_instruction(u1 opcode)
+{
+	struct OPCODE_info opcode_tmp = op_info[opcode];
+	printf("Vai executar %s\n", opcode_tmp.desc);
+
+	instr[opcode]();
+}
 
 
 void  initializeInstr()
@@ -212,7 +225,7 @@ void  initializeInstr()
 void funct_nop()
 {
 	pc++;
-	return 0;
+
 }
 
 void funct_aconst_null()
@@ -220,7 +233,7 @@ void funct_aconst_null()
 	push ( CONSTANT_Null );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_m1()
@@ -228,7 +241,7 @@ void funct_iconst_m1()
 	push( -1 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_0()
@@ -236,7 +249,7 @@ void funct_iconst_0()
 	push( 0 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_1()
@@ -244,7 +257,7 @@ void funct_iconst_1()
 	push( 1 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_2()
@@ -252,7 +265,7 @@ void funct_iconst_2()
 	push( 2 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_3()
@@ -260,7 +273,7 @@ void funct_iconst_3()
 	push( 3 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_4()
@@ -268,7 +281,7 @@ void funct_iconst_4()
 	push( 4 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iconst_5()
@@ -276,7 +289,7 @@ void funct_iconst_5()
 	push( 5 );
 
 	pc++;
-	return 0;
+
 }
 
 void funct_lconst_0()
@@ -285,7 +298,7 @@ void funct_lconst_0()
 	push (0);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_lconst_1()
@@ -294,7 +307,7 @@ void funct_lconst_1()
 	push (1);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_fconst_0()
@@ -308,7 +321,7 @@ void funct_fconst_0()
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
 	pc++;
-	return 0;
+
 }
 
 void funct_fconst_1()
@@ -322,7 +335,7 @@ void funct_fconst_1()
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
 	pc++;
-	return 0;
+
 }
 
 void funct_fconst_2()
@@ -336,7 +349,7 @@ void funct_fconst_2()
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
 
 	pc++;
-	return 0;
+
 }
 
 
@@ -351,7 +364,7 @@ void funct_dconst_0()
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
 
 	pc++;
-	return 0;
+
 }
 
 void funct_dconst_1()
@@ -365,88 +378,88 @@ void funct_dconst_1()
 	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
 
 	pc++;
-	return 0;
+
 }
 
 
-void funct_bipush(){	pc++; return 0; }
-void funct_sipush(){ pc++; return 0; }
-void funct_ldc(){ pc++; return 0; }
-void funct_ldc_w(){ pc++; return 0; }
-void funct_ldc2_w(){ pc++; return 0; }
-void funct_iload(){ pc++; return 0; }
-void funct_lload(){ pc++; return 0; }
-void funct_fload(){ pc++; return 0; }
-void funct_dload(){ pc++; return 0; }
-void funct_aload(){ pc++; return 0; }
-void funct_iload_0(){ pc++; return 0; }
-void funct_iload_1(){ pc++; return 0; }
-void funct_iload_2(){ pc++; return 0; }
-void funct_iload_3(){ pc++; return 0; }
-void funct_lload_0(){ pc++; return 0; }
-void funct_lload_1(){ pc++; return 0; }
-void funct_lload_2(){ pc++; return 0; }
-void funct_lload_3(){ pc++; return 0; }
-void funct_fload_0(){ pc++; return 0; }
-void funct_fload_1(){ pc++; return 0; }
-void funct_fload_2(){ pc++; return 0; }
-void funct_fload_3(){ pc++; return 0; }
-void funct_dload_0(){ pc++; return 0; }
-void funct_dload_1(){ pc++; return 0; }
-void funct_dload_2(){ pc++; return 0; }
-void funct_dload_3(){ pc++; return 0; }
-void funct_aload_0(){ pc++; return 0; }
-void funct_aload_1(){ pc++; return 0; }
-void funct_aload_2(){ pc++; return 0; }
-void funct_aload_3(){ pc++; return 0; }
-void funct_iaload(){ pc++; return 0; }
-void funct_laload(){ pc++; return 0; }
-void funct_faload(){ pc++; return 0; }
-void funct_daload(){ pc++; return 0; }
-void funct_aaload(){ pc++; return 0; }
-void funct_baload(){ pc++; return 0; }
-void funct_caload(){ pc++; return 0; }
-void funct_saload(){ pc++; return 0; }
-void funct_istore(){ pc++; return 0; }
-void funct_lstore(){ pc++; return 0; }
-void funct_fstore(){ pc++; return 0; }
-void funct_dstore(){ pc++; return 0; }
-void funct_astore(){ pc++; return 0; }
-void funct_istore_0(){ pc++; return 0; }
-void funct_istore_1(){ pc++; return 0; }
-void funct_istore_2(){ pc++; return 0; }
-void funct_istore_3(){ pc++; return 0; }
-void funct_lstore_0(){ pc++; return 0; }
-void funct_lstore_1(){ pc++; return 0; }
-void funct_lstore_2(){ pc++; return 0; }
-void funct_lstore_3(){ pc++; return 0; }
-void funct_fstore_0(){ pc++; return 0; }
-void funct_fstore_1(){ pc++; return 0; }
-void funct_fstore_2(){ pc++; return 0; }
-void funct_fstore_3(){ pc++; return 0; }
-void funct_dstore_0(){ pc++; return 0; }
-void funct_dstore_1(){ pc++; return 0; }
-void funct_dstore_2(){ pc++; return 0; }
-void funct_dstore_3(){ pc++; return 0; }
-void funct_astore_0(){ pc++; return 0; }
-void funct_astore_1(){ pc++; return 0; }
-void funct_astore_2(){ pc++; return 0; }
-void funct_astore_3(){ pc++; return 0; }
-void funct_iastore(){ pc++; return 0; }
-void funct_lastore(){ pc++; return 0; }
-void funct_fastore(){ pc++; return 0; }
-void funct_dastore(){ pc++; return 0; }
-void funct_aastore(){ pc++; return 0; }
-void funct_bastore(){ pc++; return 0; }
-void funct_castore(){ pc++; return 0; }
-void funct_sastore(){ pc++; return 0; }
+void funct_bipush(){	pc++;  }
+void funct_sipush(){ pc++;  }
+void funct_ldc(){ pc++;  }
+void funct_ldc_w(){ pc++;  }
+void funct_ldc2_w(){ pc++;  }
+void funct_iload(){ pc++;  }
+void funct_lload(){ pc++;  }
+void funct_fload(){ pc++;  }
+void funct_dload(){ pc++;  }
+void funct_aload(){ pc++;  }
+void funct_iload_0(){ pc++;  }
+void funct_iload_1(){ pc++;  }
+void funct_iload_2(){ pc++;  }
+void funct_iload_3(){ pc++;  }
+void funct_lload_0(){ pc++;  }
+void funct_lload_1(){ pc++;  }
+void funct_lload_2(){ pc++;  }
+void funct_lload_3(){ pc++;  }
+void funct_fload_0(){ pc++;  }
+void funct_fload_1(){ pc++;  }
+void funct_fload_2(){ pc++;  }
+void funct_fload_3(){ pc++;  }
+void funct_dload_0(){ pc++;  }
+void funct_dload_1(){ pc++;  }
+void funct_dload_2(){ pc++;  }
+void funct_dload_3(){ pc++;  }
+void funct_aload_0(){ pc++;  }
+void funct_aload_1(){ pc++;  }
+void funct_aload_2(){ pc++;  }
+void funct_aload_3(){ pc++;  }
+void funct_iaload(){ pc++;  }
+void funct_laload(){ pc++;  }
+void funct_faload(){ pc++;  }
+void funct_daload(){ pc++;  }
+void funct_aaload(){ pc++;  }
+void funct_baload(){ pc++;  }
+void funct_caload(){ pc++;  }
+void funct_saload(){ pc++;  }
+void funct_istore(){ pc++;  }
+void funct_lstore(){ pc++;  }
+void funct_fstore(){ pc++;  }
+void funct_dstore(){ pc++;  }
+void funct_astore(){ pc++;  }
+void funct_istore_0(){ pc++;  }
+void funct_istore_1(){ pc++;  }
+void funct_istore_2(){ pc++;  }
+void funct_istore_3(){ pc++;  }
+void funct_lstore_0(){ pc++;  }
+void funct_lstore_1(){ pc++;  }
+void funct_lstore_2(){ pc++;  }
+void funct_lstore_3(){ pc++;  }
+void funct_fstore_0(){ pc++;  }
+void funct_fstore_1(){ pc++;  }
+void funct_fstore_2(){ pc++;  }
+void funct_fstore_3(){ pc++;  }
+void funct_dstore_0(){ pc++;  }
+void funct_dstore_1(){ pc++;  }
+void funct_dstore_2(){ pc++;  }
+void funct_dstore_3(){ pc++;  }
+void funct_astore_0(){ pc++;  }
+void funct_astore_1(){ pc++;  }
+void funct_astore_2(){ pc++;  }
+void funct_astore_3(){ pc++;  }
+void funct_iastore(){ pc++;  }
+void funct_lastore(){ pc++;  }
+void funct_fastore(){ pc++;  }
+void funct_dastore(){ pc++;  }
+void funct_aastore(){ pc++;  }
+void funct_bastore(){ pc++;  }
+void funct_castore(){ pc++;  }
+void funct_sastore(){ pc++;  }
 
 void funct_pop()
 {
 	pop();
 
 	pc++;
-	return 0;
+
 }
 
 void funct_pop2()
@@ -455,19 +468,19 @@ void funct_pop2()
 	pop();
 
 	pc++;
-	return 0;
+
 }
 
 void funct_dup()
 {
 	u4 aux;
 
-	u4 = pop();
-	push(u4);
-	push(u4);
+	aux = pop();
+	push(aux);
+	push(aux);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_dup_x1()
@@ -482,13 +495,13 @@ void funct_dup_x1()
 	push(aux1);
 
 	pc++;
-	return 0;
+
 }
 
-void funct_dup_x2(){ pc++; return 0; }
-void funct_dup2(){ pc++; return 0; }
-void funct_dup2_x1(){ pc++; return 0; }
-void funct_dup2_x2(){ pc++; return 0; }
+void funct_dup_x2(){ pc++;  }
+void funct_dup2(){ pc++;  }
+void funct_dup2_x1(){ pc++;  }
+void funct_dup2_x2(){ pc++;  }
 
 void funct_swap()
 {
@@ -501,7 +514,7 @@ void funct_swap()
 	push(aux2);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_iadd()
@@ -514,7 +527,7 @@ void funct_iadd()
 	push (aux1 + aux2);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_ladd()
@@ -524,22 +537,22 @@ void funct_ladd()
 
 	low = pop();
 	high = pop();
-	aux1 = (signed) covert_to_64_bits( low, high );
+	aux1 = (signed) convert_to_64_bits( low, high );
 
 	low = pop();
 	high = pop();
-	aux2 = (signed) covert_to_64_bits( low, high );
+	aux2 = (signed) convert_to_64_bits( low, high );
 
 	push(aux1 + aux2);
 
 	pc++;
-	return 0;
+
 }
 
 void funct_fadd()
 {
 	float f1, f2;
-	u4 aux1, aux;
+	u4 aux1, aux2;
 
 	aux1 = pop();
 	memcpy(&f1, &aux1, sizeof(u4));
@@ -552,110 +565,110 @@ void funct_fadd()
 	push( aux1 );
 
 	pc++;
-	return 0;
+
 }
 
-void funct_dadd(){ pc++; return 0; }
-void funct_isub(){ pc++; return 0; }
-void funct_lsub(){ pc++; return 0; }
-void funct_fsub(){ pc++; return 0; }
-void funct_dsub(){ pc++; return 0; }
-void funct_imul(){ pc++; return 0; }
-void funct_lmul(){ pc++; return 0; }
-void funct_fmul(){ pc++; return 0; }
-void funct_dmul(){ pc++; return 0; }
-void funct_idiv(){ pc++; return 0; }
-void funct_ldiv(){ pc++; return 0; }
-void funct_fdiv(){ pc++; return 0; }
-void funct_ddiv(){ pc++; return 0; }
-void funct_irem(){ pc++; return 0; }
-void funct_lrem(){ pc++; return 0; }
-void funct_frem(){ pc++; return 0; }
-void funct_drem(){ pc++; return 0; }
-void funct_ineg(){ pc++; return 0; }
-void funct_lneg(){ pc++; return 0; }
-void funct_fneg(){ pc++; return 0; }
-void funct_dneg(){ pc++; return 0; }
-void funct_ishl(){ pc++; return 0; }
-void funct_lshl(){ pc++; return 0; }
-void funct_ishr(){ pc++; return 0; }
-void funct_lshr(){ pc++; return 0; }
-void funct_iushr(){ pc++; return 0; }
-void funct_lushr(){ pc++; return 0; }
-void funct_iand(){ pc++; return 0; }
-void funct_land(){ pc++; return 0; }
-void funct_ior(){ pc++; return 0; }
-void funct_lor(){ pc++; return 0; }
-void funct_ixor(){ pc++; return 0; }
-void funct_lxor(){ pc++; return 0; }
-void funct_iinc(){ pc++; return 0; }
-void funct_i2l(){ pc++; return 0; }
-void funct_i2f(){ pc++; return 0; }
-void funct_i2d(){ pc++; return 0; }
-void funct_l2i(){ pc++; return 0; }
-void funct_l2f(){ pc++; return 0; }
-void funct_l2d(){ pc++; return 0; }
-void funct_f2i(){ pc++; return 0; }
-void funct_f2l(){ pc++; return 0; }
-void funct_f2d(){ pc++; return 0; }
-void funct_d2i(){ pc++; return 0; }
-void funct_d2l(){ pc++; return 0; }
-void funct_d2f(){ pc++; return 0; }
-void funct_i2b(){ pc++; return 0; }
-void funct_i2c(){ pc++; return 0; }
-void funct_i2s(){ pc++; return 0; }
-void funct_lcmp(){ pc++; return 0; }
-void funct_fcmpl(){ pc++; return 0; }
-void funct_fcmpg(){ pc++; return 0; }
-void funct_dcmpl(){ pc++; return 0; }
-void funct_dcmpg(){ pc++; return 0; }
-void funct_ifeq(){ pc++; return 0; }
-void funct_ifne(){ pc++; return 0; }
-void funct_iflt(){ pc++; return 0; }
-void funct_ifge(){ pc++; return 0; }
-void funct_ifgt(){ pc++; return 0; }
-void funct_ifle(){ pc++; return 0; }
-void funct_if_icmpeq(){ pc++; return 0; }
-void funct_if_icmpne(){ pc++; return 0; }
-void funct_if_icmplt(){ pc++; return 0; }
-void funct_if_icmpge(){ pc++; return 0; }
-void funct_if_icmpgt(){ pc++; return 0; }
-void funct_if_icmple(){ pc++; return 0; }
-void funct_if_acmpeq(){ pc++; return 0; }
-void funct_if_acmpne(){ pc++; return 0; }
-void funct_goto(){ pc++; return 0; }
-void funct_jsr(){ pc++; return 0; }
-void funct_ret(){ pc++; return 0; }
-void funct_tableswitch(){ pc++; return 0; }
-void funct_lookupswitch(){ pc++; return 0; }
-void funct_ireturn(){ pc++; return 0; }
-void funct_lreturn(){ pc++; return 0; }
-void funct_freturn(){ pc++; return 0; }
-void funct_dreturn(){ pc++; return 0; }
-void funct_areturn(){ pc++; return 0; }
-void funct_return(){ pc++; return 0; }
-void funct_getstatic(){ pc++; return 0; }
-void funct_putstatic(){ pc++; return 0; }
-void funct_getfield(){ pc++; return 0; }
-void funct_putfield(){ pc++; return 0; }
-void funct_invokevirtual(){ pc++; return 0; }
-void funct_invokespecial(){ pc++; return 0; }
-void funct_invokestatic(){ pc++; return 0; }
-void funct_invokeinterface(){ pc++; return 0; }
+void funct_dadd(){ pc++;  }
+void funct_isub(){ pc++;  }
+void funct_lsub(){ pc++;  }
+void funct_fsub(){ pc++;  }
+void funct_dsub(){ pc++;  }
+void funct_imul(){ pc++;  }
+void funct_lmul(){ pc++;  }
+void funct_fmul(){ pc++;  }
+void funct_dmul(){ pc++;  }
+void funct_idiv(){ pc++;  }
+void funct_ldiv(){ pc++;  }
+void funct_fdiv(){ pc++;  }
+void funct_ddiv(){ pc++;  }
+void funct_irem(){ pc++;  }
+void funct_lrem(){ pc++;  }
+void funct_frem(){ pc++;  }
+void funct_drem(){ pc++;  }
+void funct_ineg(){ pc++;  }
+void funct_lneg(){ pc++;  }
+void funct_fneg(){ pc++;  }
+void funct_dneg(){ pc++;  }
+void funct_ishl(){ pc++;  }
+void funct_lshl(){ pc++;  }
+void funct_ishr(){ pc++;  }
+void funct_lshr(){ pc++;  }
+void funct_iushr(){ pc++;  }
+void funct_lushr(){ pc++;  }
+void funct_iand(){ pc++;  }
+void funct_land(){ pc++;  }
+void funct_ior(){ pc++;  }
+void funct_lor(){ pc++;  }
+void funct_ixor(){ pc++;  }
+void funct_lxor(){ pc++;  }
+void funct_iinc(){ pc++;  }
+void funct_i2l(){ pc++;  }
+void funct_i2f(){ pc++;  }
+void funct_i2d(){ pc++;  }
+void funct_l2i(){ pc++;  }
+void funct_l2f(){ pc++;  }
+void funct_l2d(){ pc++;  }
+void funct_f2i(){ pc++;  }
+void funct_f2l(){ pc++;  }
+void funct_f2d(){ pc++;  }
+void funct_d2i(){ pc++;  }
+void funct_d2l(){ pc++;  }
+void funct_d2f(){ pc++;  }
+void funct_i2b(){ pc++;  }
+void funct_i2c(){ pc++;  }
+void funct_i2s(){ pc++;  }
+void funct_lcmp(){ pc++;  }
+void funct_fcmpl(){ pc++;  }
+void funct_fcmpg(){ pc++;  }
+void funct_dcmpl(){ pc++;  }
+void funct_dcmpg(){ pc++;  }
+void funct_ifeq(){ pc++;  }
+void funct_ifne(){ pc++;  }
+void funct_iflt(){ pc++;  }
+void funct_ifge(){ pc++;  }
+void funct_ifgt(){ pc++;  }
+void funct_ifle(){ pc++;  }
+void funct_if_icmpeq(){ pc++;  }
+void funct_if_icmpne(){ pc++;  }
+void funct_if_icmplt(){ pc++;  }
+void funct_if_icmpge(){ pc++;  }
+void funct_if_icmpgt(){ pc++;  }
+void funct_if_icmple(){ pc++;  }
+void funct_if_acmpeq(){ pc++;  }
+void funct_if_acmpne(){ pc++;  }
+void funct_goto(){ pc++;  }
+void funct_jsr(){ pc++;  }
+void funct_ret(){ pc++;  }
+void funct_tableswitch(){ pc++;  }
+void funct_lookupswitch(){ pc++;  }
+void funct_ireturn(){ pc++;  }
+void funct_lreturn(){ pc++;  }
+void funct_freturn(){ pc++;  }
+void funct_dreturn(){ pc++;  }
+void funct_areturn(){ pc++;  }
+void funct_return(){ pc++;  }
+void funct_getstatic(){ pc++;  }
+void funct_putstatic(){ pc++;  }
+void funct_getfield(){ pc++;  }
+void funct_putfield(){ pc++;  }
+void funct_invokevirtual(){ pc++;  }
+void funct_invokespecial(){ pc++;  }
+void funct_invokestatic(){ pc++;  }
+void funct_invokeinterface(){ pc++;  }
 /*void funct_nao_utilizada;*/
-void funct_new(){ pc++; return 0; }
-void funct_newarray(){ pc++; return 0; }
-void funct_anewarray(){ pc++; return 0; }
-void funct_arraylength(){ pc++; return 0; }
-void funct_athrow(){ pc++; return 0; }
-void funct_checkcast(){ pc++; return 0; }
-void funct_instanceof(){ pc++; return 0; }
-void funct_monitorenter(){ pc++; return 0; }
-void funct_monitorexit(){ pc++; return 0; }
-void funct_wide(){ pc++; return 0; }
-void funct_multianewarray(){ pc++; return 0; }
-void funct_ifnull(){ pc++; return 0; }
-void funct_ifnonnull(){ pc++; return 0; }
-void funct_goto_w(){ pc++; return 0; }
-void funct_jsr_w(){ pc++; return 0; }
+void funct_new(){ pc++;  }
+void funct_newarray(){ pc++;  }
+void funct_anewarray(){ pc++;  }
+void funct_arraylength(){ pc++;  }
+void funct_athrow(){ pc++;  }
+void funct_checkcast(){ pc++;  }
+void funct_instanceof(){ pc++;  }
+void funct_monitorenter(){ pc++;  }
+void funct_monitorexit(){ pc++;  }
+void funct_wide(){ pc++;  }
+void funct_multianewarray(){ pc++;  }
+void funct_ifnull(){ pc++;  }
+void funct_ifnonnull(){ pc++;  }
+void funct_goto_w(){ pc++;  }
+void funct_jsr_w(){ pc++;  }
 

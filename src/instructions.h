@@ -1,11 +1,16 @@
-#include "classloader.h"
+#ifndef INSTRUCTIONS_H_
+#define INSTRUCTIONS_H_
+
 #include "types.h"
+
+/* TODO criei essa funcao para testes, pode deletar depois se quiserem*/
+void execute_instruction(u1 opcode);
 
 /* TO DO - Decidir onde o PC vai ficar (decidir o tipo também)*/
 u8 pc;
 
 /* Um array contendo ponteiros para as instruções */
-void *(instr[256]);
+void (*instr[256])();
 
 /* Inicializa o array de instruções */
 void initializeInstr();
@@ -215,3 +220,5 @@ void funct_ifnull();
 void funct_ifnonnull();
 void funct_goto_w();
 void funct_jsr_w();
+
+#endif /* INSTRUCTIONS_H_ */

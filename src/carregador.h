@@ -8,7 +8,9 @@
 #ifndef CARREGADOR_H_
 #define CARREGADOR_H_
 
+
 #include "classloader.h"
+
 
 int loadClass(char *);
 char *getClassName(struct ClassFile *class);
@@ -16,5 +18,6 @@ char *getParentName(struct ClassFile *class);
 int getNumClasses();
 struct ClassFile * getClassByName(char *class_name);
 struct ClassFile * getClassByIndex(int index);
+
 
 #endif /* CARREGADOR_H_ */
