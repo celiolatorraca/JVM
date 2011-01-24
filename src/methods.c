@@ -17,7 +17,7 @@
 #define WHERE "Methods"
 
 
-method_info *getInitMethod(char *class_name){
+method_info * getMainMethod(){
 
 	int i;
 	struct ClassFile *main_class;
@@ -26,7 +26,7 @@ method_info *getInitMethod(char *class_name){
 
 	main_class = getClassByIndex(0);
 
-	/* procura por método <init> ()V */
+	/* procura por método main ([LJava/lang/String;)V */
 	for (i = 0; i < main_class->methods_count; i++){
 
 		name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].name_index-1)]))->bytes;
@@ -35,9 +35,9 @@ method_info *getInitMethod(char *class_name){
 		desc = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->bytes;
 		desc_length = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->length;
 
-		if ((strncmp("<init>", name , name_length) == 0)
-			&& (strncmp("()V", desc , desc_length) == 0))
-			return (main_class->methods + i);
+		if ((strncmp("main", name, name_length) == 0)
+			&& (strncmp("([Ljava/lang/String;)V", desc, desc_length) == 0))
+			return &(main_class->methods[i]);
 	}
 
 	return NULL;
