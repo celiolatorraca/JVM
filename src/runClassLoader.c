@@ -101,7 +101,7 @@ void show_class_file(char* class_name)
   char string[200];
 
   loadClass(class_name);
-  class = getClassArray(0);
+  class = getClassByIndex(0);
 
   get_access_flags(class->access_flags, string);
 
