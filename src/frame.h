@@ -10,12 +10,12 @@
 
 struct frame 
 {
-	void *fields;
+	u4 *fields;
 	void **constant_pool;
-	u4 max_stack;
-	u4 max_locals;
-	u4 code_length;
-	u1 *code;
+	u2 max_stack;
+  u2 max_locals;
+  u4 code_length;
+  u1 	*code;
 }
 
 /**
@@ -37,7 +37,7 @@ struct frame_stack
 
 struct frame current_frame;
 
-void newFrame();
+void newFrame(u4 class_index, method_info *current_method);
 void freeFrame();
  
 
