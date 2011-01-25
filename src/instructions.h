@@ -10,7 +10,7 @@ void execute_instruction(u1 opcode);
 u8 pc;
 
 /* Um array contendo ponteiros para as instruções */
-void (*instr[256])();
+void (*instr[256]) ();
 
 /* Inicializa o array de instruções */
 void initializeInstr();

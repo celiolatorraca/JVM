@@ -11,6 +11,8 @@
 
 #include "carregador.h"
 
+#define WHERE "Loader"
+
 
 char *base_path = "";
 
@@ -47,7 +49,8 @@ int loadClass(char *class_name){
 	  sprintf(path, "%s%s.class", base_path, class_name);
 
 	/* lê a nova classe */
-	classArray[numClasses-1] = read_class_file(path);
+	if ((classArray[numClasses-1] = read_class_file(path)) == NULL)
+		fatalErrorMsg(WHERE, "Não foi possível abrir arquivo informado.");
 
 	/* carrega a superclasse da classe carregada*/
 	loadClass(getParentName(classArray[numClasses-1]));
@@ -64,10 +67,10 @@ char *getClassName(struct ClassFile *class){
 
 	u2 this_class = class->this_class;
 
-	u2 name_index = ((struct CONSTANT_Class_info*)class->constant_pool[this_class])->name_index;
+	u2 name_index = ((struct CONSTANT_Class_info*)class->constant_pool[this_class-1])->name_index;
 
-	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index]))->length;
-	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index]))->bytes;
+	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->length;
+	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->bytes;
 
 	char *class_name = malloc(sizeof(u2) * length+1);
 
@@ -85,10 +88,10 @@ char *getParentName(struct ClassFile *class){
 
 	u2 super_class = class->super_class;
 
-	u2 name_index = ((struct CONSTANT_Class_info*)class->constant_pool[super_class])->name_index;
+	u2 name_index = ((struct CONSTANT_Class_info*)(class->constant_pool[super_class-1]))->name_index;
 
-	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index]))->length;
-	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index]))->bytes;
+	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->length;
+	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->bytes;
 
 	char *class_name = malloc(sizeof(u2) * length+1);
 
@@ -114,7 +117,7 @@ struct ClassFile * getClassByName(char *class_name){
 }
 
 /*
- * N�o consegui colocar essas definicoes no .h, nao sei o motivo.
+ * N�o consegui colocar essas definicoes no .h, nao sei o motivo.
  * Entao tive q fazer esses dois getters.
  */
 struct ClassFile * getClassByIndex(int index){
