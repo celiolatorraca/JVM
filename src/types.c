@@ -26,5 +26,5 @@ u4 convert_2x8_to_32_bits(u4 low, u4 high)
 	value <<= 8;
 	value |= low;
 
-	return value
+	return value;
 }
