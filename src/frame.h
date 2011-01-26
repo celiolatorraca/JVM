@@ -3,41 +3,34 @@
 
 #include "stack.h"
 #include "types.h"
-
+#include "carregador.h"
 /**
  Frame. Modificar de void para os tipos corretos.
  */
 
 struct frame 
 {
-	void *fields;
+	u4 *fields;
 	void **constant_pool;
-	u4 max_stack;
-	u4 max_locals;
-	u4 code_length;
-	u1 *code;
-}
+	u2 max_stack;
+  u2 max_locals;
+  u4 code_length;
+  u1 	*code;
+	u4 pc;
+};
 
 /**
  Pilha de frame.
  */
 struct frame_stack
 {
-	struct frame value;
+	struct frame *value;
 	struct frame_stack *next;
-}
+};
 
-/**
-	Pegar os valores do frame:
-	1- via metodos get? getField(int index)
-	2- via acesso struct? current_frame->fields
+struct frame *current_frame;
 
-	ATUAL: acesso struct
-	*/
-
-struct frame current_frame;
-
-void newFrame();
+void newFrame(void **constant_pool, Code_attribute *code_attribute);
 void freeFrame();
  
 

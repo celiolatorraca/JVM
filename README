@@ -14,7 +14,7 @@ Para compilar e executar:
 - Digite "make"  para compilar automaticamente em sistemas que possuem suporte a Makefile.
 
 - Alternativamente, compile da seguinte maneira:
-   gcc classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c -o jvm
+   gcc classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c frame.c -lm -o jvm
 
 - Execute o arquivo classloader.exe passando como único argumento o endereço do arquivo .class desejado. 
 

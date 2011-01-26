@@ -12,9 +12,13 @@
 #include "classloader.h"
 #include "mnemonics.h"
 #include "instructions.h"
+#include "frame.h"
 
 
 #define WHERE "Methods"
+
+
+extern struct frame *current_frame;
 
 
 method_info * getMainMethod(){
@@ -78,11 +82,19 @@ method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1
 }
 
 
-void runMethod(method_info *method){
+void runProgram(){
 
-	int pc;
-	int i, j, k;
-	int code_len;
+	/* loop principal do método - executa o código*/
+	while ((current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
+		execute_instruction(current_frame->code[current_frame->pc]);
+	}
+
+}
+
+
+void prepareMethod(struct ClassFile *class, method_info *method){
+
+	int i;
 	u1 opcode, operand;
 	struct OPCODE_info opcode_tmp;
 
@@ -95,29 +107,52 @@ void runMethod(method_info *method){
 	if (((attribute_info *)method->attributes[i])->tag != ATTR_Code)
 		fatalErrorMsg(WHERE, "Nao encontrou atributo code no método.");
 
+	newFrame(class->constant_pool,((Code_attribute *)method->attributes[i]));
 
-	/* loop principal do método - executa o código*/
-	code_len = ((Code_attribute *)(method->attributes[i]))->code_length;
-	j = 0;
-	pc = 0; /*todo que diabos faz esse pc aqui?*/
+}
 
-	while (code_len != 0){
-		opcode = ((Code_attribute *)(method->attributes[i]))->code[j];
+void finishMethod(){
+	freeFrame();
+}
 
-		opcode_tmp = op_info[opcode];
 
-		for (k = 0; k < opcode_tmp.operands_count; k++){
-			j++;
-			operand = ((Code_attribute *)(method->attributes[i]))->code[j];
-			push(operand);
-			code_len--;
+
+
+
+
+
+int getNumParameters(struct ClassFile *class, method_info *method){
+
+	int prm=0;
+	int i;
+	u2 length;
+	u1 *bytes;
+
+	bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
+	length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+
+	for (i = 0; i < length; i++){
+
+		if (bytes[i] == 'L'){
+
+			while (bytes[i] != ';')
+				i++;
+			prm++;
+
+		} else if ((bytes[i] == 'B')&&(bytes[i] == 'C')&&(bytes[i] == 'F')&&
+		(bytes[i] == 'I')&&(bytes[i] == 'S')&&(bytes[i] == 'Z') ){
+			prm++;
+		} else if ((bytes[i] == 'D')&&(bytes[i] == 'J')){
+			prm+=2;
 		}
 
-		execute_instruction(opcode);
-
-		code_len--;
-		j++;
 	}
 
+	return prm;
+}
 
+
+method_info * getInitMethod(u1 *desc, u2 desc_len){
+
+	return NULL;
 }

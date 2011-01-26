@@ -1,9 +1,9 @@
 #include "stack.h"
 #include "jvmerr.h"
 
-u4 stack[MAX_STACK];
-u4 stack_top;
-u4 frame_base;
+static u4 stack[MAX_STACK];
+static u4 stack_top;
+static u4 frame_base;
 
 void newStack()
 {
