@@ -760,7 +760,7 @@ void funct_dneg()
 
 void funct_ishl()
 {
-	u4 mask = 0x1f;
+	u4 mask = 0x1f;  /*... 0001 1111*/
 	u4 aux1, aux2;
 
 	aux2 = pop();
@@ -774,9 +774,59 @@ void funct_ishl()
 	current_frame->pc++;
 }
 
-void funct_lshl(){ current_frame->pc++;  }
-void funct_ishr(){ current_frame->pc++;  }
+void funct_lshl()
+{
+	int64_t aux1;
+	u4 mask = 0x3f;  /*... 00011 1111*/
+	u4 low, high, aux2;
+
+	aux2 = pop();
+	aux2 &= mask;
+
+	low = pop();
+	high = pop();
+	aux1 = (signed) convert_2x32_to_64_bits( low , high );
+
+	aux1 <<= aux2;
+
+	convert_64_bits_to_2x32((u8)aux1, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_ishr()
+{
+	u4 mask = 0x1f;  /* ... 0001 1111 */
+	u4 aux1 = 0xffffffff;  /* 1111 1111 ... */
+	u4 aux4 = 0x80000000;  /* 1000 0000 ... */
+	u4 aux2, aux3;
+
+	aux2 = pop();
+	aux2 &= mask;
+
+	/* Deixa os (32-aux2) bits iniciais com 1 */
+	aux1 <<= (32-aux2);
+
+	aux3 = pop();
+
+	/* Verifica qual é o primeiro bit */
+	aux4 = aux3 & aux4;
+
+	aux3 >>= aux2;
+
+	if (aux4) {
+		aux3 |= aux1;
+	}
+
+	push( aux3 );
+
+	current_frame->pc++;
+}
+
 void funct_lshr(){ current_frame->pc++;  }
+
 void funct_iushr(){ current_frame->pc++;  }
 void funct_lushr(){ current_frame->pc++;  }
 void funct_iand(){ current_frame->pc++;  }
