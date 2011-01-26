@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 #include "constants.h"
 #include "instructions.h"
@@ -339,10 +340,10 @@ void funct_fconst_2()
 	current_frame.pc++;
 }
 
-
+//TODO Tem que inserir HIGH e LOW do double
 void funct_dconst_0()
 {
-	u8 *aux; /* TODO - VERIFICAR SE U8 SEMPRE TEM 64 BITS */
+	u8 *aux;
 	double d = 0.0;
 
 	aux = (u8*) malloc(sizeof(u8));
@@ -628,11 +629,11 @@ void funct_lrem()
 
 	low = pop();
 	high = pop();
-	aux2 = (signed) convert_to_64_bits( low, high );
+	aux2 = (signed) convert_2x32_to_64_bits( low , high );
 
 	low = pop();
 	high = pop();
-	aux1 = (signed) convert_to_64_bits( low, high );
+	aux1 = (signed) convert_2x32_to_64_bits( low , high );
 
 	aux1 = aux1 % aux2;
 
@@ -649,14 +650,70 @@ void funct_lrem()
 
 void funct_frem()
 {
+	float f1, f2;
+	u4 aux1, aux2;
+
+	aux1 = pop();
+	memcpy(&f2, &aux1, sizeof(u4));
+	aux2 = pop();
+	memcpy(&f1, &aux2, sizeof(u4));
+
+	f1 = fmodf( f1 , f2 );
+	memcpy(&aux1, &f1, sizeof(u4));
+
+	push( aux1 );
+
+	current_frame.pc++;
+}
+
+void funct_drem()
+{
+	double d1, d2;
+	u4 low, high, aux2;
+	u8 aux1;
+
+	low = pop();
+	high = pop();
+	d2 = (double) convert_2x32_to_64_bits( low , high );
+
+	low = pop();
+	high = pop();
+	d1 = (double) convert_2x32_to_64_bits( low , high );
+
+	d1 = fmod( d1 , d2 );
+
+	memcpy(&aux1, &d1, sizeof(u8));
+
+	/* 32 bits mais altos */
+	aux2 = aux1 >> 32;
+	push ( aux2 );
+
+	/* 32 bits mais baixos */
+	aux2 = aux1 & 0xffffffff;
+	push( aux2 );
+
+	current_frame.pc++;
+}
+
+void funct_ineg()
+{
+	int32_t aux;
+
+	aux = (int32_t) pop();
+	aux = -aux;
+
+	push( (u4)aux );
+
+	current_frame.pc++;
+}
+
+void funct_lneg()
+{
 
 
 	current_frame.pc++;
 }
 
-void funct_drem(){ current_frame.pc++;  }
-void funct_ineg(){ current_frame.pc++;  }
-void funct_lneg(){ current_frame.pc++;  }
 void funct_fneg(){ current_frame.pc++;  }
 void funct_dneg(){ current_frame.pc++;  }
 void funct_ishl(){ current_frame.pc++;  }

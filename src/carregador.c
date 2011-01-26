@@ -23,18 +23,19 @@ int numClasses = 0;
 /*!
  * Carrega uma classe pelo seu nome \a class_name.
  * Será carregada para o vetor classArray no novo índice (numClasses -1).
+ * \return Class Index
  */
 int loadClass(char *class_name){
 
 	int i;
 
 	if (strstr(class_name,"java/lang") != NULL)
-	  return 0;
+	  return -1;
 
 	/* procura em classArray se a classe já foi carregada */
 	for (i = 0; i < numClasses; i++){
 		if (strcmp(class_name, getClassName(classArray[i])) == 0)
-			return 0;
+			return i;
 	}
 
 	/* aumenta o vetor classArray */
@@ -55,7 +56,7 @@ int loadClass(char *class_name){
 	/* carrega a superclasse da classe carregada*/
 	loadClass(getParentName(classArray[numClasses-1]));
 
-	return 0;
+	return numClasses-1;
 }
 
 
