@@ -14,6 +14,7 @@
 #include "methods.h"
 #include "classloader.h"
 #include "instructions.h"
+#include "mnemonics.h"
 
 #define WHERE "Initialization"
 

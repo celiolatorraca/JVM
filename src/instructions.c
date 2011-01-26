@@ -212,7 +212,7 @@ void  initializeInstr()
 	instr[0xb7] = funct_invokespecial;
 	instr[0xb8] = funct_invokestatic;
 	instr[0xb9] = funct_invokeinterface;
-	//instr[0xba] = funct_nao_utilizada;
+	/*instr[0xba] = funct_nao_utilizada;*/
 	instr[0xbb] = funct_new;
 	instr[0xbc] = funct_newarray;
 	instr[0xbd] = funct_anewarray;
@@ -225,7 +225,7 @@ void  initializeInstr()
 	instr[0xc4] = funct_wide;
 	instr[0xc5] = funct_multianewarray;
 	instr[0xc6] = funct_ifnull;
-	//instr[0xc7] = funct_ifnonull;
+	/*instr[0xc7] = funct_ifnonull;*/
 	instr[0xc8] = funct_goto_w;
 	instr[0xc9] = funct_jsr_w;
 }
@@ -346,7 +346,7 @@ void funct_fconst_2()
 	current_frame->pc++;
 }
 
-//TODO Tem que inserir HIGH e LOW do double
+/*TODO Tem que inserir HIGH e LOW do double */
 void funct_dconst_0()
 {
 	u8 *aux;
@@ -404,10 +404,11 @@ void funct_ldc()
 	u4 aux;
 
 	current_frame->pc++;
-//	indice = current_frame->code[current_frame->pc];
-//
-//	aux = current_frame->constant_pool[indice]; /* TODO - pode dar erro pq o constant pool é um ponteiro pra void (e talvez não empilhe só u4...)*/
-//	push(aux);
+	/* TODO - pode dar erro pq o constant pool é um ponteiro pra void (e talvez não empilhe só u4...)*/
+/*	indice = current_frame->code[current_frame->pc];
+
+	aux = current_frame->constant_pool[indice];
+	push(aux);*/
 
 	current_frame->pc++;
 }
@@ -574,11 +575,11 @@ void funct_ladd()
 
 	low = pop();
 	high = pop();
-	//aux1 = (signed)convert_to_64_bits( low, high );
+	aux1 = (signed)convert_2x32_to_64_bits( low, high );
 
 	low = pop();
 	high = pop();
-	//aux2 = (signed)convert_to_64_bits( low, high );
+	aux2 = (signed)convert_2x32_to_64_bits( low, high );
 
 	push(aux1 + aux2);
 

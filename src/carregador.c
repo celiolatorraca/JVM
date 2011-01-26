@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include "carregador.h"
+#include "jvmerr.h"
 
 #define WHERE "Loader"
 
@@ -28,6 +29,7 @@ int numClasses = 0;
 int loadClass(char *class_name){
 
 	int i;
+	char *path;
 
 	if (class_name == NULL) return -1;
 
@@ -42,7 +44,7 @@ int loadClass(char *class_name){
 	classArray = realloc(classArray, (numClasses*sizeof(struct ClassFile *)));
 
 	/* cria o path completo para o arquivo da classe base_path + class_name + .class */
-	char *path = malloc(strlen(base_path) + strlen(class_name) + 7);
+	path = malloc(strlen(base_path) + strlen(class_name) + 7);
 	if (strstr(class_name,".class") != NULL)
 	  sprintf(path, "%s%s", base_path, class_name);
 	else
@@ -86,16 +88,20 @@ char *getClassName(struct ClassFile *class){
  */
 char *getParentName(struct ClassFile *class){
 
-	u2 super_class = class->super_class;
+	u2 super_class, name_index, length;
+	u1 *name;
+	char *class_name;
+
+	super_class = class->super_class;
 
 	if (super_class == 0) return NULL;
 
-	u2 name_index = ((struct CONSTANT_Class_info*)(class->constant_pool[super_class-1]))->name_index;
+	name_index = ((struct CONSTANT_Class_info*)(class->constant_pool[super_class-1]))->name_index;
 
-	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->length;
-	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->bytes;
+	length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->length;
+	name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->bytes;
 
-	char *class_name = malloc(sizeof(u2) * length+1);
+	class_name = malloc(sizeof(u2) * length+1);
 
 	strncpy(class_name, (char *)name, length);
 	class_name[length] = '\0';
@@ -119,7 +125,7 @@ struct ClassFile * getClassByName(char *class_name){
 }
 
 /*
- * N�o consegui colocar essas definicoes no .h, nao sei o motivo.
+ * Não consegui colocar essas definicoes no .h, nao sei o motivo.
  * Entao tive q fazer esses dois getters.
  */
 struct ClassFile * getClassByIndex(int index){
