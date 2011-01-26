@@ -1,5 +1,5 @@
 #include "frame.h"
-
+#include <stdlib.h>
 /**
 	Frame atual e' o topo da pilha
 	*/
@@ -8,26 +8,28 @@ static struct frame_stack *stack = NULL;
 
 /**
  para criar um frame:
- 1- alocar um vetor de variaveis locais # onde eu acho as variaveis locais para alocar o vetor?
+ 1- alocar um vetor de variaveis locais # RESOLVIDO+- onde eu acho as variaveis locais para alocar o vetor?
  2- criar um pilha # RESOLVIDO basta usar push/pop, a pilha e' sempre do current_frame
- 3- referencia para a classe # como pegar?
+ 3- referencia para a classe #  RESOLVIDO como pegar?
 
  Usar pilha de frames
  */
 
 
-void newFrame(u4 class_index, method_info *current_method)
+void newFrame(void **constant_pool, Code_attribute *code_attribute)
 {
 	struct frame_stack *new;
 	new = calloc(sizeof(struct frame_stack), 1);
+	new->value = calloc(sizeof(struct frame), 1);
 	new->next = stack;
 	stack = new;
-	stack->constant_pool = classArray[class_index]->constant_pool; 
-	stack->max_stack = ((Code_attribute*)current_method->attribute)->max_stack;
-	stack->max_locals = ((Code_attribute*)current_method->attribute)->max_locals;
-	stack->code_length = ((Code_attribute*)current_method->attribute)->code_length;		
-	stack->code = ((Code_attribute*)current_method->attribute)->code;
-	stack->fields = calloc(sizeof(u4), stack->max_locals); 
+	stack->value->constant_pool = constant_pool; 
+	stack->value->max_stack = code_attribute->max_stack;
+	stack->value->max_locals = code_attribute->max_locals;
+	stack->value->code_length = code_attribute->code_length;		
+	stack->value->code = code_attribute->code;
+	stack->value->fields = calloc(sizeof(u4), stack->value->max_locals);
+	stack->value->pc = 0;
 
 /*
  Cada quadro contém um array de variáveis chamado local variables. Seu tamanho é definido
@@ -47,25 +49,16 @@ diante.
 
 */
 
-
-	/*Coloca os valores do novo frame*/
-	/* current_frame.fields = calloc(sizeof(struct field), n);
-	   current_frame.constant_pool = &(classes[i]); ? */
-
-	/* stack->fields = current_frame.fields */
-	/* stack->constant_pool = current_frame.constant_pool */
+	current_frame = stack->value;
 	newStackFrame();
 }
 
 void freeFrame()
 {
-	struct frame_stack *old;
-	old = stack;
-	stack = stack->next;
-	free(old);
+	current_frame = stack->next->value;
 
-	/*free(current_frame.fields);*/
-	current_frame.fields = stack->fields;
-	current_frame.constant_pool = stack->constant_pool;
+	free(stack->value->fields);
+	free(stack->value);
+	free(stack);
 	freeStackFrame();
 }
