@@ -280,5 +280,9 @@ typedef struct SourceFile_attribute
  * FUNÇÕES
  */
 u8 convert_2x32_to_64_bits(u4 low, u4 high);
+u4 convert_2x8_to_32_bits(u4 low, u4 high);
+void convert_64_bits_to_2x32(u8 value, u4 *low, u4 *high);
+float convert_32_bits_to_float(u4 bits);
+double convert_2x32_bits_to_double(u4 low, u4 high);
 
 #endif

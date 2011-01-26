@@ -15,8 +15,7 @@ public class HelloWorld {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        HelloWorldObject obj = new HelloWorldObject();
-        obj.executeMethod();
+	int a = 5 % 2;
     }
 
 }

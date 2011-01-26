@@ -11,9 +11,14 @@ Yuri Maia - 09/16803
 
 Para compilar e executar:
 
-- Digite "make"  para compilar automaticamente em sistemas que possuem suporte a Makefile.
+- Compile da seguinte maneira:
+   gcc classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c frame.c -lm -o jvm
+   			ou
+   make
 
-- Alternativamente, compile da seguinte maneira:
-   gcc classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c -o jvm
-
-- Execute o arquivo classloader.exe passando como único argumento o endereço do arquivo .class desejado. 
+- Para compilar um arquivo para JDK 1.2, use o comando:
+	javac -target 1.2 -source 1.2 CodigoFonte.java
+			ou
+	make java
+	
+- Para executar a JVM digite ./jvm.exe <nome_arq>.

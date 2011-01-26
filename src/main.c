@@ -14,20 +14,31 @@
 #include "methods.h"
 #include "classloader.h"
 #include "instructions.h"
+#include "mnemonics.h"
 
 #define WHERE "Initialization"
 
 int main(int argc, char **argv)
 {
 
-	char *main_class;
+	char main_class[200];
 	method_info *main_method;
 
-	if (argc != 2)
+	if (argc == 1)
+	{
+		printf("\nDigite o nome do arquivo: ");
+		scanf("%s", main_class);
+		getchar();
+	}
+	else if (argc == 2)
+	{
+		memcpy(main_class, argv[1], (strlen(argv[1]) + 1));
+	}
+	else
+	{
 		fatalErrorMsg(WHERE, "Argumentos errados.");
+	}
 
-	main_class = malloc (sizeof(char) * (strlen(argv[1]) + 1));
-	memcpy(main_class, argv[1], (strlen(argv[1]) + 1));
 
 	loadClass(main_class);
 

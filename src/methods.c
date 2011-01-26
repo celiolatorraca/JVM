@@ -13,6 +13,7 @@
 #include "mnemonics.h"
 #include "instructions.h"
 #include "frame.h"
+#include "jvmerr.h"
 
 
 #define WHERE "Methods"
@@ -39,8 +40,8 @@ method_info * getMainMethod(){
 		desc = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->bytes;
 		desc_length = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->length;
 
-		if ((strncmp("main", name, name_length) == 0)
-			&& (strncmp("([Ljava/lang/String;)V", desc, desc_length) == 0))
+		if ((strncmp("main", (char *)name, name_length) == 0)
+			&& (strncmp("([Ljava/lang/String;)V", (char *)desc, desc_length) == 0))
 			return &(main_class->methods[i]);
 	}
 
@@ -72,8 +73,8 @@ method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1
 		if (desc_len != m_desc_len)
 			continue;
 
-		if ((strncmp(name, m_name , m_name_len) == 0)
-			&& (strncmp(desc, m_desc , m_desc_len) == 0))
+		if ((strncmp((char *)name, (char *)m_name , m_name_len) == 0)
+			&& (strncmp((char *)desc, (char *)m_desc , m_desc_len) == 0))
 			return (main_class->methods + i);
 	}
 
