@@ -28,8 +28,10 @@ int loadClass(char *class_name){
 
 	int i;
 
-	if (strstr(class_name,"java/lang") != NULL)
-	  return 0;
+	if (class_name == NULL) return 0;
+
+	/*if (strstr(class_name,"java/lang") != NULL)
+	  return 0;*/
 
 	/* procura em classArray se a classe já foi carregada */
 	for (i = 0; i < numClasses; i++){
@@ -87,6 +89,8 @@ char *getClassName(struct ClassFile *class){
 char *getParentName(struct ClassFile *class){
 
 	u2 super_class = class->super_class;
+
+	if (super_class == 0) return NULL;
 
 	u2 name_index = ((struct CONSTANT_Class_info*)(class->constant_pool[super_class-1]))->name_index;
 

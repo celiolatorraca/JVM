@@ -12,6 +12,10 @@
 
 method_info * getMainMethod();
 method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len);
-void runMethod(method_info *method);
+int getNumParameters(struct ClassFile *class, method_info *method);
+method_info * getInitMethod(u1 *desc, u2 desc_len);
+void runProgram();
+void prepareMethod(struct ClassFile *class, method_info *method);
+void finishMethod();
 
 #endif /* METHODS_H_ */

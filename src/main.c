@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 {
 
 	char *main_class;
-	method_info *main;
+	method_info *main_method;
 
 	if (argc != 2)
 		fatalErrorMsg(WHERE, "Argumentos errados.");
@@ -31,12 +31,15 @@ int main(int argc, char **argv)
 
 	loadClass(main_class);
 
-	if ((main = getMainMethod()) == NULL)
+	if ((main_method = getMainMethod()) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível localizar método main.");
 
 	initializeInstr();
 	populate_opcode_info();
-	runMethod(main);
+
+	prepareMethod(getClassByIndex(0), main_method);
+	runProgram();
+	finishMethod();
 
 	return 0;
 }

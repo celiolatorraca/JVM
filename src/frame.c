@@ -55,7 +55,8 @@ diante.
 
 void freeFrame()
 {
-	current_frame = stack->next->value;
+	if (stack->next != NULL)
+		current_frame = stack->next->value;
 
 	free(stack->value->fields);
 	free(stack->value);
