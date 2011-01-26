@@ -1,6 +1,8 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+#include "types.h"
+
 struct Object {
 	struct ClassFile *this;
 	struct Object *super;
