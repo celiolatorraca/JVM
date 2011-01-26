@@ -826,20 +826,250 @@ void funct_ishr()
 	current_frame->pc++;
 }
 
-void funct_lshr(){ current_frame->pc++;  }
+void funct_lshr()
+{
+	u4 mask = 0x3f;  /*... 00011 1111*/
+	u8 aux1 = 0xffffffffffffffff;  /* 1111 1111 ... */
+	u8 aux4 = 0x8000000000000000;  /* 1000 0000 ... */
 
-void funct_iushr(){ current_frame->pc++;  }
-void funct_lushr(){ current_frame->pc++;  }
-void funct_iand(){ current_frame->pc++;  }
-void funct_land(){ current_frame->pc++;  }
-void funct_ior(){ current_frame->pc++;  }
-void funct_lor(){ current_frame->pc++;  }
-void funct_ixor(){ current_frame->pc++;  }
-void funct_lxor(){ current_frame->pc++;  }
+	int64_t aux3;
+	u4 low, high, aux2;
+
+	aux2 = pop();
+	aux2 &= mask;
+
+	/* Deixa os (64-aux2) bits iniciais com 1 */
+	aux1 <<= (64-aux2);
+
+	low = pop();
+	high = pop();
+	aux3 = (signed) convert_2x32_to_64_bits( low , high );
+
+	/* Verifica qual é o primeiro bit */
+	aux4 = aux3 & aux4;
+
+	aux3 >>= aux2;
+
+	if (aux4) {
+		aux3 |= aux1;
+	}
+
+	convert_64_bits_to_2x32((u8)aux3, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_iushr()
+{
+	u4 mask = 0x1f;  /* ... 0001 1111 */
+	u4 aux1, aux2;
+
+	aux2 = pop();
+	aux2 &= mask;
+
+	aux1 = pop();
+	aux1 >>= aux2;
+
+	push( aux1 );
+
+	current_frame->pc++;
+}
+
+void funct_lushr()
+{
+	int64_t aux1;
+	u4 mask = 0x3f;  /*... 00011 1111*/
+	u4 low, high, aux2;
+
+	aux2 = pop();
+	aux2 &= mask;
+
+	low = pop();
+	high = pop();
+	aux1 = (signed) convert_2x32_to_64_bits( low , high );
+
+	aux1 >>= aux2;
+
+	convert_64_bits_to_2x32((u8)aux1, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_iand()
+{
+	u4 aux1, aux2;
+
+	aux1 = pop();
+	aux2 = pop();
+
+	aux1 &= aux2;
+
+	push( aux1 );
+
+	current_frame->pc++;
+}
+
+void funct_land()
+{
+	u8 aux1, aux2;
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+	aux1 = convert_2x32_to_64_bits( low , high );
+
+	low = pop();
+	high = pop();
+	aux2 = convert_2x32_to_64_bits( low , high );
+
+	aux1 &= aux2;
+
+	convert_64_bits_to_2x32(aux1, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_ior()
+{
+	u4 aux1, aux2;
+
+	aux1 = pop();
+	aux2 = pop();
+
+	aux1 |= aux2;
+
+	push( aux1 );
+
+	current_frame->pc++;
+}
+
+void funct_lor()
+{
+	u8 aux1, aux2;
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+	aux1 = convert_2x32_to_64_bits( low , high );
+
+	low = pop();
+	high = pop();
+	aux2 = convert_2x32_to_64_bits( low , high );
+
+	aux1 |= aux2;
+
+	convert_64_bits_to_2x32(aux1, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_ixor()
+{
+	u4 aux1, aux2;
+
+	aux1 = pop();
+	aux2 = pop();
+
+	aux1 ^= aux2;
+
+	push( aux1 );
+
+	current_frame->pc++;
+}
+
+void funct_lxor()
+{
+	u8 aux1, aux2;
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+	aux1 = convert_2x32_to_64_bits( low , high );
+
+	low = pop();
+	high = pop();
+	aux2 = convert_2x32_to_64_bits( low , high );
+
+	aux1 ^= aux2;
+
+	convert_64_bits_to_2x32(aux1, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
 void funct_iinc(){ current_frame->pc++;  }
-void funct_i2l(){ current_frame->pc++;  }
-void funct_i2f(){ current_frame->pc++;  }
-void funct_i2d(){ current_frame->pc++;  }
+
+void funct_i2l()
+{
+	u4 mask = 0x80000000;  /* 1000 0000 ... */
+	u8 extend = 0xffffffff00000000;
+
+	u4 aux1, aux3, low, high;
+	int64_t aux2;
+
+	aux1 = pop();
+
+	/* Verifica qual é o primeiro bit */
+	aux3 = aux1 & mask;
+
+	aux2 = (int64_t) aux1;
+
+	/* Extende o 1 do sinal caso seja */
+	if (aux3) {
+		aux2 |= extend;
+	}
+
+	convert_64_bits_to_2x32(aux2, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
+void funct_i2f()
+{
+	u4 aux;
+	float f;
+
+	aux = pop();
+	f = convert_32_bits_to_float( aux );
+
+	memcpy(&aux, &f, sizeof(u4));
+
+	push( aux );
+
+	current_frame->pc++;
+}
+
+void funct_i2d()
+{
+	double d;
+	u4 aux1, low, high;
+	u8 aux2;
+
+	aux1 = pop();
+
+	d = convert_2x32_bits_to_double( aux1 , 0 );
+
+	memcpy(&aux2, &d, sizeof(u8));
+
+	convert_64_bits_to_2x32(aux2, &low, &high);
+	push( high );
+	push( low );
+
+	current_frame->pc++;
+}
+
 void funct_l2i(){ current_frame->pc++;  }
 void funct_l2f(){ current_frame->pc++;  }
 void funct_l2d(){ current_frame->pc++;  }
