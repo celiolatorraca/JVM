@@ -18,6 +18,7 @@
 char *base_path = "";
 
 struct ClassFile **classArray = NULL;
+static_struct *classStaticArray = NULL;
 int numClasses = 0;
 
 
@@ -26,9 +27,9 @@ int numClasses = 0;
  * Será carregada para o vetor classArray no novo índice (numClasses -1).
  * \return Class Index
  */
-int loadClass(char *class_name){
+int32_t loadClass(char *class_name){
 
-	int i;
+	int32_t i;
 	char *path;
 
 	if (class_name == NULL) return -1;
@@ -42,6 +43,7 @@ int loadClass(char *class_name){
 	/* aumenta o vetor classArray */
 	numClasses++;
 	classArray = realloc(classArray, (numClasses*sizeof(struct ClassFile *)));
+	classStaticArray = realloc(classStaticArray, (numClasses*sizeof(static_struct)));
 
 	/* cria o path completo para o arquivo da classe base_path + class_name + .class */
 	path = malloc(strlen(base_path) + strlen(class_name) + 7);
@@ -54,12 +56,15 @@ int loadClass(char *class_name){
 	if ((classArray[numClasses-1] = read_class_file(path)) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível abrir arquivo informado.");
 
-	/* carrega a superclasse da classe carregada*/
+	memcpy(classStaticArray[numClasses-1].class_name, class_name, strlen(class_name));
+	classStaticArray[numClasses-1].fields_count = classArray[numClasses-1]->fields_count;
+	classStaticArray[numClasses-1].value = malloc(classArray[numClasses-1]->fields_count * sizefo(u8));
+
+	/* carrega a superclasse da classe carregada */
 	loadClass(getParentName(classArray[numClasses-1]));
 
 	return numClasses-1;
 }
-
 
 
 /*!
@@ -118,8 +123,8 @@ struct ClassFile * getClassByName(char *class_name){
 	int i;
 
 	for (i = 0; i < numClasses; i++){
-			if (strcmp(class_name, getClassName(classArray[i])) == 0)
-				return classArray[i];
+		if (strcmp(class_name, getClassName(classArray[i])) == 0)
+			return classArray[i];
 	}
 	return NULL;
 }
@@ -134,4 +139,35 @@ struct ClassFile * getClassByIndex(int index){
 
 int getNumClasses(){
 	return numClasses;
+}
+
+int32_t getFieldIndexByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len) {
+
+	int32_t i;
+	struct ClassFile *main_class;
+	u1 *m_name, *m_desc;
+	u2 m_name_len, m_desc_len;
+
+	main_class = getClassByName(class_name);
+
+	/* Procura pelo Field de acordo com o nome e o desc */
+	for (i = 0; i < main_class->fields_count; i++){
+
+		m_name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].name_index-1)]))->bytes;
+		m_name_len = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].name_index-1)]))->length;
+
+		m_desc = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].descriptor_index-1)]))->bytes;
+		m_desc_len = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].descriptor_index-1)]))->length;
+
+		if (name_len != m_name_len)
+			continue;
+		if (desc_len != m_desc_len)
+			continue;
+
+		if ((strncmp((char *)name, (char *)m_name , m_name_len) == 0)
+				&& (strncmp((char *)desc, (char *)m_desc , m_desc_len) == 0))
+			return i;
+	}
+
+	return NULL;
 }

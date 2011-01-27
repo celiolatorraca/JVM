@@ -73,6 +73,17 @@ struct ClassFile
 
 
 /*
+ * CLASS STATIC
+ */
+typedef struct static_struct
+{
+	u1 *class_name;
+	u2 fields_count;
+	u8 *value;
+}static_struct;
+
+
+/*
  * CONSTANT POOL
  */
 typedef struct cp_info_t

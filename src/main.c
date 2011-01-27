@@ -50,7 +50,6 @@ int main(int argc, char **argv)
 
 	prepareMethod(getClassByIndex(0), main_method);
 	runProgram();
-	finishMethod();
 
 	return 0;
 }

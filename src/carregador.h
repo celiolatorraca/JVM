@@ -12,7 +12,7 @@
 #include "classloader.h"
 
 
-int loadClass(char *);
+int32_t loadClass(char *);
 char *getClassName(struct ClassFile *class);
 char *getParentName(struct ClassFile *class);
 int getNumClasses();

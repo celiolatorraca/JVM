@@ -436,10 +436,35 @@ void funct_lload(){ current_frame->pc++;  }
 void funct_fload(){ current_frame->pc++;  }
 void funct_dload(){ current_frame->pc++;  }
 void funct_aload(){ current_frame->pc++;  }
-void funct_iload_0(){ current_frame->pc++;  }
-void funct_iload_1(){ current_frame->pc++;  }
-void funct_iload_2(){ current_frame->pc++;  }
-void funct_iload_3(){ current_frame->pc++;  }
+
+void funct_iload_0()
+{
+	push( current_frame->fields[0] );
+
+	current_frame->pc++;
+}
+
+void funct_iload_1()
+{
+	push( current_frame->fields[1] );
+
+	current_frame->pc++;
+}
+
+void funct_iload_2()
+{
+	push( current_frame->fields[2] );
+
+	current_frame->pc++;
+}
+
+void funct_iload_3()
+{
+	push( current_frame->fields[3] );
+
+	current_frame->pc++;
+}
+
 void funct_lload_0(){ current_frame->pc++;  }
 void funct_lload_1(){ current_frame->pc++;  }
 void funct_lload_2(){ current_frame->pc++;  }
@@ -469,10 +494,51 @@ void funct_lstore(){ current_frame->pc++;  }
 void funct_fstore(){ current_frame->pc++;  }
 void funct_dstore(){ current_frame->pc++;  }
 void funct_astore(){ current_frame->pc++;  }
-void funct_istore_0(){ current_frame->pc++;  }
-void funct_istore_1(){ current_frame->pc++;  }
-void funct_istore_2(){ current_frame->pc++;  }
-void funct_istore_3(){ current_frame->pc++;  }
+
+void funct_istore_0()
+{
+	u4 value;
+
+	value = pop();
+
+	current_frame->fields[0] = value;
+
+	current_frame->pc++;
+}
+
+void funct_istore_1()
+{
+	u4 value;
+
+	value = pop();
+
+	current_frame->fields[1] = value;
+
+	current_frame->pc++;
+}
+
+void funct_istore_2()
+{
+	u4 value;
+
+	value = pop();
+
+	current_frame->fields[2] = value;
+
+	current_frame->pc++;
+}
+
+void funct_istore_3()
+{
+	u4 value;
+
+	value = pop();
+
+	current_frame->fields[3] = value;
+
+	current_frame->pc++;
+}
+
 void funct_lstore_0(){ current_frame->pc++;  }
 void funct_lstore_1(){ current_frame->pc++;  }
 void funct_lstore_2(){ current_frame->pc++;  }
@@ -1007,7 +1073,21 @@ void funct_lxor()
 	current_frame->pc++;
 }
 
-void funct_iinc(){ current_frame->pc++;  }
+void funct_iinc()
+{
+	u4 field_index = current_frame->code[++(current_frame->pc)];
+	u4 aux = current_frame->fields[field_index];
+	u4 aux2 = current_frame->fields[current_frame->code[++(current_frame->pc)]];
+
+	u1 index = (u1) aux;
+	int8_t constant = (int8_t) aux2;
+
+	index += constant;
+
+	current_frame->fields[field_index] = (u4) index;
+
+	current_frame->pc++;
+}
 
 void funct_i2l()
 {
@@ -1111,8 +1191,36 @@ void funct_lreturn(){ current_frame->pc++;  }
 void funct_freturn(){ current_frame->pc++;  }
 void funct_dreturn(){ current_frame->pc++;  }
 void funct_areturn(){ current_frame->pc++;  }
-void funct_return(){ current_frame->pc++;  }
-void funct_getstatic(){ current_frame->pc++;  }
+
+void funct_return()
+{
+	finishMethod();
+
+	if (current_frame != NULL)
+		current_frame->pc++;
+}
+
+void funct_getstatic()
+{
+	u1 index1 = (u1) current_frame->fields[++(current_frame->pc)];
+	u1 index2 = (u1) current_frame->fields[++(current_frame->pc)];
+
+	u2 index = ((u2)index1 << 8) | (u2)index2;
+
+	char *class_name = getName(((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index);
+
+	loadClass( class_name );
+
+	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	u1 *name = getName(((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
+	u1 *type = getName(((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
+
+	int32_t field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+	current_frame->pc++;
+}
+
 void funct_putstatic(){ current_frame->pc++;  }
 void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }

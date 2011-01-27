@@ -59,7 +59,6 @@ method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1
 
 	main_class = getClassByName(class_name);
 
-	/* procura por método <init> ()V */
 	for (i = 0; i < main_class->methods_count; i++){
 
 		m_name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].name_index-1)]))->bytes;
@@ -79,14 +78,13 @@ method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1
 	}
 
 	return NULL;
-
 }
 
 
 void runProgram(){
 
 	/* loop principal do método - executa o código*/
-	while ((current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
+	while (current_frame != NULL && (current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
 		execute_instruction(current_frame->code[current_frame->pc]);
 	}
 

@@ -299,13 +299,17 @@ int read_fields()
  \param dest String de destino
  \param name_index indice no constant pool
  */
-void copy_name(char *dest, u2 name_index) {
+char * getName(u2 name_index) {
   int i;
 
+  char *dest = malloc(((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->length + 1);
+  /*TODO Usar  msmcpy */
   for (i = 0; i < ((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->length; i++) {
     dest[i] = (char) ((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->bytes[i];
   }
   dest[i] = '\0';
+
+  return dest;
 }
 
 
