@@ -19,7 +19,7 @@ void execute_instruction(u1 opcode)
 {
 	struct OPCODE_info opcode_tmp = op_info[opcode];
 	printf("Vai executar %s\n", opcode_tmp.desc);
-
+fflush(stdout);
 	instr[opcode]();
 }
 
@@ -1202,21 +1202,39 @@ void funct_return()
 
 void funct_getstatic()
 {
+	u4 low, high;
+
 	u1 index1 = (u1) current_frame->fields[++(current_frame->pc)];
 	u1 index2 = (u1) current_frame->fields[++(current_frame->pc)];
 
 	u2 index = ((u2)index1 << 8) | (u2)index2;
 
-	char *class_name = getName(((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index);
+	char *class_name = getName(current_frame->class,
+			((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index]))->class_index);
 
-	loadClass( class_name );
+	int32_t class_index = loadClass( class_name );
 
-	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+	/*TODO Chamar o método de cinit caso ainda não tenha sido chamado */
 
-	u1 *name = getName(((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
-	u1 *type = getName(((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
+	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index]))->name_and_type_index;
+
+	char *name = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
+	char *type = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	int32_t field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+	u8 value = getFieldValue( class_index , field_index );
+
+	if (type[0] == 'J' || type[0] == 'D') {
+		convert_64_bits_to_2x32( value , &low , &high );
+		push( high );
+		push( low );
+
+	} else {
+		push( (u4)value );
+	}
 
 	current_frame->pc++;
 }

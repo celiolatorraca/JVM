@@ -12,7 +12,7 @@ package teste;
 
 public class HelloWorldObject implements HelloWorldInterface {
 
-  int field;
+  static int field = 10;
   float field2 = 1.0f;
   double field3 = -666.999111333;
   long field4 = 5000000000000111l;

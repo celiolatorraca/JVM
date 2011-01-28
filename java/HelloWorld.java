@@ -4,6 +4,7 @@
  */
 
 package teste;
+import teste.HelloWorldObject;
 
 /**
  *
@@ -15,8 +16,8 @@ public class HelloWorld {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-	int a = 5 % 2;
-        System.out.println(a);
+    	int a = 5 % 2;
+    	a = a + HelloWorldObject.field;
     }
 
 }

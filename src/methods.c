@@ -106,7 +106,7 @@ void prepareMethod(struct ClassFile *class, method_info *method){
 	if (((attribute_info *)method->attributes[i])->tag != ATTR_Code)
 		fatalErrorMsg(WHERE, "Nao encontrou atributo code no método.");
 
-	newFrame(class->constant_pool,((Code_attribute *)method->attributes[i]));
+	newFrame(class, class->constant_pool, ((Code_attribute *)method->attributes[i]));
 
 }
 

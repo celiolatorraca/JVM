@@ -10,13 +10,14 @@
 
 struct frame 
 {
-	u4 *fields;
-	void **constant_pool;
-	u2 max_stack;
-  u2 max_locals;
-  u4 code_length;
-  u1 	*code;
-	u4 pc;
+	u4					*fields;
+	void				**constant_pool;
+	struct ClassFile 	*class;
+	u2 					max_stack;
+	u2 					max_locals;
+	u4 					code_length;
+	u1 					*code;
+	u4 					pc;
 };
 
 /**
@@ -30,7 +31,7 @@ struct frame_stack
 
 struct frame *current_frame;
 
-void newFrame(void **constant_pool, Code_attribute *code_attribute);
+void newFrame(struct ClassFile *class, void **constant_pool, Code_attribute *code_attribute);
 void freeFrame();
  
 

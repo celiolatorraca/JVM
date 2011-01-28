@@ -17,7 +17,7 @@ u1 read_u1();
 u2 read_u2();
 u4 read_u4();
 void read_constant_pool();
-void copy_name(char *dest, u2 name_index);
+char * getName(struct ClassFile *class_file, u2 name_index);
 int read_s();
 int read_interfaces();
 int read_fields();

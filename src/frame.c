@@ -16,13 +16,15 @@ static struct frame_stack *stack = NULL;
  */
 
 
-void newFrame(void **constant_pool, Code_attribute *code_attribute)
+void newFrame(struct ClassFile *class, void **constant_pool, Code_attribute *code_attribute)
 {
 	struct frame_stack *new;
 	new = calloc(sizeof(struct frame_stack), 1);
 	new->value = calloc(sizeof(struct frame), 1);
 	new->next = stack;
+
 	stack = new;
+	stack->value->class = class;
 	stack->value->constant_pool = constant_pool; 
 	stack->value->max_stack = code_attribute->max_stack;
 	stack->value->max_locals = code_attribute->max_locals;

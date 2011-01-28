@@ -15,7 +15,7 @@
 #define WHERE "Loader"
 
 
-char *base_path = "";
+char *base_path = "/Users/celio/UnB/workspace/JVM/src/";
 
 struct ClassFile **classArray = NULL;
 static_struct *classStaticArray = NULL;
@@ -56,9 +56,10 @@ int32_t loadClass(char *class_name){
 	if ((classArray[numClasses-1] = read_class_file(path)) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível abrir arquivo informado.");
 
+	classStaticArray[numClasses-1].class_name = malloc(strlen(class_name)+1);
 	memcpy(classStaticArray[numClasses-1].class_name, class_name, strlen(class_name));
 	classStaticArray[numClasses-1].fields_count = classArray[numClasses-1]->fields_count;
-	classStaticArray[numClasses-1].value = malloc(classArray[numClasses-1]->fields_count * sizefo(u8));
+	classStaticArray[numClasses-1].value = malloc(classArray[numClasses-1]->fields_count * sizeof(u8));
 
 	/* carrega a superclasse da classe carregada */
 	loadClass(getParentName(classArray[numClasses-1]));
@@ -141,7 +142,7 @@ int getNumClasses(){
 	return numClasses;
 }
 
-int32_t getFieldIndexByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len) {
+int32_t getFieldIndexByNameAndDesc(char *class_name, char *name, u2 name_len, char *desc, u2 desc_len) {
 
 	int32_t i;
 	struct ClassFile *main_class;
@@ -169,5 +170,9 @@ int32_t getFieldIndexByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *
 			return i;
 	}
 
-	return NULL;
+	return -1;
+}
+
+u8 getFieldValue(int32_t class_index, int32_t field_index) {
+	return classStaticArray[class_index].value[field_index];
 }

@@ -299,13 +299,13 @@ int read_fields()
  \param dest String de destino
  \param name_index indice no constant pool
  */
-char * getName(u2 name_index) {
+char * getName(struct ClassFile *class_file, u2 name_index) {
   int i;
-
-  char *dest = malloc(((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->length + 1);
+  u2 length = ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length;
+  char *dest = malloc(((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length + 1);
   /*TODO Usar  msmcpy */
-  for (i = 0; i < ((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->length; i++) {
-    dest[i] = (char) ((struct CONSTANT_Utf8_info*) class->constant_pool[name_index - 1])->bytes[i];
+  for (i = 0; i < ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length; i++) {
+    dest[i] = (char) ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->bytes[i];
   }
   dest[i] = '\0';
 
@@ -320,7 +320,7 @@ char * getName(u2 name_index) {
 void * read_attribute_info()
 {
   int i;
-  char nome[200];
+  char *nome;
 
   void *attribute;
 
@@ -330,7 +330,7 @@ void * read_attribute_info()
   name_index = read_u2();
   length = read_u4();
 
-  copy_name(nome, name_index);
+  nome = getName(class, name_index);
 
   if (strcmp("ConstantValue", nome) == 0) {
     attribute = (ConstantValue_attribute *) calloc(sizeof (ConstantValue_attribute), 1);
