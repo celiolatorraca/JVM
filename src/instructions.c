@@ -349,26 +349,32 @@ void funct_fconst_2()
 /*TODO Tem que inserir HIGH e LOW do double */
 void funct_dconst_0()
 {
-	u8 *aux;
+	u4 *aux1, *aux2;
 	double d = 0.0;
 
-	aux = (u8*) malloc(sizeof(u8));
-	memcpy(aux, &d, sizeof(u8));
+	aux1 = (u4*) malloc(sizeof(u4));
+	aux2 = (u4*) malloc(sizeof(u4));
+	memcpy(aux1, &d, sizeof(u4));
+	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
 
-	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
+	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
+	push(*aux1);
 
 	current_frame->pc++;
 }
 
 void funct_dconst_1()
 {
-	u8 *aux; /* TODO - VERIFICAR SE U8 SEMPRE TEM 64 BITS */
+	u4 *aux1, *aux2;
 	double d = 1.0;
 
-	aux = (u8*) malloc(sizeof(u8));
-	memcpy(aux, &d, sizeof(u8));
+	aux1 = (u4*) malloc(sizeof(u4));
+	aux2 = (u4*) malloc(sizeof(u4));
+	memcpy(aux1, &d, sizeof(u4));
+	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
 
-	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
+	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
+	push(*aux1);
 
 	current_frame->pc++;
 }
