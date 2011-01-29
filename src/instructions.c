@@ -432,16 +432,17 @@ void funct_ldc_w()
 	low = current_frame->code[current_frame->pc];
 
 	indice = convert_2x8_to_32_bits( low, high );
-	aux = current_frame->constant_pool[indice];
+	/*aux = current_frame->constant_pool[indice]; TODO terminar essa funcao!*/
 
 	current_frame->pc++;
 }
 void funct_ldc2_w(){ current_frame->pc++;  }
 
-void funct_iload(){
-
+void funct_iload()
+{
+	u2 index;
 	current_frame->pc++;
-	u2 index = current_frame->code[current_frame->pc];
+	index = current_frame->code[current_frame->pc];
 
 	push (current_frame->fields[index]);
 
