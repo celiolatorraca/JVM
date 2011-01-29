@@ -431,7 +431,17 @@ void funct_ldc_w()
 	current_frame->pc++;
 }
 void funct_ldc2_w(){ current_frame->pc++;  }
-void funct_iload(){ current_frame->pc++;  }
+
+void funct_iload(){
+
+	current_frame->pc++;
+	u2 index = current_frame->code[current_frame->pc];
+
+	push (current_frame->fields[index]);
+
+	current_frame->pc++;
+}
+
 void funct_lload(){ current_frame->pc++;  }
 void funct_fload(){ current_frame->pc++;  }
 void funct_dload(){ current_frame->pc++;  }
