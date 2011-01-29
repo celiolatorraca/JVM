@@ -7,6 +7,8 @@
 
 #include "types.h"
 
+#define WHERE "TYPES"
+
 u8 convert_2x32_to_64_bits(u4 low, u4 high)
 {
   u8 value;
@@ -38,7 +40,7 @@ void convert_64_bits_to_2x32(u8 value, u4 *low, u4 *high)
 	*high = value & 0xffffffff;
 }
 
-float convert_32_bits_to_float(u4 bits)
+float convert_cast_32_bits_to_float(u4 bits)
 {
 	int64_t s, e;
 	float m, pot;
@@ -79,7 +81,7 @@ float convert_32_bits_to_float(u4 bits)
  	return s*m*pot;
 }
 
-double convert_2x32_bits_to_double(u4 low, u4 high)
+double convert_cast_2x32_bits_to_double(u4 low, u4 high)
 {
 	double m, pot;
 	int64_t bits, s, e, aux_high;
