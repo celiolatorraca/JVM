@@ -22,7 +22,12 @@ void push(u4 value)
 
 void pushU8(u8 value)
 {
+	u4 aux;
 
+	aux = value >> 32;
+	push(aux);
+	aux = value;
+	push(aux);
 }
 
 
