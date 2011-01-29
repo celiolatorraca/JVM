@@ -1696,10 +1696,12 @@ void funct_instanceof(){
 
 		if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
 		{
-			errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
+			push(1);
+			current_frame->pc++;
+			return;
 		}
 
-		push(ref);
+		push(0);
 		current_frame->pc++;
 	}
 
