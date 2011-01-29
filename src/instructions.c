@@ -348,35 +348,47 @@ void funct_fconst_2()
 	current_frame->pc++;
 }
 
-/*TODO Tem que inserir HIGH e LOW do double */
 void funct_dconst_0()
 {
-	u4 *aux1, *aux2;
+	u4 aux_4;
+	u8 *aux_8;
 	double d = 0.0;
 
-	aux1 = (u4*) malloc(sizeof(u4));
-	aux2 = (u4*) malloc(sizeof(u4));
-	memcpy(aux1, &d, sizeof(u4));
-	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
+	aux_8 = (u8*) malloc(sizeof(u8));
+	memcpy(aux_8, &d, 2*sizeof(u4));
+	aux_4 = *aux_8 >> 32;
+	push(aux_4);
 
-	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
-	push(*aux1);
+	aux_4 = *aux_8;
+	push(aux_4);
 
 	current_frame->pc++;
+
+	/*  Funcao para recuperar o double:
+	 *
+		double d;
+		u8 x = 0x00000000, y = 0x00000000;
+		memcpy(&x, &high, sizeof(u4) );
+		memcpy(&y, &aux_4, sizeof(u4) );
+		x <<= 32;
+		x |= y;
+		memcpy(&d, &x, 2*sizeof(u4));
+	*/
 }
 
 void funct_dconst_1()
 {
-	u4 *aux1, *aux2;
+	u4 aux_4;
+	u8 *aux_8;
 	double d = 1.0;
 
-	aux1 = (u4*) malloc(sizeof(u4));
-	aux2 = (u4*) malloc(sizeof(u4));
-	memcpy(aux1, &d, sizeof(u4));
-	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
+	aux_8 = (u8*) malloc(sizeof(u8));
+	memcpy(aux_8, &d, 2*sizeof(u4));
+	aux_4 = *aux_8 >> 32;
+	push(aux_4);
 
-	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
-	push(*aux1);
+	aux_4 = *aux_8;
+	push(aux_4);
 
 	current_frame->pc++;
 }
