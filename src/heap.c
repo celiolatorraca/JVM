@@ -63,6 +63,18 @@ struct Object* newObject(struct ClassFile *this)
 
 	heap[heap_index] = object;
 	heap_index++;
+
+#ifdef DEBUG
+	printf("Object info\n------------\n");
+	printf("this: %X\n", object);
+	printf("super: %X\n", object->super);
+	printf("fields: ", object);
+	for (i = 0; i < counter; i++)
+		printf("%d ", object->fields[i]);
+	printf("\nfields index:", object);
+		printf("%d ", object->fields_index[i]);
+	printf("\n\n");
+#endif
 	return object;
 }
 
