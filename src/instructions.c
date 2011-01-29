@@ -12,6 +12,8 @@
 #include "methods.h"
 
 
+#define WHERE "INTRUCTIONS"
+
 extern struct frame *current_frame;
 
 int next_is_wide = 0;
@@ -420,23 +422,33 @@ void funct_sipush()
 
 void funct_ldc()
 {
-	u1 indice;
-	u4 aux;
+	u1 indice, tag;
 
 	current_frame->pc++;
-	/* TODO - pode dar erro pq o constant pool é um ponteiro pra void (e talvez não empilhe só u4...)*/
-/*	indice = current_frame->code[current_frame->pc];
+	indice = current_frame->code[current_frame->pc];
 
-	aux = current_frame->constant_pool[indice];
-	push(aux);*/
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+
+	switch(tag)
+	{
+		case (CONSTANT_Integer):
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			break;
+		case (CONSTANT_Float):
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			break;
+		case (CONSTANT_String):
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			break;
+	}
 
 	current_frame->pc++;
 }
 
 void funct_ldc_w()
 {
-	u1 ind1, ind2;
-	u4 indice, aux;
+	u1 tag;
+	u4 indice;
 	u4 high, low;
 
 	current_frame->pc++;
@@ -446,11 +458,55 @@ void funct_ldc_w()
 	low = current_frame->code[current_frame->pc];
 
 	indice = convert_2x8_to_32_bits( low, high );
-	/*aux = current_frame->constant_pool[indice]; TODO terminar essa funcao!*/
+
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+
+	switch(tag)
+	{
+		case (CONSTANT_Integer):
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			break;
+		case (CONSTANT_Float):
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			break;
+		case (CONSTANT_String):
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			break;
+	}
 
 	current_frame->pc++;
 }
-void funct_ldc2_w(){ current_frame->pc++;  }
+
+void funct_ldc2_w()
+{
+	u1 tag;
+	u4 indice;
+	u4 high, low;
+
+	current_frame->pc++;
+	high = current_frame->code[current_frame->pc];
+
+	current_frame->pc++;
+	low = current_frame->code[current_frame->pc];
+
+	indice = convert_2x8_to_32_bits( low, high );
+
+	tag = ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->tag;
+
+	switch(tag)
+	{
+		case (CONSTANT_Long):
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->high_bytes);
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->low_bytes);
+			break;
+		case (CONSTANT_Double):
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->high_bytes);
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->low_bytes);
+			break;
+	}
+
+	current_frame->pc++;
+}
 
 void funct_iload()
 {
@@ -861,7 +917,7 @@ void funct_ladd()
 	high = pop();
 	aux2 = (signed)convert_2x32_to_64_bits( low, high );
 
-	push(aux1 + aux2);
+	pushU8(aux1 + aux2);
 
 	current_frame->pc++;
 }
@@ -884,9 +940,63 @@ void funct_fadd()
 	current_frame->pc++;
 }
 
-void funct_dadd(){ current_frame->pc++;  }
-void funct_isub(){ current_frame->pc++;  }
-void funct_lsub(){ current_frame->pc++;  }
+void funct_dadd()
+{
+	double aux1, aux2;
+	u4 high, low;
+	u8 aux;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&aux1, &aux, sizeof(u8));
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&aux2, &aux, sizeof(u8));
+
+	aux1 += aux2;
+
+	memcpy(&aux, &aux1, sizeof(u8));
+	convert_64_bits_to_2x32(aux1, &low, &high);
+
+	push(high);
+	push(low);
+
+	current_frame->pc++;
+}
+
+void funct_isub()
+{
+	u4 aux1, aux2;
+
+	aux1 = pop();
+	aux2 = pop();
+
+	push (aux2 - aux1);
+
+	current_frame->pc++;
+}
+
+void funct_lsub()
+{
+	int64_t aux1, aux2;
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+	aux1 = (signed)convert_2x32_to_64_bits( low, high );
+
+	low = pop();
+	high = pop();
+	aux2 = (signed)convert_2x32_to_64_bits( low, high );
+
+	pushU8(aux2 - aux1);
+
+	current_frame->pc++;
+}
+
 void funct_fsub(){ current_frame->pc++;  }
 void funct_dsub(){ current_frame->pc++;  }
 void funct_imul(){ current_frame->pc++;  }
@@ -910,6 +1020,7 @@ void funct_irem()
 	current_frame->pc++;
 
 }
+
 void funct_lrem()
 {
 	int64_t aux1, aux2;
@@ -1336,7 +1447,7 @@ void funct_i2f()
 	float f;
 
 	aux = pop();
-	f = convert_32_bits_to_float( aux );
+	f = convert_cast_32_bits_to_float( aux );
 
 	memcpy(&aux, &f, sizeof(u4));
 
@@ -1353,7 +1464,7 @@ void funct_i2d()
 
 	aux1 = pop();
 
-	d = convert_2x32_bits_to_double( aux1 , 0 );
+	d = convert_cast_2x32_bits_to_double( aux1 , 0 );
 
 	memcpy(&aux2, &d, sizeof(u8));
 
@@ -1458,12 +1569,12 @@ void funct_getstatic()
 	current_frame->pc++;
 }
 
-void funct_putstatic(){ current_frame->pc++;current_frame->pc++;  }
+void funct_putstatic(){ current_frame->pc++;  }
 void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
 void funct_invokevirtual(){ current_frame->pc++;  }
 void funct_invokespecial(){ current_frame->pc++;  }
-void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;  }
+void funct_invokestatic(){ current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 void funct_new(){current_frame->pc++;}
@@ -1478,7 +1589,7 @@ void funct_monitorexit(){ current_frame->pc++;  }
 
 void funct_wide(){
 
-	wide = 1;
+	next_is_wide = 1;
 
 	current_frame->pc++;
 }
