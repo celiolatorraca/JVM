@@ -1585,6 +1585,7 @@ void funct_newarray(){
 	u1 type;
 
 	count = pop();
+	current_frame->pc++;
 	type = current_frame->code[current_frame->pc];
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
@@ -1594,11 +1595,116 @@ void funct_newarray(){
 	current_frame->pc++;
 }
 
-void funct_anewarray(){ current_frame->pc++;  }
-void funct_arraylength(){ current_frame->pc++;  }
-void funct_athrow(){ current_frame->pc++;  }
-void funct_checkcast(){ current_frame->pc++;  }
-void funct_instanceof(){ current_frame->pc++;  }
+void funct_anewarray(){
+
+	/* algumas coisas estão comentadas pq provavelmente
+	 * não são necessárias  */
+
+	u4 count;
+	//u2 index;
+	//u1 type;
+
+	count = pop();
+
+	current_frame->pc++;
+	//index = current_frame->code[current_frame->pc];
+	//index = index << 8;
+
+	current_frame->pc++;
+	//index = index | current_frame->code[current_frame->pc];
+
+	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
+
+	push (newArray(count, 0));
+
+	current_frame->pc++;
+
+}
+void funct_arraylength()
+{
+	int i;
+
+	u4 aref;
+
+	aref = pop();
+
+	for (i = 0; i < numArrays; i++)
+	{
+		if (arrayLength[i].ref == aref)
+		{
+			push(arrayLength[i].ref);
+			current_frame->pc++;
+			return;
+		}
+
+		current_frame->pc++;
+	}
+
+	push(0);
+
+	current_frame->pc++;
+}
+void funct_athrow(){ current_frame->pc++;  } /* Näo precisa fazer nada além disso */
+
+
+void funct_checkcast()
+{
+	struct Object *ref;
+	u2 index;
+	char * cur_class_name;
+
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+	index = index << 8;
+	current_frame->pc++;
+	index = index | current_frame->code[current_frame->pc];
+
+	ref = (struct Object *)pop();
+
+	if (ref == NULL)
+	{
+		errorMsg(WHERE,"Referência nula em 'checkcast'");
+	}
+
+	if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+	{
+		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
+	}
+
+	push(ref);
+	current_frame->pc++;
+}
+
+
+void funct_instanceof(){
+	struct Object *ref;
+		u2 index;
+		char * cur_class_name;
+
+		current_frame->pc++;
+		index = current_frame->code[current_frame->pc];
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+
+		ref = (struct Object *)pop();
+
+		if (ref == NULL)
+		{
+			errorMsg(WHERE,"Referência nula em 'checkcast'");
+		}
+
+		if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+		{
+			errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
+		}
+
+		push(ref);
+		current_frame->pc++;
+	}
+
+
+
 void funct_monitorenter(){ current_frame->pc++;  }
 void funct_monitorexit(){ current_frame->pc++;  }
 
