@@ -19,7 +19,7 @@ void execute_instruction(u1 opcode)
 {
 	struct OPCODE_info opcode_tmp = op_info[opcode];
 	printf("Vai executar %s\n", opcode_tmp.desc);
-fflush(stdout);
+	fflush(stdout);
 	instr[opcode]();
 }
 
@@ -1244,12 +1244,12 @@ void funct_getstatic()
 	current_frame->pc++;
 }
 
-void funct_putstatic(){ current_frame->pc++;  }
+void funct_putstatic(){ current_frame->pc++;current_frame->pc++;  }
 void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
 void funct_invokevirtual(){ current_frame->pc++;  }
 void funct_invokespecial(){ current_frame->pc++;  }
-void funct_invokestatic(){ current_frame->pc++;  }
+void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;  }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 void funct_new(){current_frame->pc++;}
