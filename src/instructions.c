@@ -14,6 +14,8 @@
 
 extern struct frame *current_frame;
 
+int next_is_wide = 0;
+
 
 void execute_instruction(u1 opcode)
 {
@@ -346,35 +348,47 @@ void funct_fconst_2()
 	current_frame->pc++;
 }
 
-/*TODO Tem que inserir HIGH e LOW do double */
 void funct_dconst_0()
 {
-	u4 *aux1, *aux2;
+	u4 aux_4;
+	u8 *aux_8;
 	double d = 0.0;
 
-	aux1 = (u4*) malloc(sizeof(u4));
-	aux2 = (u4*) malloc(sizeof(u4));
-	memcpy(aux1, &d, sizeof(u4));
-	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
+	aux_8 = (u8*) malloc(sizeof(u8));
+	memcpy(aux_8, &d, 2*sizeof(u4));
+	aux_4 = *aux_8 >> 32;
+	push(aux_4);
 
-	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
-	push(*aux1);
+	aux_4 = *aux_8;
+	push(aux_4);
 
 	current_frame->pc++;
+
+	/*  Funcao para recuperar o double:
+	 *
+		double d;
+		u8 x = 0x00000000, y = 0x00000000;
+		memcpy(&x, &high, sizeof(u4) );
+		memcpy(&y, &aux_4, sizeof(u4) );
+		x <<= 32;
+		x |= y;
+		memcpy(&d, &x, 2*sizeof(u4));
+	*/
 }
 
 void funct_dconst_1()
 {
-	u4 *aux1, *aux2;
+	u4 aux_4;
+	u8 *aux_8;
 	double d = 1.0;
 
-	aux1 = (u4*) malloc(sizeof(u4));
-	aux2 = (u4*) malloc(sizeof(u4));
-	memcpy(aux1, &d, sizeof(u4));
-	memcpy(aux2, &d + sizeof(u4), sizeof(u4));
+	aux_8 = (u8*) malloc(sizeof(u8));
+	memcpy(aux_8, &d, 2*sizeof(u4));
+	aux_4 = *aux_8 >> 32;
+	push(aux_4);
 
-	push(*aux2); /* Para recuperar o valor, deve-se fazer outro memcpy para um double */
-	push(*aux1);
+	aux_4 = *aux_8;
+	push(aux_4);
 
 	current_frame->pc++;
 }
@@ -440,19 +454,101 @@ void funct_ldc2_w(){ current_frame->pc++;  }
 
 void funct_iload()
 {
+
 	u2 index;
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
 
 	push (current_frame->fields[index]);
 
 	current_frame->pc++;
 }
 
-void funct_lload(){ current_frame->pc++;  }
-void funct_fload(){ current_frame->pc++;  }
-void funct_dload(){ current_frame->pc++;  }
-void funct_aload(){ current_frame->pc++;  }
+void funct_lload()
+{
+
+	u2 index = 0;
+
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	/* push high first */
+	push (current_frame->fields[index+1]);
+	push (current_frame->fields[index]);
+
+	current_frame->pc++;
+}
+
+
+void funct_fload(){
+
+	u2 index;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	push(current_frame->fields[index]);
+
+	current_frame->pc++;
+}
+
+void funct_dload(){
+
+	u2 index;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	/* push high first */
+	push (current_frame->fields[index+1]);
+	push (current_frame->fields[index]);
+
+	current_frame->pc++;
+}
+
+void funct_aload(){
+
+	u2 index;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	push (current_frame->fields[index]);
+
+	current_frame->pc++;
+}
 
 void funct_iload_0()
 {
@@ -482,22 +578,123 @@ void funct_iload_3()
 	current_frame->pc++;
 }
 
-void funct_lload_0(){ current_frame->pc++;  }
-void funct_lload_1(){ current_frame->pc++;  }
-void funct_lload_2(){ current_frame->pc++;  }
-void funct_lload_3(){ current_frame->pc++;  }
-void funct_fload_0(){ current_frame->pc++;  }
-void funct_fload_1(){ current_frame->pc++;  }
-void funct_fload_2(){ current_frame->pc++;  }
-void funct_fload_3(){ current_frame->pc++;  }
-void funct_dload_0(){ current_frame->pc++;  }
-void funct_dload_1(){ current_frame->pc++;  }
-void funct_dload_2(){ current_frame->pc++;  }
-void funct_dload_3(){ current_frame->pc++;  }
-void funct_aload_0(){ current_frame->pc++;  }
-void funct_aload_1(){ current_frame->pc++;  }
-void funct_aload_2(){ current_frame->pc++;  }
-void funct_aload_3(){ current_frame->pc++;  }
+void funct_lload_0()
+{
+
+	push( current_frame->fields[1] );
+	push( current_frame->fields[0] );
+
+	current_frame->pc++;
+}
+
+void funct_lload_1()
+{
+	push( current_frame->fields[2] );
+	push( current_frame->fields[1] );
+
+	current_frame->pc++;
+}
+
+void funct_lload_2()
+{
+	push( current_frame->fields[3] );
+	push( current_frame->fields[2] );
+
+	current_frame->pc++;
+}
+
+void funct_lload_3()
+{
+	push( current_frame->fields[4] );
+	push( current_frame->fields[3] );
+
+	current_frame->pc++;
+}
+
+void funct_fload_0()
+{
+	push( current_frame->fields[0] );
+
+	current_frame->pc++;
+}
+
+void funct_fload_1()
+{
+	push( current_frame->fields[1] );
+
+	current_frame->pc++;
+}
+
+void funct_fload_2()
+{
+	push( current_frame->fields[2] );
+
+	current_frame->pc++;
+}
+
+void funct_fload_3()
+{
+	push( current_frame->fields[3] );
+
+	current_frame->pc++;
+}
+
+
+void funct_dload_0()
+{
+	push( current_frame->fields[1] );
+	push( current_frame->fields[0] );
+
+	current_frame->pc++;
+}
+
+void funct_dload_1()
+{
+	push( current_frame->fields[2] );
+	push( current_frame->fields[1] );
+
+	current_frame->pc++;
+}
+void funct_dload_2()
+{
+	push( current_frame->fields[3] );
+	push( current_frame->fields[2] );
+
+	current_frame->pc++;
+}
+
+void funct_dload_3()
+{
+	push( current_frame->fields[4] );
+	push( current_frame->fields[3] );
+
+	current_frame->pc++;
+}
+
+void funct_aload_0()
+{
+	push( current_frame->fields[0] );
+	current_frame->pc++;
+}
+void funct_aload_1()
+{
+	push( current_frame->fields[1] );
+
+	current_frame->pc++;
+}
+void funct_aload_2()
+{
+	push( current_frame->fields[2] );
+
+	current_frame->pc++;
+}
+void funct_aload_3()
+{
+	push( current_frame->fields[3] );
+
+	current_frame->pc++;
+}
+
 void funct_iaload(){ current_frame->pc++;  }
 void funct_laload(){ current_frame->pc++;  }
 void funct_faload(){ current_frame->pc++;  }
@@ -1278,7 +1475,14 @@ void funct_checkcast(){ current_frame->pc++;  }
 void funct_instanceof(){ current_frame->pc++;  }
 void funct_monitorenter(){ current_frame->pc++;  }
 void funct_monitorexit(){ current_frame->pc++;  }
-void funct_wide(){ current_frame->pc++;  }
+
+void funct_wide(){
+
+	wide = 1;
+
+	current_frame->pc++;
+}
+
 void funct_multianewarray(){ current_frame->pc++;  }
 void funct_ifnull(){ current_frame->pc++;  }
 void funct_ifnonnull(){ current_frame->pc++;  }

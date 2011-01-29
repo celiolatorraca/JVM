@@ -4,9 +4,6 @@
 #include "stack.h"
 #include "types.h"
 #include "carregador.h"
-/**
- Frame. Modificar de void para os tipos corretos.
- */
 
 struct frame 
 {

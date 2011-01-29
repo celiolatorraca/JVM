@@ -1,8 +1,8 @@
 #include "heap.h"
 #include "carregador.h"
 #include "jvmerr.h"
-#include ""
 #include <stdlib.h>
+#include <string.h>
 
 static u4 heap_index;
 static u4 heap_max;
@@ -17,7 +17,8 @@ void newHeap()
 struct Object* newObject(struct ClassFile *this)
 {
 	struct Object *object;
-	int i, counter, index;
+	u4 i, counter;
+	u2 index;
 	char descriptor[5];
 	struct CONSTANT_Utf8_info *desc_struct;
 
@@ -40,9 +41,9 @@ struct Object* newObject(struct ClassFile *this)
 	for (i = 0; i < this->fields_count; i++)
 	{
 		counter++;
-		index = this->fields[i]->descriptor_index;
+		index = this->fields[i].descriptor_index;
 		desc_struct = (struct CONSTANT_Utf8_info*)this->constant_pool[index - 1];
-		strncpy(descriptor, desc_struct->bytes, desc_struct->length);
+		memcpy(descriptor, desc_struct->bytes, desc_struct->length);
 		if (descriptor[0] == 'D' || descriptor[0] == 'L')
 			counter++;
 	}
@@ -52,9 +53,9 @@ struct Object* newObject(struct ClassFile *this)
 
 	for (i = 0; i < this->fields_count; i++)
 	{
-		object->fields_index[i] = this->fields[i]->descriptor_index;
+		object->fields_index[i] = this->fields[i].descriptor_index;
 		desc_struct = (struct CONSTANT_Utf8_info*)this->constant_pool[index - 1];
-		strncpy(descriptor, desc_struct->bytes, desc_struct->length);
+		memcpy(descriptor, desc_struct->bytes, desc_struct->length);
 		if (descriptor[0] == 'D' || descriptor[0] == 'L')
 			i++;
 	}
