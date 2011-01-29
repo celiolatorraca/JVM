@@ -25,6 +25,8 @@ struct Object* newObject(struct ClassFile *this)
 	if (!this)
 		return NULL;
 
+	//TODO  Verificar se precisa de vetor
+	// Talvez nao precise guardar a referencia
 	if (heap_index == heap_max)
 	{		heap = realloc(heap, heap_max + HEAP_INIT);
 		if (heap == NULL)
