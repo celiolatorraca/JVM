@@ -10,11 +10,14 @@
 #include "frame.h"
 #include "types.h"
 #include "methods.h"
+#include "heap.h"
 
 
 #define WHERE "INTRUCTIONS"
 
 extern struct frame *current_frame;
+extern struct array *arrayLength = NULL;
+extern u4 numArrays = 0;
 
 int next_is_wide = 0;
 
@@ -1601,17 +1604,17 @@ void funct_anewarray(){
 	 * não são necessárias  */
 
 	u4 count;
-	//u2 index;
-	//u1 type;
+	/*u2 index;
+	u1 type;*/
 
 	count = pop();
 
 	current_frame->pc++;
-	//index = current_frame->code[current_frame->pc];
-	//index = index << 8;
+	/*index = current_frame->code[current_frame->pc];
+	index = index << 8;*/
 
 	current_frame->pc++;
-	//index = index | current_frame->code[current_frame->pc];
+	/*index = index | current_frame->code[current_frame->pc];*/
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
