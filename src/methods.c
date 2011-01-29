@@ -49,6 +49,29 @@ method_info * getMainMethod(){
 }
 
 
+method_info * getInitStaticMethod(struct ClassFile *main_class) {
+
+	int i;
+	u1 *name, *desc;
+	u2 name_length, desc_length;
+
+	/* procura por método main ([LJava/lang/String;)V */
+	for (i = 0; i < main_class->methods_count; i++){
+
+		name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].name_index-1)]))->bytes;
+		name_length = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].name_index-1)]))->length;
+
+		desc = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->bytes;
+		desc_length = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].descriptor_index-1)]))->length;
+
+		if ((strncmp("<clinit>", (char *)name, name_length) == 0)
+			&& (strncmp("()V", (char *)desc, desc_length) == 0))
+			return &(main_class->methods[i]);
+	}
+
+	return NULL;
+}
+
 
 method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len){
 

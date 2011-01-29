@@ -1209,14 +1209,16 @@ void funct_getstatic()
 
 	u2 index = ((u2)index1 << 8) | (u2)index2;
 
+	u4 tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+
 	char *class_name = getName(current_frame->class,
-			((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index]))->class_index);
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[tmp-1]))->name_index);
 
 	int32_t class_index = loadClass( class_name );
 
 	/*TODO Chamar o método de cinit caso ainda não tenha sido chamado */
 
-	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index]))->name_and_type_index;
+	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
 
 	char *name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
@@ -1228,12 +1230,15 @@ void funct_getstatic()
 	u8 value = getFieldValue( class_index , field_index );
 
 	if (type[0] == 'J' || type[0] == 'D') {
+
 		convert_64_bits_to_2x32( value , &low , &high );
 		push( high );
 		push( low );
 
 	} else {
+
 		push( (u4)value );
+
 	}
 
 	current_frame->pc++;

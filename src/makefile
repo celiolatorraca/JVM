@@ -7,4 +7,4 @@ apple:
 	gcc -Wall -ansi -pedantic -lm classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c frame.c -o jvm -g
 	
 java:
-	cd .. && make java
+	javac -target 1.2 -source 1.2 javaTeste/*.java

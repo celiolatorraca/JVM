@@ -10,6 +10,9 @@
 #include <stdlib.h>
 
 #include "carregador.h"
+#include "methods.h"
+#include "mnemonics.h"
+#include "instructions.h"
 #include "jvmerr.h"
 
 #define WHERE "Loader"
@@ -31,6 +34,7 @@ int32_t loadClass(char *class_name){
 
 	int32_t i;
 	char *path;
+	method_info *staticMethod;
 
 	if (class_name == NULL) return -1;
 
@@ -60,6 +64,15 @@ int32_t loadClass(char *class_name){
 	memcpy(classStaticArray[numClasses-1].class_name, class_name, strlen(class_name));
 	classStaticArray[numClasses-1].fields_count = classArray[numClasses-1]->fields_count;
 	classStaticArray[numClasses-1].value = malloc(classArray[numClasses-1]->fields_count * sizeof(u8));
+
+	/* Executa o método de Init Static caso tenha */
+	if ((staticMethod = getInitStaticMethod(classArray[numClasses-1])) != NULL) {
+		initializeInstr();
+		populate_opcode_info();
+
+		prepareMethod(classArray[numClasses-1], staticMethod);
+		runProgram();
+	}
 
 	/* carrega a superclasse da classe carregada */
 	loadClass(getParentName(classArray[numClasses-1]));

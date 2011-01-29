@@ -301,7 +301,7 @@ int read_fields()
  */
 char * getName(struct ClassFile *class_file, u2 name_index) {
   int i;
-  u2 length = ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length;
+
   char *dest = malloc(((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length + 1);
   /*TODO Usar  msmcpy */
   for (i = 0; i < ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length; i++) {
