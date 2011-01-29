@@ -20,6 +20,12 @@ void push(u4 value)
   stack[++stack_top] = value;
 }
 
+void pushU8(u8 value)
+{
+
+}
+
+
 u4 pop()
 {
   if (stack_top < frame_base)

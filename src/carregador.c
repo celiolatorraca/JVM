@@ -136,6 +136,9 @@ struct ClassFile * getClassByName(char *class_name){
 
 	int i;
 
+	if (!class_name)
+		return NULL;
+
 	for (i = 0; i < numClasses; i++){
 		if (strcmp(class_name, getClassName(classArray[i])) == 0)
 			return classArray[i];
