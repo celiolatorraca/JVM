@@ -18,7 +18,7 @@
 #define WHERE "Loader"
 
 
-char *base_path = "/Users/celio/UnB/workspace/JVM/src/";
+char *base_path = "";
 
 struct ClassFile **classArray = NULL;
 static_struct *classStaticArray = NULL;
