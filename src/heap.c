@@ -116,3 +116,38 @@ void setObjectFieldWide(struct Object* object, u4 cp_index, u8 value)
 		i++;
 	((u8*)object->fields)[i] = value;
 }
+
+
+
+void * newArray(u4 count, u1 type){
+
+	u4 size;
+
+	void *array;
+
+	switch (type){
+
+		case 4: size = 1;//boolean
+				break;
+		case 5: size = 1;//char
+				break;
+		case 6: size= 4;//float
+				break;
+		case 7: size = 8;//double
+				break;
+		case 8: size = 1;//byte
+				break;
+		case 9: size = 2;//short
+				break;
+		case 10: size = 4;//int
+				 break;
+		case 11: size = 8;//long
+				 break;
+
+	}
+
+	array = calloc(count, array->size);
+
+	return array;
+}
+

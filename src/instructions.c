@@ -1578,7 +1578,22 @@ void funct_invokestatic(){ current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 void funct_new(){current_frame->pc++;}
-void funct_newarray(){ current_frame->pc++;  }
+
+void funct_newarray(){
+
+	u4 count;
+	u1 type;
+
+	count = pop();
+	type = current_frame->code[current_frame->pc];
+
+	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
+
+	push (newArray(count, type));
+
+	current_frame->pc++;
+}
+
 void funct_anewarray(){ current_frame->pc++;  }
 void funct_arraylength(){ current_frame->pc++;  }
 void funct_athrow(){ current_frame->pc++;  }
