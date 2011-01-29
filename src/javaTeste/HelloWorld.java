@@ -16,8 +16,11 @@ public class HelloWorld {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-    	int a = 5 % 2;
-    	a = a + HelloWorldObject.field;
+
+      HelloWorldObject a = new HelloWorldObject();
+
+      int[] b = new int[30];
+
     }
 
 }
