@@ -682,6 +682,11 @@ void funct_lload_3()
 	push( current_frame->fields[4] );
 	push( current_frame->fields[3] );
 
+#ifdef DEBUG
+	long l = (long) convert_2x32_to_64_bits(current_frame->fields[3],current_frame->fields[4]);
+	printf("lload_3 %ld\n", l);
+#endif
+
 	current_frame->pc++;
 }
 
@@ -928,9 +933,11 @@ void funct_lstore()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[index] = value;
+
 #ifdef DEBUG
-	printf("lstore: %ld\n", ((u8*)current_frame->fields)[index]);
+	printf("lstore: %ld\n", (long)((u8*)current_frame->fields)[index]);
 #endif
+
 	current_frame->pc++;
 }
 void funct_fstore()
@@ -967,9 +974,11 @@ void funct_dstore()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[index] = value;
+
 #ifdef DEBUG
-	printf("lstore: %f\n", ((u8*)current_frame->fields)[index]);
+	printf("lstore: %f\n", (double)((u8*)current_frame->fields)[index]);
 #endif
+
 	current_frame->pc++;
 }
 void funct_astore()
@@ -1040,9 +1049,11 @@ void funct_lstore_0()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[0] = value;
+
 #ifdef DEBUG
-	printf("lstore0: %ld\n", ((u8*)current_frame->fields)[0]);
+	printf("lstore0: %ld\n", (long)((u8*)current_frame->fields)[0]);
 #endif
+
 	current_frame->pc++;
 }
 void funct_lstore_1()
@@ -1056,11 +1067,14 @@ void funct_lstore_1()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[1] = value;
+
 #ifdef DEBUG
-	printf("lstore1: %ld\n", ((u8*)current_frame->fields)[1]);
+	printf("lstore1: %ld\n", (long)((u8*)current_frame->fields)[1]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_lstore_2()
 {
 	u4 high, low;
@@ -1072,11 +1086,14 @@ void funct_lstore_2()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[2] = value;
+
 #ifdef DEBUG
-	printf("lstore2: %ld\n", ((u8*)current_frame->fields)[2]);
+	printf("lstore2: %ld\n", (long)((u8*)current_frame->fields)[2]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_lstore_3()
 {
 	u4 high, low;
@@ -1088,11 +1105,14 @@ void funct_lstore_3()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[3] = value;
+
 #ifdef DEBUG
-	printf("lstore3: %ld\n", ((u8*)current_frame->fields)[3]);
+	printf("lstore3: %ld\n", (long)((u8*)current_frame->fields)[3]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_fstore_0()
 {
 	u2  value;
@@ -1103,6 +1123,7 @@ void funct_fstore_0()
 
 	current_frame->pc++;
 }
+
 void funct_fstore_1()
 {
 	u2 value;
@@ -1113,6 +1134,7 @@ void funct_fstore_1()
 
 	current_frame->pc++;
 }
+
 void funct_fstore_2()
 {
 	u2 value;
@@ -1123,6 +1145,7 @@ void funct_fstore_2()
 
 	current_frame->pc++;
 }
+
 void funct_fstore_3()
 {
 	u2 value;
@@ -1133,6 +1156,7 @@ void funct_fstore_3()
 
 	current_frame->pc++;
 }
+
 void funct_dstore_0()
 {
 	u4 high, low;
@@ -1144,11 +1168,14 @@ void funct_dstore_0()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[0] = value;
+
 #ifdef DEBUG
-	printf("dstore0: %f\n", ((u8*)current_frame->fields)[0]);
+	printf("dstore0: %f\n", (double)((u8*)current_frame->fields)[0]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_dstore_1()
 {
 	u4 high, low;
@@ -1160,11 +1187,14 @@ void funct_dstore_1()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[1] = value;
+
 #ifdef DEBUG
-	printf("dstore1: %f\n", ((u8*)current_frame->fields)[1]);
+	printf("dstore1: %f\n", (double)((u8*)current_frame->fields)[1]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_dstore_2()
 {
 	u4 high, low;
@@ -1176,11 +1206,14 @@ void funct_dstore_2()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[2] = value;
+
 #ifdef DEBUG
-	printf("dstore2: %f\n", ((u8*)current_frame->fields)[2]);
+	printf("dstore2: %f\n", (double)((u8*)current_frame->fields)[2]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_dstore_3()
 {
 	u4 high, low;
@@ -1192,11 +1225,14 @@ void funct_dstore_3()
 	value = convert_2x32_to_64_bits(low, high);
 
 	((u8*)current_frame->fields)[3] = value;
+
 #ifdef DEBUG
-	printf("dstore3: %f\n", ((u8*)current_frame->fields)[3]);
+	printf("dstore3: %f\n", (double)((u8*)current_frame->fields)[3]);
 #endif
+
 	current_frame->pc++;
 }
+
 void funct_astore_0()
 {
 	u4 value;
@@ -1207,6 +1243,7 @@ void funct_astore_0()
 
 	current_frame->pc++;
 }
+
 void funct_astore_1()
 {
 	u4 value;
@@ -1217,6 +1254,7 @@ void funct_astore_1()
 
 	current_frame->pc++;
 }
+
 void funct_astore_2()
 {
 	u4 value;
@@ -1227,6 +1265,7 @@ void funct_astore_2()
 
 	current_frame->pc++;
 }
+
 void funct_astore_3()
 {
 	u4 value;
@@ -1608,9 +1647,11 @@ void funct_fsub()
 	value1 -= value2;
 
 	memcpy(&result, &value1, sizeof(u4));
+
 #ifdef DEBUG
 	printf("fsub %f result %X\n", value1, result);
 #endif
+
 	push(result);
 
 	current_frame->pc++;
@@ -1668,8 +1709,9 @@ void funct_lmul()
 	result = value1 * value2;
 
 #ifdef DEBUG
-	printf("lmul %ld\n", result);
+	printf("lmul %ld\n", (long)result);
 #endif
+
 	pushU8(result);
 
 	current_frame->pc++;
@@ -1686,15 +1728,16 @@ void funct_fmul()
 	memcpy(&value2, &aux2, sizeof(u4));
 
 #ifdef DEBUG
-	printf("%f - %f\n",value1, value2);
 	printf("fmul %f\n", value1 * value2);
 #endif
+
 	value1 *= value2;
 	memcpy(&result, &value1, sizeof(u4));
 	push(result);
 
 	current_frame->pc++;
 }
+
 void funct_dmul()
 {
 	u4 high1, low1, high2, low2;
@@ -1711,10 +1754,12 @@ void funct_dmul()
 #ifdef DEBUG
 	printf("dsub %f\n", value1 * value2);
 #endif
+
 	pushU8(value1 * value2);
 
 	current_frame->pc++;
 }
+
 void funct_idiv()
 {
 	int32_t value1, value2;
@@ -1725,10 +1770,12 @@ void funct_idiv()
 #ifdef DEBUG
 	printf("idiv %d\n", value1 / value2);
 #endif
+
 	push(value1 / value2);
 
 	current_frame->pc++;
 }
+
 void funct_ldiv()
 {
 	int64_t value1, value2, result;
@@ -1745,12 +1792,14 @@ void funct_ldiv()
 	result = value1 / value2;
 
 #ifdef DEBUG
-	printf("ldiv %ld\n", result);
+	printf("ldiv %ld\n", (long)result);
 #endif
+
 	pushU8(result);
 
 	current_frame->pc++;
 }
+
 void funct_fdiv()
 {
 	u4 aux1, aux2, result;
@@ -1765,12 +1814,14 @@ void funct_fdiv()
 #ifdef DEBUG
 	printf("fdiv %f\n", value1 / value2);
 #endif
+
 	value1 /= value2;
 	memcpy(&result, &value1, sizeof(u4));
 	push(result);
 
 	current_frame->pc++;
 }
+
 void funct_ddiv()
 {
 	u4 high1, low1, high2, low2;
@@ -1787,6 +1838,7 @@ void funct_ddiv()
 #ifdef DEBUG
 	printf("ddiv %f\n", value1 / value2);
 #endif
+
 	pushU8(value1 / value2);
 
 	current_frame->pc++;
@@ -2341,7 +2393,7 @@ void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("f2l converteu para %ld\n", aux_8);
+		printf("f2l converteu para %ld\n", (long)aux_8);
 	#endif
 }
 
@@ -2404,7 +2456,7 @@ void funct_d2l()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("d2l converteu para %ld\n", aux);
+		printf("d2l converteu para %ld\n", (long)aux);
 	#endif
 }
 
@@ -2456,7 +2508,7 @@ void funct_i2c()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("i2c converteu para %h\n", aux);
+		printf("i2c converteu para %hu\n", aux);
 	#endif
 }
 
@@ -2470,7 +2522,7 @@ void funct_i2s()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("i2c converteu para %h\n", aux);
+		printf("i2c converteu para %hu\n", aux);
 	#endif
 }
 
@@ -3197,6 +3249,10 @@ void funct_invokevirtual()
 		current_frame->fields[i] = fields_tmp[i];
 	}
 
+#ifdef DEBUG
+	printf("%ld\n",(long)convert_2x32_to_64_bits(current_frame->fields[4],current_frame->fields[3]));
+#endif
+
 	runMethod();
 
 	current_frame->pc++;
@@ -3305,7 +3361,6 @@ void funct_checkcast()
 {
 	struct Object *ref;
 	u2 index;
-	char * cur_class_name;
 
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
@@ -3327,7 +3382,7 @@ void funct_checkcast()
 	}
 
 	/*TODO Verificar a subclasses*/
-	push(ref);
+	push((u4)ref);
 	current_frame->pc++;
 }
 
@@ -3335,7 +3390,6 @@ void funct_checkcast()
 void funct_instanceof(){
 	struct Object *ref;
 	u2 index;
-	char * cur_class_name;
 
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
