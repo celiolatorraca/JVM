@@ -1195,14 +1195,127 @@ void funct_astore_3()
 
 	current_frame->pc++;
 }
-void funct_iastore(){ current_frame->pc++;  }
-void funct_lastore(){ current_frame->pc++;  }
-void funct_fastore(){ current_frame->pc++;  }
-void funct_dastore(){ current_frame->pc++;  }
-void funct_aastore(){ current_frame->pc++;  }
-void funct_bastore(){ current_frame->pc++;  }
-void funct_castore(){ current_frame->pc++;  }
-void funct_sastore(){ current_frame->pc++;  }
+
+void funct_iastore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u4 *)ref)[index] = value;
+
+	current_frame->pc++;
+}
+
+void funct_lastore(){
+
+	u4 index, low, high;
+	u8 value;
+	void *ref;
+
+	low = pop();
+	high = pop();
+	value = convert_to_64_bits(low, high);
+
+	index = pop();
+	ref = (void *)pop();
+
+	((u8 *)ref)[index] = value;
+
+	current_frame->pc++;
+}
+
+void funct_fastore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u4 *)ref)[index] = value;
+
+	current_frame->pc++;
+}
+
+void funct_dastore(){
+
+	u4 index, low, high;
+	u8 value;
+	void *ref;
+
+	low = pop();
+	high = pop();
+	value = convert_to_64_bits(low, high);
+
+	index = pop();
+	ref = (void *)pop();
+
+	((u8 *)ref)[index] = value;
+
+	current_frame->pc++;
+}
+
+void funct_aastore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u4 *)ref)[index] = value;
+
+	current_frame->pc++;
+}
+
+void funct_bastore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u1 *)ref)[index] = (u1)value;
+
+	current_frame->pc++;
+}
+
+void funct_castore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u2 *)ref)[index] = (u2)value;
+
+	current_frame->pc++;
+
+}
+
+void funct_sastore(){
+
+	u4 index, value;
+	void *ref;
+
+	value = pop();
+	index = pop();
+	ref = (void *)pop();
+
+	((u2 *)ref)[index] = (u2)value;
+
+	current_frame->pc++;
+}
 
 void funct_pop()
 {
