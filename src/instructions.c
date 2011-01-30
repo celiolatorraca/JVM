@@ -27,9 +27,11 @@ extern opcode_info *op_info;
 
 void execute_instruction(u1 opcode)
 {
+	#ifdef DEBUG
 	struct OPCODE_info opcode_tmp = op_info[opcode];
-	printf("Vai executar %s\n", opcode_tmp.desc);
-	fflush(stdout);
+	printf("\t%s\n", opcode_tmp.desc);
+	#endif
+
 	instr[opcode]();
 }
 
@@ -433,18 +435,18 @@ void funct_ldc()
 	current_frame->pc++;
 	indice = current_frame->code[current_frame->pc];
 
-	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Integer):
-			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_Float):
-			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
 			break;
 	}
 
@@ -465,18 +467,18 @@ void funct_ldc_w()
 
 	indice = convert_2x8_to_32_bits( low, high );
 
-	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Integer):
-			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_Float):
-			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
 			break;
 	}
 
@@ -497,17 +499,17 @@ void funct_ldc2_w()
 
 	indice = convert_2x8_to_32_bits( low, high );
 
-	tag = ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Long):
-			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->high_bytes);
-			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->low_bytes);
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->high_bytes);
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->low_bytes);
 			break;
 		case (CONSTANT_Double):
-			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->high_bytes);
-			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->low_bytes);
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice-1])->high_bytes);
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice-1])->low_bytes);
 			break;
 	}
 
@@ -683,6 +685,10 @@ void funct_fload_0()
 void funct_fload_1()
 {
 	push( current_frame->fields[1] );
+
+#ifdef DEBUG
+	printf("%f\n",current_frame->fields[1]);
+#endif
 
 	current_frame->pc++;
 }
@@ -1159,6 +1165,7 @@ void funct_fmul()
 	memcpy(&value2, &aux2, sizeof(u4));
 
 #ifdef DEBUG
+	printf("%f - %f\n",aux1, aux2);
 	printf("fmul %f\n", value1 * value2);
 #endif
 	value1 *= value2;

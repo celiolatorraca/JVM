@@ -67,9 +67,9 @@ int32_t loadClass(char *class_name){
 
 	/* Executa o método de Init Static caso tenha */
 	if ((staticMethod = getInitStaticMethod(classArray[numClasses-1])) != NULL) {
-		initializeInstr();
-		populate_opcode_info();
-
+		#ifdef DEBUG
+		printf("\nClass: %s\n", class_name);
+		#endif
 		prepareMethod(classArray[numClasses-1], staticMethod);
 		runMethod();
 	}
