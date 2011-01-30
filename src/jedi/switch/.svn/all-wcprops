@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/jvm/!svn/ver/75/trunk/tests/switch
+END
+lookupswitch.class
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/jvm/!svn/ver/75/trunk/tests/switch/lookupswitch.class
+END
+tableswitch.java
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/jvm/!svn/ver/75/trunk/tests/switch/tableswitch.java
+END
+lookupswitch.java
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/jvm/!svn/ver/75/trunk/tests/switch/lookupswitch.java
+END
+tableswitch.class
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/jvm/!svn/ver/75/trunk/tests/switch/tableswitch.class
+END

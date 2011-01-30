@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/jvm/!svn/ver/81/trunk/tests/static
+END
+static_test.java
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/jvm/!svn/ver/59/trunk/tests/static/static_test.java
+END
+static_test.class
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/jvm/!svn/ver/81/trunk/tests/static/static_test.class
+END

@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/jvm/!svn/ver/74/trunk/tests/FooCorporation
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/.classpath
+END
+Empregado.java
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/Empregado.java
+END
+Engenheiro.java
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/Engenheiro.java
+END
+FooCorporation.java
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/jvm/!svn/ver/74/trunk/tests/FooCorporation/FooCorporation.java
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/.project
+END
+Empregado.class
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/jvm/!svn/ver/74/trunk/tests/FooCorporation/Empregado.class
+END
+Engenheiro.class
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/Engenheiro.class
+END
+FooCorporation.class
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/jvm/!svn/ver/74/trunk/tests/FooCorporation/FooCorporation.class
+END
+Gerente.java
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/Gerente.java
+END
+Gerente.class
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/jvm/!svn/ver/71/trunk/tests/FooCorporation/Gerente.class
+END
