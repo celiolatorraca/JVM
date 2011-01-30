@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	populate_opcode_info();
 
 	prepareMethod(getClassByIndex(0), main_method);
-	runProgram();
+	runMethod();
 
 	return 0;
 }

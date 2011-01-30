@@ -1753,10 +1753,7 @@ void funct_areturn(){ current_frame->pc++;  }
 
 void funct_return()
 {
-	finishMethod();
-
-	if (current_frame != NULL)
-		current_frame->pc++;
+	current_frame->pc++;
 }
 
 void funct_getstatic()
@@ -1769,19 +1766,19 @@ void funct_getstatic()
 	char *class_name, *name, *type;
 
 
-	index1 = (u1) current_frame->fields[++(current_frame->pc)];
-	index2 = (u1) current_frame->fields[++(current_frame->pc)];
+	index1 = (u1) current_frame->code[++(current_frame->pc)];
+	index2 = (u1) current_frame->code[++(current_frame->pc)];
 
 	index = ((u2)index1 << 8) | (u2)index2;
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
 	class_index = loadClass( class_name );
 
-	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
@@ -1813,19 +1810,19 @@ void funct_putstatic()
 	char *class_name, *name, *type;
 
 
-	index1 = (u1) current_frame->fields[++(current_frame->pc)];
-	index2 = (u1) current_frame->fields[++(current_frame->pc)];
+	index1 = (u1) current_frame->code[++(current_frame->pc)];
+	index2 = (u1) current_frame->code[++(current_frame->pc)];
 
 	index = ((u2)index1 << 8) | (u2)index2;
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
 	class_index = loadClass( class_name );
 
-	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
@@ -1853,7 +1850,7 @@ void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
 void funct_invokevirtual(){ current_frame->pc++;  }
 void funct_invokespecial(){ current_frame->pc++;  }
-void funct_invokestatic(){ current_frame->pc++; }
+void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 void funct_new(){current_frame->pc++;}
@@ -1945,11 +1942,11 @@ void funct_checkcast()
 		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
 
-	/*TODO usar possivelmente getClassName(current_frame->class)*/
-	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+
+	if (strcmp(getName(current_frame(current_frame->class, index)), getClassName(ref->this)) == 0)
 	{
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
-	}*/
+	}
 
 	/*TODO Verificar a subclasses*/
 	push(ref);
@@ -1975,13 +1972,12 @@ void funct_instanceof(){
 		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
 
-	/*TODO usar possivelmente getClassName(current_frame->class)*/
-	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+	if (strcmp( getName(current_frame->class, index), getClassName(ref->this)) == 0)
 	{
 		push(1);
 		current_frame->pc++;
 		return;
-	}*/
+	}
 
 	push(0);
 	current_frame->pc++;
@@ -1989,8 +1985,8 @@ void funct_instanceof(){
 
 
 
-void funct_monitorenter(){ current_frame->pc++;  }
-void funct_monitorexit(){ current_frame->pc++;  }
+void funct_monitorenter(){ pop(); current_frame->pc++;  } /* só precisa disso */
+void funct_monitorexit(){ pop(); current_frame->pc++;  } /* só precisa disso */
 
 void funct_wide(){
 

@@ -104,12 +104,14 @@ method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1
 }
 
 
-void runProgram(){
+void runMethod(){
 
 	/* loop principal do método - executa o código*/
 	while (current_frame != NULL && (current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
 		execute_instruction(current_frame->code[current_frame->pc]);
 	}
+	/* Finaliza o método chamado */
+	finishMethod();
 
 }
 

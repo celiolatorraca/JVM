@@ -1,0 +1,2 @@
+segmentation fault:
+	double_aritmetica.class -> linha 331 (utils.c- ReadAttbInfo ())
