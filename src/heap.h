@@ -25,7 +25,7 @@ struct array{
 struct Object **heap;
 
 /* número de arrays alocados e vetor com o tamanho dos arrays */
-struct array *arrayLength = NULL;
+struct array *arrayLength = 0;
 u4 numArrays = 0;
 
 
