@@ -1,8 +1,9 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "heap.h"
 #include "carregador.h"
 #include "jvmerr.h"
-#include <stdlib.h>
-#include <string.h>
 
 static u4 heap_index;
 static u4 heap_max;
@@ -25,8 +26,8 @@ struct Object* newObject(struct ClassFile *this)
 	if (!this)
 		return NULL;
 
-	//TODO  Verificar se precisa de vetor
-	// Talvez nao precise guardar a referencia
+	/*TODO  Verificar se precisa de vetor
+	Talvez nao precise guardar a referencia*/
 	if (heap_index == heap_max)
 	{		heap = realloc(heap, heap_max + HEAP_INIT);
 		if (heap == NULL)
@@ -46,7 +47,7 @@ struct Object* newObject(struct ClassFile *this)
 		index = this->fields[i].descriptor_index;
 		desc_struct = (struct CONSTANT_Utf8_info*)this->constant_pool[index - 1];
 		memcpy(descriptor, desc_struct->bytes, desc_struct->length);
-		if (descriptor[0] == 'D' || descriptor[0] == 'L')
+		if (descriptor[0] == 'D' || descriptor[0] == 'J')
 			counter++;
 	}
 
@@ -58,7 +59,7 @@ struct Object* newObject(struct ClassFile *this)
 		object->fields_index[i] = this->fields[i].descriptor_index;
 		desc_struct = (struct CONSTANT_Utf8_info*)this->constant_pool[index - 1];
 		memcpy(descriptor, desc_struct->bytes, desc_struct->length);
-		if (descriptor[0] == 'D' || descriptor[0] == 'L')
+		if (descriptor[0] == 'D' || descriptor[0] == 'J')
 			i++;
 	}
 
@@ -127,23 +128,23 @@ void* newArray(u4 count, u1 type){
 
 	switch (type){
 
-		case 0: size = 4; //reference
+		case 0: size = 4; /*reference*/
 				break;
-		case 4: size = 1;//boolean
+		case 4: size = 1;/*boolean*/
 				break;
-		case 5: size = 1;//char
+		case 5: size = 1;/*char*/
 				break;
-		case 6: size= 4;//float
+		case 6: size= 4;/*float*/
 				break;
-		case 7: size = 8;//double
+		case 7: size = 8;/*double*/
 				break;
-		case 8: size = 1;//byte
+		case 8: size = 1;/*byte*/
 				break;
-		case 9: size = 2;//short
+		case 9: size = 2;/*short*/
 				break;
-		case 10: size = 4;//int
+		case 10: size = 4;/*int*/
 				 break;
-		case 11: size = 8;//long
+		case 11: size = 8;/*long*/
 				 break;
 
 	}
@@ -152,7 +153,7 @@ void* newArray(u4 count, u1 type){
 	numArrays++;
 	arrayLength = realloc (arrayLength, sizeof(u4)*numArrays);
 	arrayLength[numArrays-1].size = size;
-	arrayLength[numArrays-1].ref = array;
+	arrayLength[numArrays-1].ref = (u4)array;
 
 	return array;
 }

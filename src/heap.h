@@ -25,8 +25,8 @@ struct array{
 struct Object **heap;
 
 /* número de arrays alocados e vetor com o tamanho dos arrays */
-struct array *arrayLength = 0;
-u4 numArrays = 0;
+struct array *arrayLength;
+u4 numArrays;
 
 
 void newHeap();
@@ -35,5 +35,6 @@ u4 getObjectField(struct Object* object, u4 cp_index);
 u8 getObjectFieldWide(struct Object* object, u4 cp_index);
 void setObjectField(struct Object* object, u4 cp_index, u4 value);
 void setObjectFieldWide(struct Object* object, u4 cp_index, u8 value);
+void* newArray(u4 count, u1 type);
 
 #endif

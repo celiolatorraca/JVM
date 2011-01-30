@@ -1,10 +1,28 @@
 .PHONY: all, apple, java
 
-all:
-	gcc -Wall -ansi -pedantic -error -lm classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c frame.c -o jvm -g
+CC = gcc
+FLAGS = -Wall -ansi -pedantic -error -lm -g
+AFLAGS = -Wall -ansi -pedantic -lm -g
+OBJS = classloader.o methods.o jvmerr.o carregador.o mnemonics.o stack.o heap.o instructions.o types.o frame.o
+
+
+all: main.c $(OBJS)
+	$(CC) main.c -o jvm $(OBJS) $(AFLAGS)
 	
-apple:
-	gcc -Wall -ansi -pedantic -lm classloader.c methods.c jvmerr.c carregador.c main.c mnemonics.c stack.c instructions.c types.c frame.c -o jvm -g
+apple: main.c $(OBJS)
+	$(CC) main.c -o jvm $(OBJS) $(AFLAGS)
+
+debug: main.c $(OBJS)
+	$(CC) main.c -o jvm $(OBJS) $(FLAGS) -DDEBUG
 	
+debug_apple: main.c $(OBJS)
+	$(CC) main.c -o jvm $(OBJS) $(AFLAGS) -DDEBUG
+
 java:
 	javac -target 1.2 -source 1.2 javaTeste/*.java
+	
+clean:
+	rm *.o
+
+%.o: %.c %.h
+	$(CC) $< -o $@ -c $(AFLAGS)
