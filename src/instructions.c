@@ -1042,7 +1042,7 @@ void funct_dsub()
 #ifdef DEBUG
 	printf("dsub %lf\n", value1 - value2);
 #endif
-	push(value1 - value2);
+	pushU8(value1 - value2);
 	current_frame->pc++;
 }
 
@@ -1086,7 +1086,7 @@ void funct_lmul()
 }
 void funct_fmul()
 {
-	u4 aux1, aux2;
+	u4 aux1, aux2, result;
 	float value1, value2;
 
 	aux1 = pop();
@@ -1098,7 +1098,9 @@ void funct_fmul()
 #ifdef DEBUG
 	printf("fmul %f\n", value1 * value2);
 #endif
-	push(value1 * value2);
+	value1 *= value2;
+	memcpy(&result, &value1, sizeof(u4));
+	push(result);
 
 	current_frame->pc++;
 }
@@ -1118,31 +1120,86 @@ void funct_dmul()
 #ifdef DEBUG
 	printf("dsub %lf\n", value1 * value2);
 #endif
-	push(value1 * value2);
+	pushU8(value1 * value2);
+
 	current_frame->pc++;
 }
 void funct_idiv()
 {
-	u4 value1, value2;
+	int32_t value1, value2;
 
-	value1 = pop();
-	value2 = pop();
+	value1 = (int32_t)pop();
+	value2 = (int32_t)pop();
 
 #ifdef DEBUG
 	printf("idiv %d\n", value1 / value2);
 #endif
-
 	push(value1 / value2);
 
 	current_frame->pc++;
 }
 void funct_ldiv()
 {
+	int64_t value1, value2, result;
+	u4 high1, low1, high2, low2;
+
+	low1 = pop();
+	high1 = pop();
+	low2 = pop();
+	high2 = pop();
+
+	value1 = (int64_t)convert_2x32_to_64_bits(low1, high1);
+	value2 = (int64_t)convert_2x32_to_64_bits(low2, high2);
+
+	result = value1 / value2;
+
+#ifdef DEBUG
+	printf("ldiv %ld\n", result);
+#endif
+	pushU8(result);
 
 	current_frame->pc++;
 }
-void funct_fdiv(){ current_frame->pc++;  }
-void funct_ddiv(){ current_frame->pc++;  }
+void funct_fdiv()
+{
+	u4 aux1, aux2, result;
+	float value1, value2;
+
+	aux1 = pop();
+	aux2 = pop();
+
+	memcpy(&value1, &aux1, sizeof(u4));
+	memcpy(&value2, &aux2, sizeof(u4));
+
+#ifdef DEBUG
+	printf("fdiv %f\n", value1 / value2);
+#endif
+	value1 /= value2;
+	memcpy(&result, &value1, sizeof(u4));
+	push(result);
+
+	current_frame->pc++;
+}
+void funct_ddiv()
+{
+	u4 high1, low1, high2, low2;
+	double value1, value2;
+
+	low1 = pop();
+	high1 = pop();
+	low2 = pop();
+	high1 = pop();
+
+	value1 = convert_cast_2x32_bits_to_double(low1, high1);
+	value2 = convert_cast_2x32_bits_to_double(low2, high2);
+
+#ifdef DEBUG
+	printf("ddiv %lf\n", value1 / value2);
+#endif
+	pushU8(value1 / value2);
+
+	current_frame->pc++;
+}
 
 void funct_irem()
 {
