@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/jvm/!svn/ver/95/trunk/tests/short
+END
+short_aritmetica.java
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/jvm/!svn/ver/95/trunk/tests/short/short_aritmetica.java
+END
+short_cast.java
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/jvm/!svn/ver/95/trunk/tests/short/short_cast.java
+END
+short_load.java
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/jvm/!svn/ver/95/trunk/tests/short/short_load.java
+END

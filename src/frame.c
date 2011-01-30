@@ -57,13 +57,18 @@ diante.
 
 void freeFrame()
 {
+	struct frame_stack *next;
+
 	if (stack->next != NULL)
 		current_frame = stack->next->value;
 	else
 		current_frame = NULL;
 
+	next = stack->next;
 	free(stack->value->fields);
 	free(stack->value);
 	free(stack);
+	stack = next;
+
 	freeStackFrame();
 }

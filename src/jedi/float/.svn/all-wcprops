@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/jvm/!svn/ver/83/trunk/tests/float
+END
+float_cast.java
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/jvm/!svn/ver/67/trunk/tests/float/float_cast.java
+END
+float_logico.java
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/jvm/!svn/ver/83/trunk/tests/float/float_logico.java
+END
+float_cast.class
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/jvm/!svn/ver/67/trunk/tests/float/float_cast.class
+END
+float_logico.class
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/jvm/!svn/ver/83/trunk/tests/float/float_logico.class
+END
+float_aritmetica.java
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/jvm/!svn/ver/48/trunk/tests/float/float_aritmetica.java
+END
+float_aritmetica.class
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/jvm/!svn/ver/48/trunk/tests/float/float_aritmetica.class
+END

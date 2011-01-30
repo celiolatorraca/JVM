@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/jvm/!svn/ver/84/trunk/tests/Belote
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/jvm/!svn/ver/76/trunk/tests/Belote/.classpath
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/jvm/!svn/ver/76/trunk/tests/Belote/.project
+END
+Jogador.java
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/jvm/!svn/ver/76/trunk/tests/Belote/Jogador.java
+END
+Jogador.class
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/jvm/!svn/ver/84/trunk/tests/Belote/Jogador.class
+END
+Belote.java
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/jvm/!svn/ver/84/trunk/tests/Belote/Belote.java
+END
+Carta.java
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/jvm/!svn/ver/76/trunk/tests/Belote/Carta.java
+END
+Belote.class
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/jvm/!svn/ver/84/trunk/tests/Belote/Belote.class
+END
+Carta.class
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/jvm/!svn/ver/84/trunk/tests/Belote/Carta.class
+END
