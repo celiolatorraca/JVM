@@ -55,7 +55,7 @@ method_info * getInitStaticMethod(struct ClassFile *main_class) {
 	u1 *name, *desc;
 	u2 name_length, desc_length;
 
-	/* procura por método main ([LJava/lang/String;)V */
+	/* procura por método main <clinit>()V */
 	for (i = 0; i < main_class->methods_count; i++){
 
 		name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->methods[i].name_index-1)]))->bytes;
@@ -110,17 +110,20 @@ void runMethod(){
 	while (current_frame != NULL && (current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
 		execute_instruction(current_frame->code[current_frame->pc]);
 	}
+
 	/* Finaliza o método chamado */
 	finishMethod();
-
+	#ifdef DEBUG
+	if (current_frame != NULL) {
+		printf("\nClass: %s\n", getClassName(current_frame->class));
+	}
+	#endif
 }
 
 
 void prepareMethod(struct ClassFile *class, method_info *method){
 
 	int i;
-	u1 opcode, operand;
-	struct OPCODE_info opcode_tmp;
 
 	/* procura por atributo Code */
 	for (i = 0; i < method->attributes_count; i++){
@@ -138,12 +141,6 @@ void prepareMethod(struct ClassFile *class, method_info *method){
 void finishMethod(){
 	freeFrame();
 }
-
-
-
-
-
-
 
 int getNumParameters(struct ClassFile *class, method_info *method){
 
@@ -174,7 +171,6 @@ int getNumParameters(struct ClassFile *class, method_info *method){
 
 	return prm;
 }
-
 
 method_info * getInitMethod(u1 *desc, u2 desc_len){
 

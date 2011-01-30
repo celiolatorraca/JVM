@@ -27,9 +27,11 @@ extern opcode_info *op_info;
 
 void execute_instruction(u1 opcode)
 {
+	#ifdef DEBUG
 	struct OPCODE_info opcode_tmp = op_info[opcode];
-	printf("Vai executar %s\n", opcode_tmp.desc);
-	fflush(stdout);
+	printf("\t%s\n", opcode_tmp.desc);
+	#endif
+
 	instr[opcode]();
 }
 
@@ -433,18 +435,18 @@ void funct_ldc()
 	current_frame->pc++;
 	indice = current_frame->code[current_frame->pc];
 
-	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Integer):
-			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_Float):
-			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
 			break;
 	}
 
@@ -465,18 +467,18 @@ void funct_ldc_w()
 
 	indice = convert_2x8_to_32_bits( low, high );
 
-	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Integer):
-			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Integer_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_Float):
-			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice])->bytes);
+			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice])->string_index);
+			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
 			break;
 	}
 
@@ -497,17 +499,17 @@ void funct_ldc2_w()
 
 	indice = convert_2x8_to_32_bits( low, high );
 
-	tag = ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->tag;
+	tag = ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->tag;
 
 	switch(tag)
 	{
 		case (CONSTANT_Long):
-			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->high_bytes);
-			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice])->low_bytes);
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->high_bytes);
+			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->low_bytes);
 			break;
 		case (CONSTANT_Double):
-			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->high_bytes);
-			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice])->low_bytes);
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice-1])->high_bytes);
+			push ( ((struct CONSTANT_Double_info *) current_frame->constant_pool[indice-1])->low_bytes);
 			break;
 	}
 
@@ -683,6 +685,10 @@ void funct_fload_0()
 void funct_fload_1()
 {
 	push( current_frame->fields[1] );
+
+#ifdef DEBUG
+	printf("%f\n",current_frame->fields[1]);
+#endif
 
 	current_frame->pc++;
 }
@@ -983,10 +989,73 @@ void funct_dup_x1()
 	current_frame->pc++;
 }
 
-void funct_dup_x2(){ current_frame->pc++;  }
-void funct_dup2(){ current_frame->pc++;  }
-void funct_dup2_x1(){ current_frame->pc++;  }
-void funct_dup2_x2(){ current_frame->pc++;  }
+void funct_dup_x2()
+{
+	u4 value1, value2, value3;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+
+
+	push(value1);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
+void funct_dup2()
+{
+	u4 value1, value2;
+
+	value1 = pop();
+	value2 = pop();
+
+	push(value2);
+	push(value1);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
+void funct_dup2_x1()
+{
+	u4 value1, value2, value3;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+
+	push(value2);
+	push(value1);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+void funct_dup2_x2()
+{
+	u4 value1, value2, value3, value4;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+	value4 = pop();
+
+	push(value2);
+	push(value1);
+	push(value4);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
 
 void funct_swap()
 {
@@ -1137,7 +1206,7 @@ void funct_dsub()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
@@ -1199,6 +1268,7 @@ void funct_fmul()
 	memcpy(&value2, &aux2, sizeof(u4));
 
 #ifdef DEBUG
+	printf("%f - %f\n",aux1, aux2);
 	printf("fmul %f\n", value1 * value2);
 #endif
 	value1 *= value2;
@@ -1215,7 +1285,7 @@ void funct_dmul()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
@@ -1291,7 +1361,7 @@ void funct_ddiv()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
@@ -1768,13 +1838,169 @@ void funct_fcmpl(){ current_frame->pc++;  }
 void funct_fcmpg(){ current_frame->pc++;  }
 void funct_dcmpl(){ current_frame->pc++;  }
 void funct_dcmpg(){ current_frame->pc++;  }
-void funct_ifeq(){ current_frame->pc++;  }
-void funct_ifne(){ current_frame->pc++;  }
-void funct_iflt(){ current_frame->pc++;  }
-void funct_ifge(){ current_frame->pc++;  }
-void funct_ifgt(){ current_frame->pc++;  }
-void funct_ifle(){ current_frame->pc++;  }
-void funct_if_icmpeq(){ current_frame->pc++;  }
+
+void funct_ifeq()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux == 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_ifne()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux != 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_iflt()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux < 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_ifge()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux >= 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_ifgt()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux > 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_ifle()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux <= 0 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
+void funct_if_icmpeq()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux1 = (signed) pop();
+	aux2 = (signed) pop();
+
+	if ( aux1 == aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmpeq fez o branch para o PC %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmpeq NAO fez o branch %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+
 void funct_if_icmpne(){ current_frame->pc++;  }
 void funct_if_icmplt(){ current_frame->pc++;  }
 void funct_if_icmpge(){ current_frame->pc++;  }
@@ -1986,7 +2212,7 @@ void funct_checkcast()
 	}
 
 
-	if (strcmp(getName(current_frame(current_frame->class, index)), getClassName(ref->this)) == 0)
+	if (strcmp(getName(current_frame->class, index), getClassName(ref->this)) == 0)
 	{
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
 	}
@@ -2038,11 +2264,34 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
+
 void funct_multianewarray(){
     /* TODO implementar se der tempo */
 	current_frame->pc++;
 }
-void funct_ifnull(){ current_frame->pc++;  }
+
+void funct_ifnull()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux == CONSTANT_Null )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		current_frame->pc += offset;
+	}
+	else
+	{
+		current_frame->pc += 3;
+	}
+}
+
 void funct_ifnonnull(){ current_frame->pc++;  }
 void funct_goto_w(){ current_frame->pc++;  }
 void funct_jsr_w(){ current_frame->pc++;  }
