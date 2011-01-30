@@ -2168,9 +2168,12 @@ void funct_i2f()
 	push( aux );
 
 	current_frame->pc++;
+	#ifdef DEBUG
+		printf("i2f converteu para %f\n", f);
+	#endif
 }
 
-void funct_i2d()
+void funct_i2d() /* TODO - vai dar pau no sinal negativo */
 {
 	double d;
 	u4 aux1;
@@ -2185,6 +2188,10 @@ void funct_i2d()
 	pushU8( aux2 );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("i2d converteu para %f\n", d);
+	#endif
 }
 
 void funct_l2i()
@@ -2199,7 +2206,7 @@ void funct_l2i()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("l2i empilhou %d\n", low);
+		printf("l2i econverteu para %d\n", low);
 	#endif
 }
 
@@ -2221,7 +2228,7 @@ void funct_l2f()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("l2f empilhou %f\n", f);
+		printf("l2f converteu para %f\n", f);
 	#endif
 }
 
@@ -2247,7 +2254,7 @@ void funct_l2d()
 	current_frame->pc++;
 
 	#ifdef DEBUG
-		printf("l2d empilhou %f\n", d);
+		printf("l2d converteu para %f\n", d);
 	#endif
 }
 
@@ -2263,9 +2270,13 @@ void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	push( aux );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("f2i converteu para %d\n", aux);
+	#endif
 }
 
-void funct_f2l()
+void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2278,9 +2289,13 @@ void funct_f2l()
 	pushU8( aux_8 );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("f2l converteu para %ld\n", aux_8);
+	#endif
 }
 
-void funct_f2d()
+void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2295,9 +2310,13 @@ void funct_f2d()
 	pushU8( aux_8 );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("f2d converteu para %f\n", d);
+	#endif
 }
 
-void funct_d2i()
+void funct_d2i() /* TODO - Conferir caso do signed */
 {
 	u4 low, high, resp;
 	u8 aux;
@@ -2306,12 +2325,16 @@ void funct_d2i()
 	low = pop();
 	high = pop();
 	aux = convert_2x32_to_64_bits(low, high);
-
 	memcpy(&d, &aux, 2*sizeof(u4));
+
 	resp = (u4) d;
 	push( resp );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("d2i converteu para %d\n", resp);
+	#endif
 }
 
 void funct_d2l()
@@ -2329,6 +2352,10 @@ void funct_d2l()
 	push( aux );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("d2l converteu para %ld\n", aux);
+	#endif
 }
 
 void funct_d2f()
@@ -2349,6 +2376,10 @@ void funct_d2f()
 	push( resp );
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("d2f converteu para %f\n", f);
+	#endif
 }
 
 void funct_i2b()
@@ -2359,6 +2390,10 @@ void funct_i2b()
 	push(aux);
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("i2b converteu para %c\n", aux);
+	#endif
 }
 
 void funct_i2c()
@@ -2369,6 +2404,10 @@ void funct_i2c()
 	push( (u4) aux);
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("i2c converteu para %h\n", aux);
+	#endif
 }
 
 void funct_i2s()
@@ -2379,13 +2418,163 @@ void funct_i2s()
 	push( (u4) aux);
 
 	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("i2c converteu para %h\n", aux);
+	#endif
 }
 
-void funct_lcmp(){ current_frame->pc++;  }
-void funct_fcmpl(){ current_frame->pc++;  }
-void funct_fcmpg(){ current_frame->pc++;  }
-void funct_dcmpl(){ current_frame->pc++;  }
-void funct_dcmpg(){ current_frame->pc++;  }
+void funct_lcmp()
+{
+	int32_t resp;
+	u4 low, high;
+	u8 aux1, aux2;
+
+	low = pop();
+	high = pop();
+	aux2 = convert_2x32_to_64_bits(low, high);
+
+	low = pop();
+	high = pop();
+	aux1 = convert_2x32_to_64_bits(low, high);
+
+	if ( aux1 == aux2 )
+		resp = 0;
+	else if ( aux1 > aux2 )
+		resp = 1;
+	else
+		resp = -1;
+
+	push((u4) resp);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("lcmp empilhou %d\n", resp);
+	#endif
+}
+
+void funct_fcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+{
+	int32_t resp;
+	u4 aux;
+	float f1, f2;
+
+	aux = pop();
+	memcpy(&f2, &aux, sizeof(u4));
+
+	aux = pop();
+	memcpy(&f1, &aux, sizeof(u4));
+
+	if ( f1 == f2 )
+		resp = 0;
+	else if ( f1 > f2 )
+		resp = 1;
+	else
+		resp = -1;
+
+	push((u4) resp);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("fcmpl empilhou %d\n", resp);
+	#endif
+}
+
+void funct_fcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+{
+	int32_t resp;
+	u4 aux;
+	float f1, f2;
+
+	aux = pop();
+	memcpy(&f2, &aux, sizeof(u4));
+
+	aux = pop();
+	memcpy(&f1, &aux, sizeof(u4));
+
+	if ( f1 == f2 )
+		resp = 0;
+	else if ( f1 > f2 )
+		resp = 1;
+	else
+		resp = -1;
+
+	push((u4) resp);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("fcmpg empilhou %d\n", resp);
+	#endif
+}
+
+void funct_dcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+{
+	int32_t resp;
+	u4 low, high;
+	u8 aux;
+	double d1, d2;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&d2, &aux, 2*sizeof(u4));
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&d1, &aux, 2*sizeof(u4));
+
+	if ( d1 == d2 )
+		resp = 0;
+	else if ( d1 > d2 )
+		resp = 1;
+	else
+		resp = -1;
+
+	push((u4) resp);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("dcmpl empilhou %d\n", resp);
+	#endif
+}
+
+void funct_dcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+{
+	int32_t resp;
+	u4 low, high;
+	u8 aux;
+	double d1, d2;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&d2, &aux, 2*sizeof(u4));
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+	memcpy(&d1, &aux, 2*sizeof(u4));
+
+	if ( d1 == d2 )
+		resp = 0;
+	else if ( d1 > d2 )
+		resp = 1;
+	else
+		resp = -1;
+
+	push((u4) resp);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("dcmpg empilhou %d\n", resp);
+	#endif
+}
 
 void funct_ifeq()
 {
@@ -2583,7 +2772,6 @@ void funct_if_icmpeq()
 		#endif
 	}
 }
-
 
 void funct_if_icmpne()
 {
