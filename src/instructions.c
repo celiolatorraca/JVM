@@ -1719,8 +1719,8 @@ void funct_idiv()
 {
 	int32_t value1, value2;
 
-	value1 = (int32_t)pop();
 	value2 = (int32_t)pop();
+	value1 = (int32_t)pop();
 
 #ifdef DEBUG
 	printf("idiv %d\n", value1 / value2);
@@ -1734,10 +1734,10 @@ void funct_ldiv()
 	int64_t value1, value2, result;
 	u4 high1, low1, high2, low2;
 
-	low1 = pop();
-	high1 = pop();
 	low2 = pop();
 	high2 = pop();
+	low1 = pop();
+	high1 = pop();
 
 	value1 = (int64_t)convert_2x32_to_64_bits(low1, high1);
 	value2 = (int64_t)convert_2x32_to_64_bits(low2, high2);
@@ -1756,8 +1756,8 @@ void funct_fdiv()
 	u4 aux1, aux2, result;
 	float value1, value2;
 
-	aux1 = pop();
 	aux2 = pop();
+	aux1 = pop();
 
 	memcpy(&value1, &aux1, sizeof(u4));
 	memcpy(&value2, &aux2, sizeof(u4));
@@ -1776,10 +1776,10 @@ void funct_ddiv()
 	u4 high1, low1, high2, low2;
 	double value1, value2;
 
-	low1 = pop();
-	high1 = pop();
 	low2 = pop();
 	high2 = pop();
+	low1 = pop();
+	high1 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
