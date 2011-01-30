@@ -1250,7 +1250,7 @@ void funct_dastore(){
 
 	low = pop();
 	high = pop();
-	value = convert_to_64_bits(low, high);
+	value = convert_2x32_to_64_bits(low, high);
 
 	index = pop();
 	ref = (void *)pop();
