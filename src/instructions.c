@@ -573,6 +573,12 @@ void funct_fload(){
 
 	push(current_frame->fields[index]);
 
+#ifdef DEBUG
+	float f;
+	memcpy(&f,&(current_frame->fields[index]),sizeof(u4));
+	printf("fload %u %f\n",index,f);
+#endif
+
 	current_frame->pc++;
 }
 
@@ -624,6 +630,10 @@ void funct_iload_0()
 void funct_iload_1()
 {
 	push( current_frame->fields[1] );
+
+#ifdef DEBUG
+	printf("iload_1 %d\n", current_frame->fields[1]);
+#endif
 
 	current_frame->pc++;
 }
@@ -679,6 +689,12 @@ void funct_fload_0()
 {
 	push( current_frame->fields[0] );
 
+#ifdef DEBUG
+	float f;
+	memcpy(&f,&(current_frame->fields[0]),sizeof(u4));
+	printf("fload_0 %f\n",f);
+#endif
+
 	current_frame->pc++;
 }
 
@@ -687,7 +703,9 @@ void funct_fload_1()
 	push( current_frame->fields[1] );
 
 #ifdef DEBUG
-	printf("%f\n",current_frame->fields[1]);
+	float f;
+	memcpy(&f,&(current_frame->fields[1]),sizeof(u4));
+	printf("fload_1 %f\n",f);
 #endif
 
 	current_frame->pc++;
@@ -697,12 +715,24 @@ void funct_fload_2()
 {
 	push( current_frame->fields[2] );
 
+#ifdef DEBUG
+	float f;
+	memcpy(&f,&(current_frame->fields[2]),sizeof(u4));
+	printf("fload_2 %f\n",f);
+#endif
+
 	current_frame->pc++;
 }
 
 void funct_fload_3()
 {
 	push( current_frame->fields[3] );
+
+#ifdef DEBUG
+	float f;
+	memcpy(&f,&(current_frame->fields[3]),sizeof(u4));
+	printf("fload_3 %f\n",f);
+#endif
 
 	current_frame->pc++;
 }
@@ -872,7 +902,9 @@ void funct_saload(){
 
 void funct_istore()
 {
-	u2 index, value;
+	u2 index;
+	u4 value;
+
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
 
@@ -903,13 +935,21 @@ void funct_lstore()
 }
 void funct_fstore()
 {
-	u2 index, value;
+	u2 index;
+	u4 value;
+
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
 
 	value = pop();
 
 	current_frame->fields[index] = value;
+
+#ifdef DEBUG
+	float f;
+	memcpy(&f,&(value),sizeof(u4));
+	printf("fstore %u %f\n",index,f);
+#endif
 
 	current_frame->pc++;
 }
@@ -934,7 +974,9 @@ void funct_dstore()
 }
 void funct_astore()
 {
-	u2 index, value;
+	u2 index;
+	u4 value;
+
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
 
@@ -1447,6 +1489,10 @@ void funct_iadd()
 
 	push (aux1 + aux2);
 
+#ifdef DEBUG
+	printf("iadd %d\n", aux1+aux2);
+#endif
+
 	current_frame->pc++;
 }
 
@@ -1482,6 +1528,10 @@ void funct_fadd()
 	memcpy(&aux1, &f1, sizeof(u4));
 
 	push( aux1 );
+
+#ifdef DEBUG
+	printf("%f\n", f1);
+#endif
 
 	current_frame->pc++;
 }
@@ -1636,7 +1686,7 @@ void funct_fmul()
 	memcpy(&value2, &aux2, sizeof(u4));
 
 #ifdef DEBUG
-	printf("%f - %f\n",aux1, aux2);
+	printf("%f - %f\n",value1, value2);
 	printf("fmul %f\n", value1 * value2);
 #endif
 	value1 *= value2;
@@ -3108,6 +3158,7 @@ void funct_invokevirtual()
 	int32_t class_index, class_index_tmp;
 	u2 name_type_index;
 	char *class_name;
+	u4 *fields_tmp;
 
 	struct ClassFile *class;
 	method_info *method;
@@ -3124,9 +3175,6 @@ void funct_invokevirtual()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	#ifdef DEBUG
-	printf("Class name: %s\n", class_name);
-	#endif
 
 	class_index = loadClass( class_name );
 	class = getClassByIndex( class_index );
@@ -3136,11 +3184,19 @@ void funct_invokevirtual()
 	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
 
 	numParams = getNumParameters( class , method );
+	fields_tmp = malloc(numParams * sizeof(u4));
+
 	for (i = numParams; i >= 0; i--) {
-		current_frame->fields[i] = pop();
+		fields_tmp[i] = pop();
 	}
 
+	/* Prepara o novo frame para colocar os parametros que serao usados */
 	prepareMethod(class, method);
+
+	for (i = numParams; i >= 0; i--) {
+		current_frame->fields[i] = fields_tmp[i];
+	}
+
 	runMethod();
 
 	current_frame->pc++;
@@ -3154,14 +3210,23 @@ void funct_invokeinterface(){ current_frame->pc++;  }
 void funct_new()
 {
 	u1 low, high;
-	u4 index;
+	u4 index, class_index;
+	char *class_name;
+	struct Object *objeto;
 
 	high = current_frame->code[++(current_frame->pc)];
 	low = current_frame->code[++(current_frame->pc)];
 
 	index = convert_2x8_to_32_bits(low, high);
 
-	current_frame->constant_pool[index-1];
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[index-1]))->name_index);
+
+	class_index = loadClass( class_name );
+
+	objeto = newObject(getClassByIndex(class_index));
+
+	push( (u4)objeto );
 
 	current_frame->pc++;
 }

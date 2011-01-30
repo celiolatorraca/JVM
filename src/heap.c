@@ -20,7 +20,7 @@ struct Object* newObject(struct ClassFile *this)
 	struct Object *object;
 	u4 i, counter;
 	u2 index;
-	char descriptor[5];
+	char descriptor[200];
 	struct CONSTANT_Utf8_info *desc_struct;
 
 	if (!this)
@@ -71,10 +71,11 @@ struct Object* newObject(struct ClassFile *this)
 	printf("Object info\n------------\n");
 	printf("this: %X\n", object);
 	printf("super: %X\n", object->super);
-	printf("fields: ", object);
+	printf("fields: ");
 	for (i = 0; i < counter; i++)
 		printf("%d ", object->fields[i]);
-	printf("\nfields index:", object);
+	printf("\nfields index: ");
+	for (i = 0; i < counter; i++)
 		printf("%d ", object->fields_index[i]);
 	printf("\n\n");
 #endif

@@ -113,8 +113,8 @@ method_info * getMethodByNameAndDescIndex(struct ClassFile *main_class, struct C
 
 void runMethod(){
 
-	/* loop principal do método - executa o código*/
-	while (current_frame != NULL && (current_frame->pc) < current_frame->code_length){ /* < ou <= ? */
+	/* loop principal do método - executa o código */
+	while (current_frame != NULL && (current_frame->pc) < current_frame->code_length){
 		execute_instruction(current_frame->code[current_frame->pc]);
 	}
 
