@@ -22,6 +22,8 @@ extern u4 numArrays;
 
 int next_is_wide = 0;
 
+extern opcode_info *op_info;
+
 
 void execute_instruction(u1 opcode)
 {
