@@ -71,7 +71,7 @@ int32_t loadClass(char *class_name){
 		populate_opcode_info();
 
 		prepareMethod(classArray[numClasses-1], staticMethod);
-		runProgram();
+		runMethod();
 	}
 
 	/* carrega a superclasse da classe carregada */
