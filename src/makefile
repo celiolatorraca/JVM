@@ -2,7 +2,7 @@
 
 CC = gcc
 FLAGS = -Wall -ansi -pedantic -error -lm -g
-AFLAGS = -Wall -ansi -pedantic -lm -g
+AFLAGS = -Wall -ansi -pedantic -lm -g -m32
 OBJS = classloader.o methods.o jvmerr.o carregador.o mnemonics.o stack.o heap.o instructions.o types.o frame.o
 
 all: main.c $(OBJS)

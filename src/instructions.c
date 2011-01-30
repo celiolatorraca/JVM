@@ -683,7 +683,7 @@ void funct_lload_3()
 	push( current_frame->fields[3] );
 
 #ifdef DEBUG
-	long l = (long) convert_2x32_to_64_bits(current_frame->fields[3],current_frame->fields[4]);
+	int64_t l = (int64_t) convert_2x32_to_64_bits(current_frame->fields[4],current_frame->fields[3]);
 	printf("lload_3 %ld\n", l);
 #endif
 
