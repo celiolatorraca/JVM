@@ -1882,11 +1882,11 @@ void funct_checkcast()
 		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
 
-	/*TODO usar possivelmente getClassName(current_frame->class)*/
-	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+
+	if (strcmp(getName(current_frame(current_frame->class, index)), getClassName(ref->this)) == 0)
 	{
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
-	}*/
+	}
 
 	/*TODO Verificar a subclasses*/
 	push(ref);
@@ -1912,13 +1912,12 @@ void funct_instanceof(){
 		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
 
-	/*TODO usar possivelmente getClassName(current_frame->class)*/
-	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+	if (strcmp( getName(current_frame->class, index), getClassName(ref->this)) == 0)
 	{
 		push(1);
 		current_frame->pc++;
 		return;
-	}*/
+	}
 
 	push(0);
 	current_frame->pc++;
