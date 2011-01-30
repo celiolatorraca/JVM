@@ -11,13 +11,14 @@
 #include "types.h"
 #include "methods.h"
 #include "heap.h"
+#include "jvmerr.h"
 
 
 #define WHERE "INTRUCTIONS"
 
 extern struct frame *current_frame;
-extern struct array *arrayLength = NULL;
-extern u4 numArrays = 0;
+extern struct array *arrayLength;
+extern u4 numArrays;
 
 int next_is_wide = 0;
 
@@ -999,7 +1000,7 @@ void funct_lsub()
 
 	current_frame->pc++;
 }
-// TODO verificar se funciona, se nao usar memcpy pra pegar resultado
+/* TODO verificar se funciona, se nao usar memcpy pra pegar resultado */
 void funct_fsub()
 {
 	u4 aux1, aux2;
@@ -1099,9 +1100,7 @@ void funct_lrem()
 
 	aux1 = aux1 % aux2;
 
-	convert_64_bits_to_2x32((u8)aux1, &low, &high);
-	push( high );
-	push( low );
+	push( (u8)aux1 );
 
 	current_frame->pc++;
 }
@@ -1142,9 +1141,7 @@ void funct_drem()
 
 	memcpy(&aux, &d1, sizeof(u8));
 
-	convert_64_bits_to_2x32(aux, &low, &high);
-	push( high );
-	push( low );
+	push( aux );
 
 	current_frame->pc++;
 }
@@ -1172,9 +1169,7 @@ void funct_lneg()
 
 	aux = -aux;
 
-	convert_64_bits_to_2x32((u8)aux, &low, &high);
-	push( high );
-	push( low );
+	push( (u8)aux );
 
 	current_frame->pc++;
 }
@@ -1206,9 +1201,7 @@ void funct_dneg()
 
 	d = -d;
 
-	convert_64_bits_to_2x32((u8)d, &low, &high);
-	push( high );
-	push( low );
+	push( (u8)d );
 
 	current_frame->pc++;
 }
@@ -1244,9 +1237,7 @@ void funct_lshl()
 
 	aux1 <<= aux2;
 
-	convert_64_bits_to_2x32((u8)aux1, &low, &high);
-	push( high );
-	push( low );
+	push( (u8)aux1 );
 
 	current_frame->pc++;
 }
@@ -1286,8 +1277,9 @@ void funct_lshr()
 	u8 aux1 = 0xffffffffffffffff;  /* 1111 1111 ... */
 	u8 aux4 = 0x8000000000000000;  /* 1000 0000 ... */
 
+	u4 low, high;
 	int64_t aux3;
-	u4 low, high, aux2;
+	u4 aux2;
 
 	aux2 = pop();
 	aux2 &= mask;
@@ -1308,9 +1300,7 @@ void funct_lshr()
 		aux3 |= aux1;
 	}
 
-	convert_64_bits_to_2x32((u8)aux3, &low, &high);
-	push( high );
-	push( low );
+	push( (u8)aux3 );
 
 	current_frame->pc++;
 }
@@ -1335,7 +1325,8 @@ void funct_lushr()
 {
 	int64_t aux1;
 	u4 mask = 0x3f;  /*... 00011 1111*/
-	u4 low, high, aux2;
+	u4 aux2;
+	u4 low, high;
 
 	aux2 = pop();
 	aux2 &= mask;
@@ -1346,9 +1337,7 @@ void funct_lushr()
 
 	aux1 >>= aux2;
 
-	convert_64_bits_to_2x32((u8)aux1, &low, &high);
-	push( high );
-	push( low );
+	pushU8( (u8)aux1 );
 
 	current_frame->pc++;
 }
@@ -1382,9 +1371,7 @@ void funct_land()
 
 	aux1 &= aux2;
 
-	convert_64_bits_to_2x32(aux1, &low, &high);
-	push( high );
-	push( low );
+	pushU8( aux1 );
 
 	current_frame->pc++;
 }
@@ -1418,9 +1405,7 @@ void funct_lor()
 
 	aux1 |= aux2;
 
-	convert_64_bits_to_2x32(aux1, &low, &high);
-	push( high );
-	push( low );
+	pushU8( aux1 );
 
 	current_frame->pc++;
 }
@@ -1454,9 +1439,7 @@ void funct_lxor()
 
 	aux1 ^= aux2;
 
-	convert_64_bits_to_2x32(aux1, &low, &high);
-	push( high );
-	push( low );
+	pushU8( aux1 );
 
 	current_frame->pc++;
 }
@@ -1482,7 +1465,7 @@ void funct_i2l()
 	u4 mask = 0x80000000;  /* 1000 0000 ... */
 	u8 extend = 0xffffffff00000000;
 
-	u4 aux1, aux3, low, high;
+	u4 aux1, aux3;
 	int64_t aux2;
 
 	aux1 = pop();
@@ -1497,9 +1480,7 @@ void funct_i2l()
 		aux2 |= extend;
 	}
 
-	convert_64_bits_to_2x32(aux2, &low, &high);
-	push( high );
-	push( low );
+	pushU8( aux2 );
 
 	current_frame->pc++;
 }
@@ -1522,7 +1503,7 @@ void funct_i2f()
 void funct_i2d()
 {
 	double d;
-	u4 aux1, low, high;
+	u4 aux1;
 	u8 aux2;
 
 	aux1 = pop();
@@ -1531,9 +1512,7 @@ void funct_i2d()
 
 	memcpy(&aux2, &d, sizeof(u8));
 
-	convert_64_bits_to_2x32(aux2, &low, &high);
-	push( high );
-	push( low );
+	pushU8( aux2 );
 
 	current_frame->pc++;
 }
@@ -1590,47 +1569,94 @@ void funct_return()
 
 void funct_getstatic()
 {
-	u4 low, high;
+	u1 index1, index2;
+	u2 index, name_type_index;
+	u4 class_index_tmp;
+	int32_t class_index, field_index;
+	u8 value;
+	char *class_name, *name, *type;
 
-	u1 index1 = (u1) current_frame->fields[++(current_frame->pc)];
-	u1 index2 = (u1) current_frame->fields[++(current_frame->pc)];
 
-	u2 index = ((u2)index1 << 8) | (u2)index2;
+	index1 = (u1) current_frame->fields[++(current_frame->pc)];
+	index2 = (u1) current_frame->fields[++(current_frame->pc)];
 
-	u4 tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+	index = ((u2)index1 << 8) | (u2)index2;
 
-	char *class_name = getName(current_frame->class,
-			((struct CONSTANT_Class_info *)(current_frame->constant_pool[tmp-1]))->name_index);
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
 
-	int32_t class_index = loadClass( class_name );
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+	class_index = loadClass( class_name );
 
-	char *name = getName(current_frame->class,
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+
+	name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
-	char *type = getName(current_frame->class,
+	type = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
-	int32_t field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
 
-	u8 value = getFieldValue( class_index , field_index );
+	value = getStaticFieldValue( class_index , field_index );
 
+	/* Verifica se eh Double ou Long para saber quantos bits colocar na pilha */
 	if (type[0] == 'J' || type[0] == 'D') {
-
-		convert_64_bits_to_2x32( value , &low , &high );
-		push( high );
-		push( low );
-
+		pushU8( value );
 	} else {
-
 		push( (u4)value );
-
 	}
 
 	current_frame->pc++;
 }
 
-void funct_putstatic(){ current_frame->pc++;  }
+void funct_putstatic()
+{
+	u1 index1, index2;
+	u2 index, name_type_index;
+	u4 class_index_tmp;
+	int32_t class_index, field_index;
+	u4 value1, value2;
+	u8 value;
+	char *class_name, *name, *type;
+
+
+	index1 = (u1) current_frame->fields[++(current_frame->pc)];
+	index2 = (u1) current_frame->fields[++(current_frame->pc)];
+
+	index = ((u2)index1 << 8) | (u2)index2;
+
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+	class_index = loadClass( class_name );
+
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+
+	name = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
+	type = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
+
+	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+	/* Pega o valor a ser inserido no field static */
+	if (type[0] == 'J' || type[0] == 'D') {
+		value1 = pop();
+		value2 = pop();
+
+		value = convert_2x32_to_64_bits( value1 , value2 );
+	} else {
+		value = (u8) pop();
+	}
+
+	setStaticFieldValue( class_index , field_index , value );
+
+	current_frame->pc++;
+}
+
 void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
 void funct_invokevirtual(){ current_frame->pc++;  }
@@ -1727,11 +1753,13 @@ void funct_checkcast()
 		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
 
-	if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+	/*TODO usar possivelmente getClassName(current_frame->class)*/
+	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
 	{
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
-	}
+	}*/
 
+	/*TODO Verificar a subclasses*/
 	push(ref);
 	current_frame->pc++;
 }
@@ -1739,32 +1767,33 @@ void funct_checkcast()
 
 void funct_instanceof(){
 	struct Object *ref;
-		u2 index;
-		char * cur_class_name;
+	u2 index;
+	char * cur_class_name;
 
-		current_frame->pc++;
-		index = current_frame->code[current_frame->pc];
-		index = index << 8;
-		current_frame->pc++;
-		index = index | current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+	index = index << 8;
+	current_frame->pc++;
+	index = index | current_frame->code[current_frame->pc];
 
-		ref = (struct Object *)pop();
+	ref = (struct Object *)pop();
 
-		if (ref == NULL)
-		{
-			errorMsg(WHERE,"Referência nula em 'checkcast'");
-		}
-
-		if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
-		{
-			push(1);
-			current_frame->pc++;
-			return;
-		}
-
-		push(0);
-		current_frame->pc++;
+	if (ref == NULL)
+	{
+		errorMsg(WHERE,"Referência nula em 'checkcast'");
 	}
+
+	/*TODO usar possivelmente getClassName(current_frame->class)*/
+	/*if (strcmp( getFieldValue(current_frame->class, index), getClassName(ref->this)) == 0)
+	{
+		push(1);
+		current_frame->pc++;
+		return;
+	}*/
+
+	push(0);
+	current_frame->pc++;
+}
 
 
 

@@ -22,12 +22,11 @@ void push(u4 value)
 
 void pushU8(u8 value)
 {
-	u4 aux;
+	u4 low, high;
 
-	aux = value >> 32;
-	push(aux);
-	aux = value;
-	push(aux);
+	convert_64_bits_to_2x32( value , &low , &high );
+	push( high );
+	push( low );
 }
 
 
