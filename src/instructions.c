@@ -996,11 +996,71 @@ void funct_lsub()
 
 	current_frame->pc++;
 }
+// TODO verificar se funciona, se nao usar memcpy pra pegar resultado
+void funct_fsub()
+{
+	u4 aux1, aux2;
+	float value1, value2;
 
-void funct_fsub(){ current_frame->pc++;  }
-void funct_dsub(){ current_frame->pc++;  }
-void funct_imul(){ current_frame->pc++;  }
-void funct_lmul(){ current_frame->pc++;  }
+	aux1 = pop();
+	aux2 = pop();
+
+	memcpy(&value1, &aux1, sizeof(u4));
+	memcpy(&value2, &aux2, sizeof(u4));
+
+	push(value1 - value2);
+
+	current_frame->pc++;
+}
+
+void funct_dsub()
+{
+	u4 high1, low1, high2, low2;
+	double value1, value2;
+
+	low1 = pop();
+	high1 = pop();
+	low2 = pop();
+	high1 = pop();
+
+	value1 = convert_2x32_bits_to_double(low1, high1);
+	value2 = convert_2x32_bits_to_double(low2, high2);
+
+	push(value1 - value2);
+	current_frame->pc++;
+}
+
+void funct_imul()
+{
+	u4 value1, value2;
+
+	value1 = pop();
+	value2 = pop();
+
+	push(value1*value2);
+
+	current_frame->pc++;
+}
+
+void funct_lmul()
+{
+	u8 value1, value2, result;
+	u4 high1, low1, high2, low2;
+
+	low1 = pop();
+	high1 = pop();
+	low2 = pop();
+	high2 = pop();
+
+	value1 = convert_2x32_to_64_bits(low1, high1);
+	value2 = convert_2x32_to_64_bits(low2, high2);
+
+	result = value1 * value2;
+
+	pushU8(result);
+
+	current_frame->pc++;
+}
 void funct_fmul(){ current_frame->pc++;  }
 void funct_dmul(){ current_frame->pc++;  }
 void funct_idiv(){ current_frame->pc++;  }

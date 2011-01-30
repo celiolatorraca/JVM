@@ -6,7 +6,7 @@
 #define HEAP_INIT 15
 
 struct Object {
-	void **this_cp;
+	struct ClassFile *this;
 	struct Object *super;
 	u4 *fields;
 	u4 *fields_index;

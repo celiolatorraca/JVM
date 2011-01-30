@@ -36,7 +36,7 @@ struct Object* newObject(struct ClassFile *this)
 	}
 
 	object = calloc(sizeof(struct Object),1);
-	object->this_cp = this->constant_pool;
+	object->this = this;
 	object->super = newObject(getClassByName(getParentName(this)));
 
 	counter = 0;
@@ -119,7 +119,7 @@ void setObjectFieldWide(struct Object* object, u4 cp_index, u8 value)
 
 
 
-void * newArray(u4 count, u1 type){
+void* newArray(u4 count, u1 type){
 
 	u4 size;
 
