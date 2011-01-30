@@ -39,14 +39,18 @@ int main(int argc, char **argv)
 		fatalErrorMsg(WHERE, "Argumentos errados.");
 	}
 
+	/* Popula array de instrucoes */
+	initializeInstr();
+	populate_opcode_info();
 
 	loadClass(main_class);
 
 	if ((main_method = getMainMethod()) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível localizar método main.");
 
-	initializeInstr();
-	populate_opcode_info();
+	#ifdef DEBUG
+	printf("\nClass: %s\n", getClassName(getClassByIndex(0)));
+	#endif
 
 	prepareMethod(getClassByIndex(0), main_method);
 	runMethod();
