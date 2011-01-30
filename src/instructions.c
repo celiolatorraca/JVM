@@ -1875,10 +1875,16 @@ void funct_if_icmpeq()
 	{
 		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmpeq fez o branch para o PC %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmpeq NAO fez o branch %d\n", current_frame->pc);
+		#endif
 	}
 }
 
