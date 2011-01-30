@@ -763,20 +763,187 @@ void funct_aload_3()
 	current_frame->pc++;
 }
 
-void funct_iaload(){ current_frame->pc++;  }
-void funct_laload(){ current_frame->pc++;  }
-void funct_faload(){ current_frame->pc++;  }
-void funct_daload(){ current_frame->pc++;  }
-void funct_aaload(){ current_frame->pc++;  }
-void funct_baload(){ current_frame->pc++;  }
-void funct_caload(){ current_frame->pc++;  }
-void funct_saload(){ current_frame->pc++;  }
-void funct_istore(){ current_frame->pc++;  }
-void funct_lstore(){ current_frame->pc++;  }
-void funct_fstore(){ current_frame->pc++;  }
-void funct_dstore(){ current_frame->pc++;  }
-void funct_astore(){ current_frame->pc++;  }
+void funct_iaload(){
 
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push( ((u4 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_laload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	pushU8(((u8 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_faload(){
+
+	u4 index, res;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	memcpy(&res, &((float *)ref)[index], sizeof(u4));
+	push(res);
+
+	current_frame->pc++;
+}
+
+void funct_daload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	pushU8(((u8 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_aaload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push( ((u4 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_baload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u1*)ref)[index] ));
+
+	current_frame->pc++;
+}
+
+void funct_caload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u2*)ref)[index] ));
+
+	current_frame->pc++;
+
+}
+void funct_saload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u2*)ref)[index] ));
+
+	current_frame->pc++;
+
+}
+
+
+void funct_istore()
+{
+	u2 index, value;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	value = pop();
+
+	current_frame->fields[index] = value;
+
+	current_frame->pc++;
+}
+void funct_lstore()
+{
+	u2 index;
+	u4 high, low;
+	u8 value;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[index] = value;
+#ifdef DEBUG
+	printf("lstore: %ld\n", ((u8*)current_frame->fields)[index]);
+#endif
+	current_frame->pc++;
+}
+void funct_fstore()
+{
+	u2 index, value;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	value = pop();
+
+	current_frame->fields[index] = value;
+
+	current_frame->pc++;
+}
+void funct_dstore()
+{
+	u2 index;
+	u4 high, low;
+	u8 value;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[index] = value;
+#ifdef DEBUG
+	printf("lstore: %f\n", ((u8*)current_frame->fields)[index]);
+#endif
+	current_frame->pc++;
+}
+void funct_astore()
+{
+	u2 index, value;
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	value = pop();
+
+	current_frame->fields[index] = value;
+
+	current_frame->pc++;
+}
 void funct_istore_0()
 {
 	u4 value;
@@ -820,23 +987,214 @@ void funct_istore_3()
 
 	current_frame->pc++;
 }
+void funct_lstore_0()
+{
+	u4 high, low;
+	u8 value;
 
-void funct_lstore_0(){ current_frame->pc++;  }
-void funct_lstore_1(){ current_frame->pc++;  }
-void funct_lstore_2(){ current_frame->pc++;  }
-void funct_lstore_3(){ current_frame->pc++;  }
-void funct_fstore_0(){ current_frame->pc++;  }
-void funct_fstore_1(){ current_frame->pc++;  }
-void funct_fstore_2(){ current_frame->pc++;  }
-void funct_fstore_3(){ current_frame->pc++;  }
-void funct_dstore_0(){ current_frame->pc++;  }
-void funct_dstore_1(){ current_frame->pc++;  }
-void funct_dstore_2(){ current_frame->pc++;  }
-void funct_dstore_3(){ current_frame->pc++;  }
-void funct_astore_0(){ current_frame->pc++;  }
-void funct_astore_1(){ current_frame->pc++;  }
-void funct_astore_2(){ current_frame->pc++;  }
-void funct_astore_3(){ current_frame->pc++;  }
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[0] = value;
+#ifdef DEBUG
+	printf("lstore0: %ld\n", ((u8*)current_frame->fields)[0]);
+#endif
+	current_frame->pc++;
+}
+void funct_lstore_1()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[1] = value;
+#ifdef DEBUG
+	printf("lstore1: %ld\n", ((u8*)current_frame->fields)[1]);
+#endif
+	current_frame->pc++;
+}
+void funct_lstore_2()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[2] = value;
+#ifdef DEBUG
+	printf("lstore2: %ld\n", ((u8*)current_frame->fields)[2]);
+#endif
+	current_frame->pc++;
+}
+void funct_lstore_3()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[3] = value;
+#ifdef DEBUG
+	printf("lstore3: %ld\n", ((u8*)current_frame->fields)[3]);
+#endif
+	current_frame->pc++;
+}
+void funct_fstore_0()
+{
+	u2  value;
+
+	value = pop();
+
+	current_frame->fields[0] = value;
+
+	current_frame->pc++;
+}
+void funct_fstore_1()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[1] = value;
+
+	current_frame->pc++;
+}
+void funct_fstore_2()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[2] = value;
+
+	current_frame->pc++;
+}
+void funct_fstore_3()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[3] = value;
+
+	current_frame->pc++;
+}
+void funct_dstore_0()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[0] = value;
+#ifdef DEBUG
+	printf("dstore0: %f\n", ((u8*)current_frame->fields)[0]);
+#endif
+	current_frame->pc++;
+}
+void funct_dstore_1()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[1] = value;
+#ifdef DEBUG
+	printf("dstore1: %f\n", ((u8*)current_frame->fields)[1]);
+#endif
+	current_frame->pc++;
+}
+void funct_dstore_2()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[2] = value;
+#ifdef DEBUG
+	printf("dstore2: %f\n", ((u8*)current_frame->fields)[2]);
+#endif
+	current_frame->pc++;
+}
+void funct_dstore_3()
+{
+	u4 high, low;
+	u8 value;
+
+	low = pop();
+	high = pop();
+
+	value = convert_2x32_to_64_bits(low, high);
+
+	((u8*)current_frame->fields)[3] = value;
+#ifdef DEBUG
+	printf("dstore3: %f\n", ((u8*)current_frame->fields)[3]);
+#endif
+	current_frame->pc++;
+}
+void funct_astore_0()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[0] = value;
+
+	current_frame->pc++;
+}
+void funct_astore_1()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[1] = value;
+
+	current_frame->pc++;
+}
+void funct_astore_2()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[2] = value;
+
+	current_frame->pc++;
+}
+void funct_astore_3()
+{
+	u2 value;
+
+	value = pop();
+
+	current_frame->fields[3] = value;
+
+	current_frame->pc++;
+}
 void funct_iastore(){ current_frame->pc++;  }
 void funct_lastore(){ current_frame->pc++;  }
 void funct_fastore(){ current_frame->pc++;  }
@@ -1109,7 +1467,7 @@ void funct_dsub()
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
 #ifdef DEBUG
-	printf("dsub %lf\n", value1 - value2);
+	printf("dsub %f\n", value1 - value2);
 #endif
 	pushU8(value1 - value2);
 	current_frame->pc++;
@@ -1123,7 +1481,7 @@ void funct_imul()
 	value2 = (int32_t)pop();
 
 #ifdef DEBUG
-	printf("imul %ld\n", value1 * value2);
+	printf("imul %d\n", value1 * value2);
 #endif
 
 	push(value1 * value2);
@@ -1188,7 +1546,7 @@ void funct_dmul()
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
 #ifdef DEBUG
-	printf("dsub %lf\n", value1 * value2);
+	printf("dsub %f\n", value1 * value2);
 #endif
 	pushU8(value1 * value2);
 
@@ -1264,7 +1622,7 @@ void funct_ddiv()
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
 #ifdef DEBUG
-	printf("ddiv %lf\n", value1 / value2);
+	printf("ddiv %f\n", value1 / value2);
 #endif
 	pushU8(value1 / value2);
 
@@ -1717,6 +2075,8 @@ void funct_i2d()
 }
 
 void funct_l2i(){ current_frame->pc++;  }
+
+
 void funct_l2f(){ current_frame->pc++;  }
 void funct_l2d(){ current_frame->pc++;  }
 void funct_f2i(){ current_frame->pc++;  }
@@ -2276,7 +2636,7 @@ void funct_newarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	push (newArray(count, type));
+	push ((u4)newArray(count, type));
 
 	current_frame->pc++;
 }
@@ -2301,7 +2661,7 @@ void funct_anewarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	push (newArray(count, 0));
+	push ((u4)newArray(count, 0));
 
 	current_frame->pc++;
 
@@ -2330,6 +2690,7 @@ void funct_arraylength()
 
 	current_frame->pc++;
 }
+
 void funct_athrow(){ current_frame->pc++;  } /* Näo precisa fazer nada além disso */
 
 
@@ -2405,7 +2766,11 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-void funct_multianewarray(){ current_frame->pc++;  }
+
+void funct_multianewarray(){
+    /* TODO implementar se der tempo */
+	current_frame->pc++;
+}
 
 void funct_ifnull()
 {
