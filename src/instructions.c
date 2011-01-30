@@ -1663,7 +1663,18 @@ void funct_fcmpl(){ current_frame->pc++;  }
 void funct_fcmpg(){ current_frame->pc++;  }
 void funct_dcmpl(){ current_frame->pc++;  }
 void funct_dcmpg(){ current_frame->pc++;  }
-void funct_ifeq(){ current_frame->pc++;  }
+
+void funct_ifeq()
+{
+	u4 aux;
+
+	current_frame->code[++(current_frame->pc)];
+
+	aux = pop();
+
+	current_frame->pc++;
+}
+
 void funct_ifne(){ current_frame->pc++;  }
 void funct_iflt(){ current_frame->pc++;  }
 void funct_ifge(){ current_frame->pc++;  }
