@@ -127,6 +127,8 @@ void* newArray(u4 count, u1 type){
 
 	switch (type){
 
+		case 0: size = 4; //reference
+				break;
 		case 4: size = 1;//boolean
 				break;
 		case 5: size = 1;//char
@@ -146,7 +148,11 @@ void* newArray(u4 count, u1 type){
 
 	}
 
-	array = calloc(count, array->size);
+	array = calloc(count, size);
+	numArrays++;
+	arrayLength = realloc (arrayLength, sizeof(u4)*numArrays);
+	arrayLength[numArrays-1].size = size;
+	arrayLength[numArrays-1].ref = array;
 
 	return array;
 }
