@@ -1747,12 +1747,18 @@ void funct_ifeq()
 
 	if ( aux == 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifeq fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifeq NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1769,12 +1775,18 @@ void funct_ifne()
 
 	if ( aux != 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifne fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifne NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1791,12 +1803,18 @@ void funct_iflt()
 
 	if ( aux < 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("iflt fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("iflt NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1813,12 +1831,18 @@ void funct_ifge()
 
 	if ( aux >= 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifge fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifge NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1835,12 +1859,18 @@ void funct_ifgt()
 
 	if ( aux > 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifgt fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifgt NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1857,12 +1887,18 @@ void funct_ifle()
 
 	if ( aux <= 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifle fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifle NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
@@ -1880,30 +1916,241 @@ void funct_if_icmpeq()
 
 	if ( aux1 == aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 		#ifdef DEBUG
-			printf("if_icmpeq fez o branch para o PC %d\n", current_frame->pc);
+			printf("if_icmpeq fez o branch para o PC = %d\n", current_frame->pc);
 		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
 		#ifdef DEBUG
-			printf("if_icmpeq NAO fez o branch %d\n", current_frame->pc);
+			printf("if_icmpeq NAO fez o branch PC = %d\n", current_frame->pc);
 		#endif
 	}
 }
 
 
-void funct_if_icmpne(){ current_frame->pc++;  }
-void funct_if_icmplt(){ current_frame->pc++;  }
-void funct_if_icmpge(){ current_frame->pc++;  }
-void funct_if_icmpgt(){ current_frame->pc++;  }
-void funct_if_icmple(){ current_frame->pc++;  }
-void funct_if_acmpeq(){ current_frame->pc++;  }
-void funct_if_acmpne(){ current_frame->pc++;  }
-void funct_goto(){ current_frame->pc++;  }
+void funct_if_icmpne()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux1 = (signed) pop();
+	aux2 = (signed) pop();
+
+	if ( aux1 != aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmpne fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmpne NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_icmplt()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 < aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmplt fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmplt NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_icmpge()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 >= aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmpge fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmpge NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_icmpgt()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 > aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmpgt fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmpgt NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_icmple()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 <= aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_icmple fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_icmple NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_acmpeq()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 == aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_acmpeq fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_acmpeq NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_if_acmpne()
+{
+	int32_t aux1, aux2;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux2 = (signed) pop();
+	aux1 = (signed) pop();
+
+	if ( aux1 != aux2 )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("if_acmpne fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("if_acmpne NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_goto()
+{
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+	current_frame->pc += offset;
+
+	#ifdef DEBUG
+		printf("goto - novo PC = %d\n", current_frame->pc);
+	#endif
+}
+
 void funct_jsr(){ current_frame->pc++;  }
 void funct_ret(){ current_frame->pc++;  }
 void funct_tableswitch(){ current_frame->pc++;  }
@@ -2173,12 +2420,18 @@ void funct_ifnull()
 
 	if ( aux == CONSTANT_Null )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte1, branchbyte2);
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
+		#ifdef DEBUG
+			printf("ifnull fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
 	}
 	else
 	{
 		current_frame->pc += 3;
+		#ifdef DEBUG
+			printf("ifnull NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
 	}
 }
 
