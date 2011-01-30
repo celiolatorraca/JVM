@@ -377,7 +377,7 @@ void funct_dconst_0()
 	/*  Funcao para recuperar o double:
 	 *
 		double d;
-		u8 x = 0x00000000, y = 0x00000000;
+		u8 x = 0x0000000000000000, y = 0x0000000000000000;
 		memcpy(&x, &high, sizeof(u4) );
 		memcpy(&y, &aux_4, sizeof(u4) );
 		x <<= 32;
@@ -2074,20 +2074,200 @@ void funct_i2d()
 	current_frame->pc++;
 }
 
-void funct_l2i(){ current_frame->pc++;  }
+void funct_l2i()
+{
+	u4 low, high;
 
+	low = pop();
+	high = pop();
 
-void funct_l2f(){ current_frame->pc++;  }
-void funct_l2d(){ current_frame->pc++;  }
-void funct_f2i(){ current_frame->pc++;  }
-void funct_f2l(){ current_frame->pc++;  }
-void funct_f2d(){ current_frame->pc++;  }
-void funct_d2i(){ current_frame->pc++;  }
-void funct_d2l(){ current_frame->pc++;  }
-void funct_d2f(){ current_frame->pc++;  }
-void funct_i2b(){ current_frame->pc++;  }
-void funct_i2c(){ current_frame->pc++;  }
-void funct_i2s(){ current_frame->pc++;  }
+	push(low);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("l2i empilhou %d\n", low);
+	#endif
+}
+
+void funct_l2f()
+{
+	u4 low, high, *aux;
+	float f;
+
+	low = pop();
+	high = pop();
+
+	f = (float) convert_cast_2x32_bits_to_double(low, high);
+
+	aux = (u4*) malloc(sizeof(u4));
+	memcpy(aux, &f, sizeof(u4));
+
+	push(*aux); /* Para recuperar o valor, deve-se fazer outro memcpy para um float */
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("l2f empilhou %f\n", f);
+	#endif
+}
+
+void funct_l2d()
+{
+	u4 low, high, aux_4;
+	u8 *aux_8;
+	double d;
+
+	low = pop();
+	high = pop();
+
+	d =  convert_cast_2x32_bits_to_double(low, high);
+
+	aux_8 = (u8*) malloc(sizeof(u8));
+	memcpy(aux_8, &d, 2*sizeof(u4));
+	aux_4 = *aux_8 >> 32;
+	push(aux_4);
+
+	aux_4 = *aux_8;
+	push(aux_4);
+
+	current_frame->pc++;
+
+	#ifdef DEBUG
+		printf("l2d empilhou %f\n", d);
+	#endif
+}
+
+void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+{
+	u4 aux;
+	float f;
+
+	aux = pop();
+	memcpy(&f, &aux, sizeof(u4));
+
+	aux = (u4) f;
+	push( aux );
+
+	current_frame->pc++;
+}
+
+void funct_f2l()
+{
+	u4 aux_4;
+	u8 aux_8;
+	float f;
+
+	aux_4 = pop();
+	memcpy(&f, &aux_4, sizeof(u4));
+
+	aux_8 = (u8) f;
+	pushU8( aux_8 );
+
+	current_frame->pc++;
+}
+
+void funct_f2d()
+{
+	u4 aux_4;
+	u8 aux_8;
+	float f;
+	double d;
+
+	aux_4 = pop();
+	memcpy(&f, &aux_4, sizeof(u4));
+
+	d = (u8) f;
+	memcpy(&aux_8, &d, 2*sizeof(u4));
+	pushU8( aux_8 );
+
+	current_frame->pc++;
+}
+
+void funct_d2i()
+{
+	u4 low, high, resp;
+	u8 aux;
+	double d;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+
+	memcpy(&d, &aux, 2*sizeof(u4));
+	resp = (u4) d;
+	push( resp );
+
+	current_frame->pc++;
+}
+
+void funct_d2l()
+{
+	u4 low, high;
+	u8 aux;
+	double d;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+
+	memcpy(&d, &aux, 2*sizeof(u4));
+	aux = (u8) d;
+	push( aux );
+
+	current_frame->pc++;
+}
+
+void funct_d2f()
+{
+	u4 low, high, resp;
+	u8 aux;
+	double d;
+	float f;
+
+	low = pop();
+	high = pop();
+	aux = convert_2x32_to_64_bits(low, high);
+
+	memcpy(&d, &aux, 2*sizeof(u4));
+	f = (float) d;
+
+	memcpy(&resp, &f, sizeof(u4));
+	push( resp );
+
+	current_frame->pc++;
+}
+
+void funct_i2b()
+{
+	u1 aux;
+
+	aux = (u1) pop();
+	push(aux);
+
+	current_frame->pc++;
+}
+
+void funct_i2c()
+{
+	u2 aux;
+
+	aux = (u2) pop();
+	push( (u4) aux);
+
+	current_frame->pc++;
+}
+
+void funct_i2s()
+{
+	u2 aux;
+
+	aux = (u2) pop();
+	push( (u4) aux);
+
+	current_frame->pc++;
+}
+
 void funct_lcmp(){ current_frame->pc++;  }
 void funct_fcmpl(){ current_frame->pc++;  }
 void funct_fcmpg(){ current_frame->pc++;  }
