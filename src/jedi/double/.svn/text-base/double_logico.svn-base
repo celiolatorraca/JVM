@@ -1,0 +1,22 @@
+/*
+ * Compile assim: javac long_logico.java -target 1.2 -source 1.2
+ */
+public class float_logico{
+	public static void main(String args[]){
+		float a=1.0;
+		float b=0.0;
+		/*fand*/
+		float c = a&b;
+		
+		/*for*/
+		c=a|b;
+		
+		/*fxor*/
+		c=a|b;
+		
+		/*fcmp*/
+		//if(a>b){
+			
+		//}
+	}
+}

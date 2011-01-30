@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/jvm/!svn/ver/97/trunk/tests/long
+END
+long_logico.class
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/jvm/!svn/ver/97/trunk/tests/long/long_logico.class
+END
+long_aritmetica.java
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/jvm/!svn/ver/83/trunk/tests/long/long_aritmetica.java
+END
+long_load.class
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/jvm/!svn/ver/34/trunk/tests/long/long_load.class
+END
+long_aritmetica.class
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/jvm/!svn/ver/97/trunk/tests/long/long_aritmetica.class
+END
+long_cast.java
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/jvm/!svn/ver/59/trunk/tests/long/long_cast.java
+END
+long_logico.java
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/jvm/!svn/ver/97/trunk/tests/long/long_logico.java
+END
+long_cast.class
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/jvm/!svn/ver/59/trunk/tests/long/long_cast.class
+END
+long_load.java
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/jvm/!svn/ver/82/trunk/tests/long/long_load.java
+END

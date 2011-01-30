@@ -17,8 +17,8 @@
 #define WHERE "INTRUCTIONS"
 
 extern struct frame *current_frame;
-extern struct array *arrayLength;
-extern u4 numArrays;
+extern struct array *arrayLength = NULL;
+extern u4 numArrays = 0;
 
 int next_is_wide = 0;
 
