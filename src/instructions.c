@@ -1922,8 +1922,8 @@ void funct_instanceof(){
 
 
 
-void funct_monitorenter(){ current_frame->pc++;  }
-void funct_monitorexit(){ current_frame->pc++;  }
+void funct_monitorenter(){ pop(); current_frame->pc++;  } /* só precisa disso */
+void funct_monitorexit(){ pop(); current_frame->pc++;  } /* só precisa disso */
 
 void funct_wide(){
 
