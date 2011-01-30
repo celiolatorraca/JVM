@@ -132,7 +132,7 @@ void* newArray(u4 count, u1 type){
 				break;
 		case 4: size = 1;/*boolean*/
 				break;
-		case 5: size = 1;/*char*/
+		case 5: size = 2;/*char*/
 				break;
 		case 6: size= 4;/*float*/
 				break;
@@ -151,7 +151,7 @@ void* newArray(u4 count, u1 type){
 
 	array = calloc(count, size);
 	numArrays++;
-	arrayLength = realloc (arrayLength, sizeof(u4)*numArrays);
+	arrayLength = realloc (arrayLength, sizeof(struct array)*numArrays);
 	arrayLength[numArrays-1].size = size;
 	arrayLength[numArrays-1].ref = (u4)array;
 
