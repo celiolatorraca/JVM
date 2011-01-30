@@ -85,20 +85,11 @@ int32_t loadClass(char *class_name){
  * Retorna string com nome da classe a partir de ponteiro para ClassFile
  */
 char *getClassName(struct ClassFile *class){
-
 	u2 this_class = class->this_class;
 
 	u2 name_index = ((struct CONSTANT_Class_info*)class->constant_pool[this_class-1])->name_index;
 
-	u2 length = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->length;
-	u1 *name = ((struct CONSTANT_Utf8_info*) (class->constant_pool[name_index-1]))->bytes;
-
-	char *class_name = malloc(sizeof(u2) * length+1);
-
-	strncpy(class_name, (char *)name, length);
-	class_name[length] = '\0';
-
-	return class_name;
+	return getName( class , name_index );
 }
 
 
@@ -189,6 +180,22 @@ int32_t getFieldIndexByNameAndDesc(char *class_name, char *name, u2 name_len, ch
 	return -1;
 }
 
-u8 getFieldValue(int32_t class_index, int32_t field_index) {
+int32_t getClassIndex(struct ClassFile *class_file) {
+	int i;
+
+	for (i = 0; i < numClasses; i++) {
+		if (classArray[i] == class_file) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+u8 getStaticFieldValue(int32_t class_index, int32_t field_index) {
 	return classStaticArray[class_index].value[field_index];
+}
+
+void setStaticFieldValue(int32_t class_index, int32_t field_index, u8 value) {
+	classStaticArray[class_index].value[field_index] = value;
 }
