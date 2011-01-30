@@ -12,5 +12,5 @@ package javaTeste;
 
 public interface HelloWorldInterface {
   int field = 0;
-  public abstract void executeMethod();
+  public abstract void executeMethod(int a, float b, long c);
 }
