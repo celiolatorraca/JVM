@@ -73,14 +73,21 @@ method_info * getInitStaticMethod(struct ClassFile *main_class) {
 }
 
 
-method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len){
+method_info * getMethodByNameAndDescIndex(struct ClassFile *main_class, struct ClassFile *name_type_class, u2 name_type_index){
 
 	int i;
-	struct ClassFile *main_class;
 	u1 *m_name, *m_desc;
 	u2 m_name_len, m_desc_len;
+	char *name, *desc;
+	u2 name_len, desc_len;
 
-	main_class = getClassByName(class_name);
+	name = getName(name_type_class,
+			((struct CONSTANT_NameAndType_info *)(name_type_class->constant_pool[name_type_index-1]))->name_index);
+	name_len = strlen(name);
+
+	desc = getName(name_type_class,
+			((struct CONSTANT_NameAndType_info *)(name_type_class->constant_pool[name_type_index-1]))->descriptor_index);
+	desc_len = strlen(desc);
 
 	for (i = 0; i < main_class->methods_count; i++){
 
@@ -142,10 +149,10 @@ void finishMethod(){
 	freeFrame();
 }
 
-int getNumParameters(struct ClassFile *class, method_info *method){
+int32_t getNumParameters(struct ClassFile *class, method_info *method){
 
-	int prm=0;
-	int i;
+	int32_t prm=0;
+	int32_t i;
 	u2 length;
 	u1 *bytes;
 
@@ -160,10 +167,10 @@ int getNumParameters(struct ClassFile *class, method_info *method){
 				i++;
 			prm++;
 
-		} else if ((bytes[i] == 'B')&&(bytes[i] == 'C')&&(bytes[i] == 'F')&&
-		(bytes[i] == 'I')&&(bytes[i] == 'S')&&(bytes[i] == 'Z') ){
+		} else if ((bytes[i] == 'B')||(bytes[i] == 'C')||(bytes[i] == 'F')||
+		(bytes[i] == 'I')||(bytes[i] == 'S')||(bytes[i] == 'Z') ){
 			prm++;
-		} else if ((bytes[i] == 'D')&&(bytes[i] == 'J')){
+		} else if ((bytes[i] == 'D')||(bytes[i] == 'J')){
 			prm+=2;
 		}
 

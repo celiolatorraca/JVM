@@ -18,7 +18,7 @@ public class HelloWorld {
     public static void main(String[] args) {
 
       HelloWorldObject a = new HelloWorldObject();
-
+      a.executeMethod(1, 2.0f, 3l);
       int[] b = new int[30];
 
     }

@@ -12,7 +12,7 @@
 
 method_info * getMainMethod();
 method_info * getInitStaticMethod();
-method_info * getMethodByNameAndDesc(char *class_name, u1 *name, u2 name_len, u1 *desc, u2 desc_len);
+method_info * getMethodByNameAndDescIndex(struct ClassFile *main_class, struct ClassFile *name_type_class, u2 name_type_index);
 int getNumParameters(struct ClassFile *class, method_info *method);
 method_info * getInitMethod(u1 *desc, u2 desc_len);
 void runMethod();

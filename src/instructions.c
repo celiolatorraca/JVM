@@ -2011,7 +2011,53 @@ void funct_putstatic()
 
 void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
-void funct_invokevirtual(){ current_frame->pc++;  }
+
+void funct_invokevirtual()
+{
+	u4 index;
+	u1 low, high;
+	int32_t numParams, i;
+	int32_t class_index, class_index_tmp;
+	u2 name_type_index;
+	char *class_name;
+
+	struct ClassFile *class;
+	method_info *method;
+
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+
+	index = convert_2x8_to_32_bits(low, high);
+
+
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+	#ifdef DEBUG
+	printf("Class name: %s\n", class_name);
+	#endif
+
+	class_index = loadClass( class_name );
+	class = getClassByIndex( class_index );
+
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	numParams = getNumParameters( class , method );
+	for (i = numParams; i >= 0; i--) {
+		current_frame->fields[i] = pop();
+	}
+
+	prepareMethod(class, method);
+	runMethod();
+
+	current_frame->pc++;
+}
+
 void funct_invokespecial(){ current_frame->pc++;  }
 void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }

@@ -31,13 +31,14 @@ public class HelloWorldObject implements HelloWorldInterface {
   HelloWorldObject(int field) {
     this.field = field;
   }
-  public void executeMethod() {
-    System.out.println("HelloWorld\n");
+  public void executeMethod(int a, float b, long c) {
+    a += a;
+    b *= b;
+    c /= c;
   }
   private int privateMethod(){
 	int methodField = 11;
     this.field = 10;
-	executeMethod();
     return this.field;
   }
 
