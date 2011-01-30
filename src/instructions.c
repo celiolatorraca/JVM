@@ -880,10 +880,73 @@ void funct_dup_x1()
 	current_frame->pc++;
 }
 
-void funct_dup_x2(){ current_frame->pc++;  }
-void funct_dup2(){ current_frame->pc++;  }
-void funct_dup2_x1(){ current_frame->pc++;  }
-void funct_dup2_x2(){ current_frame->pc++;  }
+void funct_dup_x2()
+{
+	u4 value1, value2, value3;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+
+
+	push(value1);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
+void funct_dup2()
+{
+	u4 value1, value2;
+
+	value1 = pop();
+	value2 = pop();
+
+	push(value2);
+	push(value1);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
+void funct_dup2_x1()
+{
+	u4 value1, value2, value3;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+
+	push(value2);
+	push(value1);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+void funct_dup2_x2()
+{
+	u4 value1, value2, value3, value4;
+
+	value1 = pop();
+	value2 = pop();
+	value3 = pop();
+	value4 = pop();
+
+	push(value2);
+	push(value1);
+	push(value4);
+	push(value3);
+	push(value2);
+	push(value1);
+
+	current_frame->pc++;
+}
+
 
 void funct_swap()
 {
@@ -1034,7 +1097,7 @@ void funct_dsub()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
@@ -1112,7 +1175,7 @@ void funct_dmul()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
@@ -1188,7 +1251,7 @@ void funct_ddiv()
 	low1 = pop();
 	high1 = pop();
 	low2 = pop();
-	high1 = pop();
+	high2 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
