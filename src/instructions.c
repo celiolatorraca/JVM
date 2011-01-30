@@ -757,14 +757,115 @@ void funct_aload_3()
 	current_frame->pc++;
 }
 
-void funct_iaload(){ current_frame->pc++;  }
-void funct_laload(){ current_frame->pc++;  }
-void funct_faload(){ current_frame->pc++;  }
-void funct_daload(){ current_frame->pc++;  }
-void funct_aaload(){ current_frame->pc++;  }
-void funct_baload(){ current_frame->pc++;  }
-void funct_caload(){ current_frame->pc++;  }
-void funct_saload(){ current_frame->pc++;  }
+void funct_iaload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push( ((u4 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_laload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	pushU8(((u8 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_faload(){
+
+	u4 index, res;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	memcpy(&res, &((float *)ref)[index], sizeof(u4));
+	push(res);
+
+	current_frame->pc++;
+}
+
+void funct_daload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	pushU8(((u8 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_aaload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push( ((u4 *)ref)[index]);
+
+	current_frame->pc++;
+}
+
+void funct_baload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u1*)ref)[index] ));
+
+	current_frame->pc++;
+}
+
+void funct_caload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u2*)ref)[index] ));
+
+	current_frame->pc++;
+
+}
+void funct_saload(){
+
+	u4 index;
+	void *ref;
+
+	index = pop();
+	ref = (void *)pop();
+
+	push((u4)( ((u2*)ref)[index] ));
+
+	current_frame->pc++;
+
+}
+
+
+
+
 void funct_istore(){ current_frame->pc++;  }
 void funct_lstore(){ current_frame->pc++;  }
 void funct_fstore(){ current_frame->pc++;  }
@@ -831,6 +932,8 @@ void funct_astore_0(){ current_frame->pc++;  }
 void funct_astore_1(){ current_frame->pc++;  }
 void funct_astore_2(){ current_frame->pc++;  }
 void funct_astore_3(){ current_frame->pc++;  }
+
+
 void funct_iastore(){ current_frame->pc++;  }
 void funct_lastore(){ current_frame->pc++;  }
 void funct_fastore(){ current_frame->pc++;  }
@@ -1647,6 +1750,8 @@ void funct_i2d()
 }
 
 void funct_l2i(){ current_frame->pc++;  }
+
+
 void funct_l2f(){ current_frame->pc++;  }
 void funct_l2d(){ current_frame->pc++;  }
 void funct_f2i(){ current_frame->pc++;  }
@@ -1803,7 +1908,7 @@ void funct_newarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	push (newArray(count, type));
+	push ((u4)newArray(count, type));
 
 	current_frame->pc++;
 }
@@ -1828,7 +1933,7 @@ void funct_anewarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	push (newArray(count, 0));
+	push ((u4)newArray(count, 0));
 
 	current_frame->pc++;
 
@@ -1857,6 +1962,7 @@ void funct_arraylength()
 
 	current_frame->pc++;
 }
+
 void funct_athrow(){ current_frame->pc++;  } /* Näo precisa fazer nada além disso */
 
 
@@ -1932,7 +2038,10 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-void funct_multianewarray(){ current_frame->pc++;  }
+void funct_multianewarray(){
+    /* TODO implementar se der tempo */
+	current_frame->pc++;
+}
 void funct_ifnull(){ current_frame->pc++;  }
 void funct_ifnonnull(){ current_frame->pc++;  }
 void funct_goto_w(){ current_frame->pc++;  }
