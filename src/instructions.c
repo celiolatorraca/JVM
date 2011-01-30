@@ -1604,8 +1604,6 @@ void funct_getstatic()
 
 	int32_t class_index = loadClass( class_name );
 
-	/*TODO Chamar o método de cinit caso ainda não tenha sido chamado */
-
 	u2 name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
 
 	char *name = getName(current_frame->class,
