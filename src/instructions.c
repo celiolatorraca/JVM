@@ -1690,10 +1690,7 @@ void funct_areturn(){ current_frame->pc++;  }
 
 void funct_return()
 {
-	finishMethod();
-
-	if (current_frame != NULL)
-		current_frame->pc++;
+	current_frame->pc++;
 }
 
 void funct_getstatic()
