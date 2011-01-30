@@ -1649,19 +1649,19 @@ void funct_getstatic()
 	char *class_name, *name, *type;
 
 
-	index1 = (u1) current_frame->fields[++(current_frame->pc)];
-	index2 = (u1) current_frame->fields[++(current_frame->pc)];
+	index1 = (u1) current_frame->code[++(current_frame->pc)];
+	index2 = (u1) current_frame->code[++(current_frame->pc)];
 
 	index = ((u2)index1 << 8) | (u2)index2;
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
 	class_index = loadClass( class_name );
 
-	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
@@ -1693,19 +1693,19 @@ void funct_putstatic()
 	char *class_name, *name, *type;
 
 
-	index1 = (u1) current_frame->fields[++(current_frame->pc)];
-	index2 = (u1) current_frame->fields[++(current_frame->pc)];
+	index1 = (u1) current_frame->code[++(current_frame->pc)];
+	index2 = (u1) current_frame->code[++(current_frame->pc)];
 
 	index = ((u2)index1 << 8) | (u2)index2;
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->class_index;
+	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
 	class_index = loadClass( class_name );
 
-	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index+1]))->name_and_type_index;
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
@@ -1733,7 +1733,7 @@ void funct_getfield(){ current_frame->pc++;  }
 void funct_putfield(){ current_frame->pc++;  }
 void funct_invokevirtual(){ current_frame->pc++;  }
 void funct_invokespecial(){ current_frame->pc++;  }
-void funct_invokestatic(){ current_frame->pc++; }
+void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 void funct_new(){current_frame->pc++;}
