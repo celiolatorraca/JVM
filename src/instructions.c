@@ -1157,7 +1157,7 @@ void funct_dstore_3()
 }
 void funct_astore_0()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1167,7 +1167,7 @@ void funct_astore_0()
 }
 void funct_astore_1()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1177,7 +1177,7 @@ void funct_astore_1()
 }
 void funct_astore_2()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1187,7 +1187,7 @@ void funct_astore_2()
 }
 void funct_astore_3()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -2962,7 +2962,21 @@ void funct_invokespecial(){ current_frame->pc++;  }
 void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
-void funct_new(){current_frame->pc++;}
+
+void funct_new()
+{
+	u1 low, high;
+	u4 index;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+
+	index = convert_2x8_to_32_bits(low, high);
+
+	current_frame->constant_pool[index-1];
+
+	current_frame->pc++;
+}
 
 void funct_newarray(){
 
@@ -2975,7 +2989,8 @@ void funct_newarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	push ((u4)newArray(count, type));
+	u4 teste = (u4)newArray(count, type);
+	push (teste);
 
 	current_frame->pc++;
 }
