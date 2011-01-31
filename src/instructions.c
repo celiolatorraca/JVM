@@ -3212,10 +3212,9 @@ void funct_putfield()
 {
 	u1 low, high;
 	u4 index;
-	int32_t class_index, class_index_tmp;
+	int32_t class_index, field_index, descriptor_index;
 	u2 name_type_index;
 	char *class_name, *name, *type;
-	struct ClassFile *class;
 
 	struct Object *objeto;
 	u4 value1, value2;
@@ -3228,14 +3227,11 @@ void funct_putfield()
 	index = convert_2x8_to_32_bits(low, high);
 
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
+	class_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
-			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index-1]))->name_index);
 
-
-	class_index = loadClass( class_name );
-	class = getClassByIndex( class_index );
 
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
@@ -3243,6 +3239,10 @@ void funct_putfield()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
 	type = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
+
+
+	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+	descriptor_index = current_frame->class->fields[field_index].descriptor_index;
 
 	/* Pega o valor a ser colocado no field */
 	if (type[0] == 'J' || type[0] == 'D') {
@@ -3253,7 +3253,7 @@ void funct_putfield()
 		objeto = (struct Object *) pop();
 
 		value = convert_2x32_to_64_bits(value1, value2);
-		/*setObjectFieldWide(objeto, index, value);*/
+		setObjectFieldWide(objeto, descriptor_index, value);
 
 	} else {
 		value1 = pop();
@@ -3261,7 +3261,7 @@ void funct_putfield()
 		/* Pega a referencia do objeto que tera o field alterado de valor */
 		objeto = (struct Object *) pop();
 
-		/*setObjectField(objeto, index, value1);*/
+		setObjectField(objeto, descriptor_index, value1);
 	}
 
 	current_frame->pc++;
