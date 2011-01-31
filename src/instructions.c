@@ -3211,7 +3211,7 @@ void funct_putfield(){ current_frame->pc++;  }
 
 void funct_invokevirtual()
 {
-	u4 index, aux;
+	u4 index;
 	u1 low, high;
 	int32_t numParams, i;
 	int32_t class_index, class_index_tmp;
@@ -3229,7 +3229,7 @@ void funct_invokevirtual()
 	index = convert_2x8_to_32_bits(low, high);
 
 
-	class_index_tmp = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
+	class_index_tmp = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->class_index;
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
@@ -3238,9 +3238,13 @@ void funct_invokevirtual()
 	class_index = loadClass( class_name );
 	class = getClassByIndex( class_index );
 
-	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+#ifdef DEBUG
+	printf("invokevirtual %s->%s\n", class_name, getName(class, method->name_index));
+#endif
 
 	numParams = getNumParameters( class , method );
 
@@ -3262,7 +3266,54 @@ void funct_invokevirtual()
 
 void funct_invokespecial()
 {
+	u4 index;
+	u1 low, high;
+	int32_t numParams, i;
+	int32_t class_index, class_index_tmp;
+	u2 name_type_index;
+	char *class_name;
+	u4 *fields_tmp;
 
+	struct ClassFile *class;
+	method_info *method;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+
+	index = convert_2x8_to_32_bits(low, high);
+
+
+	class_index_tmp = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+
+	class_index = loadClass( class_name );
+	class = getClassByIndex( class_index );
+
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+#ifdef DEBUG
+	printf("invokespecial %s -> %s\n", class_name, getName(class, method->name_index));
+#endif
+
+	numParams = getNumParameters( class , method );
+
+	fields_tmp = calloc(sizeof(u4),numParams+1);
+	for (i = numParams; i >= 0; i--) {
+		fields_tmp[i] = pop();
+	}
+
+	prepareMethod(class, method);
+
+	for (i = numParams; i >= 0; i--) {
+		current_frame->fields[i] = fields_tmp[i];
+	}
+
+	runMethod();
 
 	current_frame->pc++;
 }
@@ -3287,6 +3338,10 @@ void funct_new()
 
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[index-1]))->name_index);
+
+#ifdef DEBUG
+	printf("new %s\n", class_name);
+#endif
 
 	class_index = loadClass(class_name);
 	class = getClassByIndex(class_index);
