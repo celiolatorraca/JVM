@@ -787,7 +787,7 @@ void funct_aload_1()
 	push( current_frame->fields[1] );
 
 #ifdef DEBUG
-	printf("aload_1: %ld\n", current_frame->fields[1]);
+	printf("aload_1: %u\n", current_frame->fields[1]);
 #endif
 
 	current_frame->pc++;
@@ -937,7 +937,7 @@ void funct_lstore()
 {
 	u2 index;
 	u4 high, low;
-	u8 value;
+
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
 
@@ -970,7 +970,7 @@ void funct_dstore()
 {
 	u2 index;
 	u4 high, low;
-	u8 value;
+
 	current_frame->pc++;
 	index = current_frame->code[current_frame->pc];
 
@@ -981,7 +981,7 @@ void funct_dstore()
 	current_frame->fields[index + 1] = high;
 
 #ifdef DEBUG
-	printf("lstore: %f\n", ((u8*)current_frame->fields)[index]);
+	printf("lstore: %f\n", convert_2x32_to_64_bits(current_frame->fields[index],current_frame->fields[index+1]));
 #endif
 
 	current_frame->pc++;
@@ -1049,7 +1049,6 @@ void funct_istore_3()
 void funct_lstore_0()
 {
 	u4 high, low;
-	u8 value;
 
 	low = pop();
 	high = pop();
@@ -1070,7 +1069,7 @@ void funct_lstore_1()
 	current_frame->fields[2] = high;
 
 #ifdef DEBUG
-	printf("lstore1: %ld\n", ((u8*)current_frame->fields)[1]);
+	printf("lstore1: %ld\n", convert_2x32_to_64_bits(current_frame->fields[1],current_frame->fields[2]));
 #endif
 
 	current_frame->pc++;
@@ -1102,7 +1101,7 @@ void funct_lstore_3()
 
 void funct_fstore_0()
 {
-	u2  value;
+	u4  value;
 
 	value = pop();
 
@@ -1113,7 +1112,7 @@ void funct_fstore_0()
 
 void funct_fstore_1()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1124,7 +1123,7 @@ void funct_fstore_1()
 
 void funct_fstore_2()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1135,7 +1134,7 @@ void funct_fstore_2()
 
 void funct_fstore_3()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1155,7 +1154,7 @@ void funct_dstore_0()
 	current_frame->fields[1] = high;
 
 #ifdef DEBUG
-	printf("dstore0: %f\n", ((u8*)current_frame->fields)[0]);
+	printf("dstore0: %f\n", convert_2x32_to_64_bits(current_frame->fields[0],current_frame->fields[1]));
 #endif
 
 	current_frame->pc++;
@@ -1172,7 +1171,7 @@ void funct_dstore_1()
 	current_frame->fields[2] = high;
 
 #ifdef DEBUG
-	printf("dstore1: %f\n", ((u8*)current_frame->fields)[1]);
+	printf("dstore1: %f\n", convert_2x32_to_64_bits(current_frame->fields[1],current_frame->fields[2]));
 #endif
 
 	current_frame->pc++;
@@ -1189,7 +1188,7 @@ void funct_dstore_2()
 	current_frame->fields[3] = high;
 
 #ifdef DEBUG
-	printf("dstore2: %f\n", ((u8*)current_frame->fields)[2]);
+	printf("dstore2: %f\n", convert_2x32_to_64_bits(current_frame->fields[2],current_frame->fields[3]));
 #endif
 
 	current_frame->pc++;
@@ -1206,7 +1205,7 @@ void funct_dstore_3()
 	current_frame->fields[4] = high;
 
 #ifdef DEBUG
-	printf("dstore3: %f\n", ((u8*)current_frame->fields)[3]);
+	printf("dstore3: %f\n", convert_2x32_to_64_bits(current_frame->fields[3],current_frame->fields[4]));
 #endif
 
 	current_frame->pc++;
