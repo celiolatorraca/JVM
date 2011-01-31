@@ -504,12 +504,6 @@ void funct_ldc2_w()
 	switch(tag)
 	{
 		case (CONSTANT_Long):
-			#ifdef DEBUG
-				printf("ldc2_w %u\n", indice);
-				printf("ldc2_w %X\n",((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->low_bytes);
-				printf("ldc2_w %X\n",((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->high_bytes);
-			#endif
-
 			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->high_bytes);
 			push ( ((struct CONSTANT_Long_info *) current_frame->constant_pool[indice-1])->low_bytes);
 			break;
@@ -543,7 +537,6 @@ void funct_iload()
 
 void funct_lload()
 {
-
 	u2 index = 0;
 
 	current_frame->pc++;
@@ -557,8 +550,12 @@ void funct_lload()
 	}
 
 	/* push high first */
-	push (current_frame->fields[index+1]);
 	push (current_frame->fields[index]);
+	push (current_frame->fields[index+1]);
+
+#ifdef DEBUG
+	printf("lload %hu %ld\n", index, convert_2x32_to_64_bits(current_frame->fields[index+1],current_frame->fields[index]));
+#endif
 
 	current_frame->pc++;
 }
@@ -657,36 +654,35 @@ void funct_iload_3()
 void funct_lload_0()
 {
 
-	push( current_frame->fields[1] );
 	push( current_frame->fields[0] );
+	push( current_frame->fields[1] );
 
 	current_frame->pc++;
 }
 
 void funct_lload_1()
 {
-	push( current_frame->fields[2] );
 	push( current_frame->fields[1] );
+	push( current_frame->fields[2] );
 
 	current_frame->pc++;
 }
 
 void funct_lload_2()
 {
-	push( current_frame->fields[3] );
 	push( current_frame->fields[2] );
+	push( current_frame->fields[3] );
 
 	current_frame->pc++;
 }
 
 void funct_lload_3()
 {
-	push( current_frame->fields[4] );
 	push( current_frame->fields[3] );
+	push( current_frame->fields[4] );
 
 #ifdef DEBUG
-	int64_t l = (int64_t) convert_2x32_to_64_bits(current_frame->fields[4],current_frame->fields[3]);
-	printf("lload_3 %ld\n", l);
+	printf("lload_3 %ld\n", convert_2x32_to_64_bits(current_frame->fields[4],current_frame->fields[3]));
 #endif
 
 	current_frame->pc++;
@@ -944,9 +940,12 @@ void funct_lstore()
 	low = pop();
 	high = pop();
 
-	current_frame->fields[index] = low;
-	current_frame->fields[index + 1] = high;
+	current_frame->fields[index] = high;
+	current_frame->fields[index + 1] = low;
 
+#ifdef DEBUG
+	printf("lstore %hu %ld\n", index, convert_2x32_to_64_bits(low,high));
+#endif
 
 	current_frame->pc++;
 }
@@ -1053,8 +1052,9 @@ void funct_lstore_0()
 	low = pop();
 	high = pop();
 
-	current_frame->fields[0] = low;
-	current_frame->fields[1] = high;
+	current_frame->fields[0] = high;
+	current_frame->fields[1] = low;
+
 	current_frame->pc++;
 }
 
@@ -1065,11 +1065,11 @@ void funct_lstore_1()
 	low = pop();
 	high = pop();
 
-	current_frame->fields[1] = low;
-	current_frame->fields[2] = high;
+	current_frame->fields[1] = high;
+	current_frame->fields[2] = low;
 
 #ifdef DEBUG
-	printf("lstore1: %ld\n", convert_2x32_to_64_bits(current_frame->fields[1],current_frame->fields[2]));
+	printf("lstore1: %ld\n", convert_2x32_to_64_bits(current_frame->fields[2],current_frame->fields[1]));
 #endif
 
 	current_frame->pc++;
@@ -1082,8 +1082,9 @@ void funct_lstore_2()
 	low = pop();
 	high = pop();
 
-	current_frame->fields[2] = low;
-	current_frame->fields[3] = high;
+	current_frame->fields[2] = high;
+	current_frame->fields[3] = low;
+
 	current_frame->pc++;
 }
 
@@ -1094,8 +1095,9 @@ void funct_lstore_3()
 	low = pop();
 	high = pop();
 
-	current_frame->fields[3] = low;
-	current_frame->fields[4] = high;
+	current_frame->fields[3] = high;
+	current_frame->fields[4] = low;
+
 	current_frame->pc++;
 }
 
@@ -1359,7 +1361,6 @@ void funct_castore(){
 	((u2 *)ref)[index] = (u2)value;
 
 	current_frame->pc++;
-
 }
 
 void funct_sastore(){
@@ -1522,8 +1523,11 @@ void funct_ladd()
 	high = pop();
 	aux2 = convert_2x32_to_64_bits( low, high );
 
-
 	pushU8(aux1 + aux2);
+
+#ifdef DEBUG
+	printf("ladd %ld\n", aux1+aux2);
+#endif
 
 	current_frame->pc++;
 }
@@ -3240,10 +3244,9 @@ void funct_invokevirtual()
 
 	numParams = getNumParameters( class , method );
 
-	fields_tmp = malloc(numParams * sizeof(u4));
+	fields_tmp = calloc(sizeof(u4),numParams+1);
 	for (i = numParams; i >= 0; i--) {
-		aux = pop();
-		memcpy(&(fields_tmp[i]), &aux, sizeof(u4));
+		fields_tmp[i] = pop();
 	}
 
 	prepareMethod(class, method);
@@ -3252,16 +3255,18 @@ void funct_invokevirtual()
 		current_frame->fields[i] = fields_tmp[i];
 	}
 
-#ifdef DEBUG
-	printf("invokevirtual %ld\n", fields_tmp[4]);
-#endif
-
 	runMethod();
 
 	current_frame->pc++;
 }
 
-void funct_invokespecial(){ current_frame->pc++;  }
+void funct_invokespecial()
+{
+
+
+	current_frame->pc++;
+}
+
 void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
@@ -3270,13 +3275,25 @@ void funct_new()
 {
 	u1 low, high;
 	u4 index;
+	char *class_name;
+	int32_t class_index;
+	struct ClassFile *class;
+	struct Object *objeto;
 
 	high = current_frame->code[++(current_frame->pc)];
 	low = current_frame->code[++(current_frame->pc)];
 
 	index = convert_2x8_to_32_bits(low, high);
 
-	current_frame->constant_pool[index-1];
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[index-1]))->name_index);
+
+	class_index = loadClass(class_name);
+	class = getClassByIndex(class_index);
+
+	objeto = newObject(class);
+
+	push( (u4)objeto );
 
 	current_frame->pc++;
 }
@@ -3323,6 +3340,7 @@ void funct_anewarray(){
 	current_frame->pc++;
 
 }
+
 void funct_arraylength()
 {
 	int i;
@@ -3349,7 +3367,6 @@ void funct_arraylength()
 }
 
 void funct_athrow(){ current_frame->pc++;  } /* Näo precisa fazer nada além disso */
-
 
 void funct_checkcast()
 {
