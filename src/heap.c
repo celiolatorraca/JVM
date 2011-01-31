@@ -80,6 +80,7 @@ struct Object* newObject(struct ClassFile *this)
 		printf("%d ", object->fields_index[i]);
 	printf("\n\n");
 #endif
+
 	return object;
 }
 
