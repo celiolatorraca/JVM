@@ -135,6 +135,7 @@ struct ClassFile * getClassByName(char *class_name){
 		if (strcmp(class_name, getClassName(classArray[i])) == 0)
 			return classArray[i];
 	}
+
 	return NULL;
 }
 
@@ -160,7 +161,7 @@ int32_t getFieldIndexByNameAndDesc(char *class_name, char *name, u2 name_len, ch
 	main_class = getClassByName(class_name);
 
 	/* Procura pelo Field de acordo com o nome e o desc */
-	for (i = 0; i < main_class->fields_count; i++){
+	for (i = 0; main_class && i < main_class->fields_count; i++){
 
 		m_name = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].name_index-1)]))->bytes;
 		m_name_len = ((struct CONSTANT_Utf8_info *)(main_class->constant_pool[(main_class->fields[i].name_index-1)]))->length;
