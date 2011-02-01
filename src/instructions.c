@@ -3128,8 +3128,44 @@ void funct_goto()
 	#endif
 }
 
-void funct_jsr(){ current_frame->pc++;  }
-void funct_ret(){ current_frame->pc++;  }
+void funct_jsr()
+{
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	push((current_frame->pc) + 3); /* pc da proxima instrucao */
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+	current_frame->pc += offset;
+
+#ifdef DEBUG
+	printf("jsr - novo PC = %d\n", current_frame->pc);
+#endif
+	}
+
+void funct_ret()
+{
+	u2 index;
+
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	current_frame->pc = current_frame->fields[i]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
+
+#ifdef DEBUG
+	printf("ret - novo PC: %d\n", current_frame->pc);
+#endif
+}
 void funct_tableswitch(){ current_frame->pc++;  }
 void funct_lookupswitch(){ current_frame->pc++;  }
 
@@ -3884,7 +3920,7 @@ void funct_goto_w()
 	branchbyte3 = current_frame->code[(current_frame->pc)+3];
 	branchbyte4 = current_frame->code[(current_frame->pc)+4];
 
-	offset = (branchbyte1<<24) | (branchbyte2<<16) | (branchbyte3<<8) | (branchbyte1);
+	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
 
 	current_frame->pc += offset;
 
@@ -3893,5 +3929,24 @@ void funct_goto_w()
 	#endif
 }
 
-void funct_jsr_w(){ current_frame->pc++;  }
+void funct_jsr_w()
+{
+	u4 offset;
+	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
+
+	push((current_frame->pc) + 5);
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+	branchbyte3 = current_frame->code[(current_frame->pc)+3];
+	branchbyte4 = current_frame->code[(current_frame->pc)+4];
+
+	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
+
+	current_frame->pc += offset;
+
+	#ifdef DEBUG
+		printf("jsr_w - novo PC = %d\n", current_frame->pc);
+	#endif
+}
 
