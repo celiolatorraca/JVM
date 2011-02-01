@@ -1641,6 +1641,7 @@ void funct_dsub()
 {
 	u4 high1, low1, high2, low2;
 	double value1, value2;
+	u8 result;
 
 	low1 = pop();
 	high1 = pop();
@@ -1650,11 +1651,14 @@ void funct_dsub()
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
+	value1 -= value2;
+	memcpy(&result, &value1, sizeof(u8));
 #ifdef DEBUG
 	printf("dsub %f\n", value1 - value2);
 #endif
 
-	pushU8(value1 - value2);
+	pushU8(result);
+
 	current_frame->pc++;
 }
 
@@ -1669,7 +1673,7 @@ void funct_imul()
 	printf("imul %d\n", value1 * value2);
 #endif
 
-	push(value1 * value2);
+	push((u4)(value1 * value2));
 
 	current_frame->pc++;
 }
@@ -1693,7 +1697,7 @@ void funct_lmul()
 	printf("lmul %ld\n", result);
 #endif
 
-	pushU8(result);
+	pushU8(((u8)result));
 
 	current_frame->pc++;
 }
@@ -3489,7 +3493,60 @@ void funct_invokespecial()
 	current_frame->pc++;
 }
 
-void funct_invokestatic(){ current_frame->pc++;current_frame->pc++;current_frame->pc++; }
+void funct_invokestatic(){
+
+	u4 index;
+	u1 low, high;
+	int32_t numParams, i;
+	int32_t class_index, class_index_tmp;
+	u2 name_type_index;
+	char *class_name;
+	u4 *fields_tmp;
+
+	struct ClassFile *class;
+	method_info *method;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+
+	index = convert_2x8_to_32_bits(low, high);
+
+
+	class_index_tmp = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+
+	class_index = loadClass( class_name );
+	class = getClassByIndex( class_index );
+
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+#ifdef DEBUG
+	printf("invokestatic %s -> %s\n", class_name, getName(class, method->name_index));
+#endif
+
+	numParams = getNumParameters( class , method );
+
+	fields_tmp = calloc(sizeof(u4),numParams+1);
+	for (i = numParams; i > 0; i--) { /* única diferença pra invokespecial */
+		fields_tmp[i] = pop();
+	}
+
+	prepareMethod(class, method);
+
+	for (i = numParams; i >= 0; i--) {
+		current_frame->fields[i] = fields_tmp[i];
+	}
+
+	runMethod();
+
+	current_frame->pc++;
+
+}
 void funct_invokeinterface(){ current_frame->pc++;  }
 /*void funct_nao_utilizada;*/
 
