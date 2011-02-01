@@ -241,7 +241,7 @@ void  initializeInstr()
 	instr[0xc4] = funct_wide;
 	instr[0xc5] = funct_multianewarray;
 	instr[0xc6] = funct_ifnull;
-	instr[0xc7] = funct_ifnonull;
+	instr[0xc7] = funct_ifnonnull;
 	instr[0xc8] = funct_goto_w;
 	instr[0xc9] = funct_jsr_w;
 }
@@ -3686,9 +3686,78 @@ void funct_invokestatic(){
 
 }
 
-void funct_invokeinterface(){ current_frame->pc++;  }
+void funct_invokeinterface()
+{
+	u4 index;
+	u1 low, high, args_count, zero;
+	int32_t class_index, class_index_tmp, i;
+	u2 name_type_index;
+	char *class_name;
+	u4 *fields_tmp;
 
-/*void funct_nao_utilizada;*/
+	struct ClassFile *class;
+	method_info *method;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+	index = convert_2x8_to_32_bits(low, high);
+
+	args_count = current_frame->code[++(current_frame->pc)];
+	zero = current_frame->code[++(current_frame->pc)];
+
+	/* pega da pilha os argumentos e o objectref */
+	args_count = calloc(sizeof(u4),args_count+1);
+	for (i = args_count; i >= 0; i--) {
+		fields_tmp[i] = pop();
+	}
+
+	class_index_tmp = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+				((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+	class_index = loadClass( class_name );
+	class = getClassByIndex( class_index );
+
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	/* Se o metodo nao for encontrado, procura nas superclasses */
+	while ( method == NULL )
+	{
+		class_name = getParentName( class );
+
+		/* Interrompe, se nao encontrar o metodo em nenhuma superclasse */
+		if ( class == NULL )
+		{
+			#ifdef DEBUG
+				printf("invokeinterface lancaria uma excecao aqui!");
+			#endif
+			current_frame->pc++;
+			return;
+		}
+
+		class_index = loadClass( class_name );
+		class = getClassByIndex( class_index );
+
+		name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+		method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	}
+
+	/* Prepara e executa o metodo */
+	prepareMethod(class, method);
+
+	for (i = args_count; i >= 0; i--) {
+		current_frame->fields[i] = fields_tmp[i];
+	}
+
+	runMethod();
+
+	current_frame->pc++;
+}
 
 void funct_new()
 {
@@ -3820,7 +3889,6 @@ void funct_checkcast()
 	current_frame->pc++;
 }
 
-
 void funct_instanceof(){
 	struct Object *ref;
 	u2 index;
@@ -3849,9 +3917,8 @@ void funct_instanceof(){
 	current_frame->pc++;
 }
 
-
-
 void funct_monitorenter(){ pop(); current_frame->pc++;  } /* só precisa disso */
+
 void funct_monitorexit(){ pop(); current_frame->pc++;  } /* só precisa disso */
 
 void funct_wide(){
@@ -3861,9 +3928,8 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-
-void funct_multianewarray(){
-    /* TODO implementar se der tempo */
+void funct_multianewarray() /* TODO implementar se der tempo */
+{
 	current_frame->pc++;
 }
 
