@@ -3242,7 +3242,8 @@ void funct_lookupswitch()
 {
 	int32_t default_, npairs, key;
 	int32_t *match, *offset;
-	u4 target, lookupswitch_address;
+	u4 byte1, byte2, byte3, byte4, target, lookupswitch_address, i;
+	u1 found;
 
 	key = (int32_t)pop();
 	lookupswitch_address = current_frame->pc;
@@ -3251,6 +3252,66 @@ void funct_lookupswitch()
 	while ((current_frame->pc + 1) % 4 != 0)
 		current_frame->pc++;
 	current_frame->pc++;
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	default_ = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	npairs = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	match = calloc(sizeof(int32_t), npairs);
+	offset = calloc(sizeof(int32_t), npairs);
+#ifdef DEBUG
+	printf("TABLESWITCH\n-----------\n");
+	printf("npairs : %d\n", npairs);
+#endif
+	for (i = 0; i < npairs; i++)
+	{
+		byte1 = current_frame->code[current_frame->pc++];
+		byte2 = current_frame->code[current_frame->pc++];
+		byte3 = current_frame->code[current_frame->pc++];
+		byte4 = current_frame->code[current_frame->pc++];
+
+		match[i] = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+		byte1 = current_frame->code[current_frame->pc++];
+		byte2 = current_frame->code[current_frame->pc++];
+		byte3 = current_frame->code[current_frame->pc++];
+		byte4 = current_frame->code[current_frame->pc++];
+
+		offset[i] = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+#ifdef DEBUG
+	printf("match-offset %d: %d-%d\n", i, match[i], offset[i]);
+#endif
+	}
+
+	i = 0;
+	found = 0;
+	while ((i < npairs) && (!found))
+	{
+		if (match[i] == key)
+			found = 1;
+		i++;
+	}
+	i--;
+
+	if (found)
+		target = offset[i] + lookupswitch_address;
+	else
+		target = default_ + lookupswitch_address;
+
+	current_frame->pc = target;
+#ifdef DEBUG
+	printf("new PC: %d\n", current_frame->pc);
+#endif
 }
 
 
@@ -3344,8 +3405,6 @@ void funct_getstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3354,6 +3413,26 @@ void funct_getstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pushU8( 0 );
+		} else {
+			push( 0 );
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
+	class_index = loadClass( class_name );
 
 	value = getStaticFieldValue( class_index , field_index );
 
@@ -3388,8 +3467,6 @@ void funct_putstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3398,6 +3475,25 @@ void funct_putstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
 
 	/* Pega o valor a ser inserido no field static */
 	if (type[0] == 'J' || type[0] == 'D') {
@@ -3408,6 +3504,8 @@ void funct_putstatic()
 	} else {
 		value = (u8) pop();
 	}
+
+	class_index = loadClass( class_name );
 
 	setStaticFieldValue( class_index , field_index , value );
 
@@ -3454,11 +3552,17 @@ void funct_getfield()
 
 	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
 	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
 		if (type[0] == 'J' || type[0] == 'D') {
 			pushU8( 0 );
 		} else {
 			push( 0 );
 		}
+
+		current_frame->pc++;
 		return;
 	}
 
@@ -3512,6 +3616,26 @@ void funct_putfield()
 
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
 	name_index = current_frame->class->fields[field_index].name_index;
 
 	/* Pega o valor a ser colocado no field */
