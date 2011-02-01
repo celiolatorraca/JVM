@@ -241,7 +241,7 @@ void  initializeInstr()
 	instr[0xc4] = funct_wide;
 	instr[0xc5] = funct_multianewarray;
 	instr[0xc6] = funct_ifnull;
-	/*instr[0xc7] = funct_ifnonull;*/
+	instr[0xc7] = funct_ifnonnull;
 	instr[0xc8] = funct_goto_w;
 	instr[0xc9] = funct_jsr_w;
 }
@@ -567,7 +567,8 @@ void funct_lload()
 }
 
 
-void funct_fload(){
+void funct_fload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -591,7 +592,8 @@ void funct_fload(){
 	current_frame->pc++;
 }
 
-void funct_dload(){
+void funct_dload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -611,7 +613,8 @@ void funct_dload(){
 	current_frame->pc++;
 }
 
-void funct_aload(){
+void funct_aload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -809,7 +812,8 @@ void funct_aload_3()
 	current_frame->pc++;
 }
 
-void funct_iaload(){
+void funct_iaload()
+{
 
 	u4 index;
 	void *ref;
@@ -822,7 +826,8 @@ void funct_iaload(){
 	current_frame->pc++;
 }
 
-void funct_laload(){
+void funct_laload()
+{
 
 	u4 index;
 	void *ref;
@@ -839,7 +844,8 @@ void funct_laload(){
 	current_frame->pc++;
 }
 
-void funct_faload(){
+void funct_faload()
+{
 
 	u4 index, res;
 	void *ref;
@@ -853,7 +859,8 @@ void funct_faload(){
 	current_frame->pc++;
 }
 
-void funct_daload(){
+void funct_daload()
+{
 
 	u4 index;
 	void *ref;
@@ -866,7 +873,8 @@ void funct_daload(){
 	current_frame->pc++;
 }
 
-void funct_aaload(){
+void funct_aaload()
+{
 
 	u4 index;
 	void *ref;
@@ -879,7 +887,8 @@ void funct_aaload(){
 	current_frame->pc++;
 }
 
-void funct_baload(){
+void funct_baload()
+{
 
 	u4 index;
 	void *ref;
@@ -892,7 +901,8 @@ void funct_baload(){
 	current_frame->pc++;
 }
 
-void funct_caload(){
+void funct_caload()
+{
 
 	u4 index;
 	void *ref;
@@ -906,7 +916,8 @@ void funct_caload(){
 
 }
 
-void funct_saload(){
+void funct_saload()
+{
 
 	u4 index;
 	void *ref;
@@ -1263,7 +1274,8 @@ void funct_astore_3()
 	current_frame->pc++;
 }
 
-void funct_iastore(){
+void funct_iastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1277,7 +1289,8 @@ void funct_iastore(){
 	current_frame->pc++;
 }
 
-void funct_lastore(){
+void funct_lastore()
+{
 
 	u4 index, low, high;
 	u8 value;
@@ -1295,7 +1308,8 @@ void funct_lastore(){
 	current_frame->pc++;
 }
 
-void funct_fastore(){
+void funct_fastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1309,7 +1323,8 @@ void funct_fastore(){
 	current_frame->pc++;
 }
 
-void funct_dastore(){
+void funct_dastore()
+{
 
 	u4 index, low, high;
 	u8 value;
@@ -1327,7 +1342,8 @@ void funct_dastore(){
 	current_frame->pc++;
 }
 
-void funct_aastore(){
+void funct_aastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1341,7 +1357,8 @@ void funct_aastore(){
 	current_frame->pc++;
 }
 
-void funct_bastore(){
+void funct_bastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1355,7 +1372,8 @@ void funct_bastore(){
 	current_frame->pc++;
 }
 
-void funct_castore(){
+void funct_castore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1369,7 +1387,8 @@ void funct_castore(){
 	current_frame->pc++;
 }
 
-void funct_sastore(){
+void funct_sastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -3111,8 +3130,44 @@ void funct_goto()
 	#endif
 }
 
-void funct_jsr(){ current_frame->pc++;  }
-void funct_ret(){ current_frame->pc++;  }
+void funct_jsr()
+{
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	push((current_frame->pc) + 3); /* pc da proxima instrucao */
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+	current_frame->pc += offset;
+
+#ifdef DEBUG
+	printf("jsr - novo PC = %d\n", current_frame->pc);
+#endif
+	}
+
+void funct_ret()
+{
+	u2 index;
+
+	current_frame->pc++;
+	index = current_frame->code[current_frame->pc];
+
+	if (next_is_wide == 1){
+		index = index << 8;
+		current_frame->pc++;
+		index = index | current_frame->code[current_frame->pc];
+		next_is_wide = 0;
+	}
+
+	current_frame->pc = current_frame->fields[i]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
+
+#ifdef DEBUG
+	printf("ret - novo PC: %d\n", current_frame->pc);
+#endif
+}
 void funct_tableswitch(){ current_frame->pc++;  }
 void funct_lookupswitch(){ current_frame->pc++;  }
 
@@ -3614,8 +3669,79 @@ void funct_invokestatic(){
 	current_frame->pc++;
 
 }
-void funct_invokeinterface(){ current_frame->pc++;  }
-/*void funct_nao_utilizada;*/
+
+void funct_invokeinterface()
+{
+	u4 index;
+	u1 low, high, args_count, zero;
+	int32_t class_index, class_index_tmp, i;
+	u2 name_type_index;
+	char *class_name;
+	u4 *fields_tmp;
+
+	struct ClassFile *class;
+	method_info *method;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+	index = convert_2x8_to_32_bits(low, high);
+
+	args_count = current_frame->code[++(current_frame->pc)];
+	zero = current_frame->code[++(current_frame->pc)];
+
+	/* pega da pilha os argumentos e o objectref */
+	args_count = calloc(sizeof(u4),args_count+1);
+	for (i = args_count; i >= 0; i--) {
+		fields_tmp[i] = pop();
+	}
+
+	class_index_tmp = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+				((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
+
+	class_index = loadClass( class_name );
+	class = getClassByIndex( class_index );
+
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	/* Se o metodo nao for encontrado, procura nas superclasses */
+	while ( method == NULL )
+	{
+		class_name = getParentName( class );
+
+		/* Interrompe, se nao encontrar o metodo em nenhuma superclasse */
+		if ( class == NULL )
+		{
+			#ifdef DEBUG
+				printf("invokeinterface lancaria uma excecao aqui!");
+			#endif
+			current_frame->pc++;
+			return;
+		}
+
+		class_index = loadClass( class_name );
+		class = getClassByIndex( class_index );
+
+		name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+		method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	}
+
+	/* Prepara e executa o metodo */
+	prepareMethod(class, method);
+
+	for (i = args_count; i >= 0; i--) {
+		current_frame->fields[i] = fields_tmp[i];
+	}
+
+	runMethod();
+
+	current_frame->pc++;
+}
 
 void funct_new()
 {
@@ -3747,7 +3873,6 @@ void funct_checkcast()
 	current_frame->pc++;
 }
 
-
 void funct_instanceof(){
 	struct Object *ref;
 	u2 index;
@@ -3776,9 +3901,8 @@ void funct_instanceof(){
 	current_frame->pc++;
 }
 
-
-
 void funct_monitorenter(){ pop(); current_frame->pc++;  } /* só precisa disso */
+
 void funct_monitorexit(){ pop(); current_frame->pc++;  } /* só precisa disso */
 
 void funct_wide(){
@@ -3788,9 +3912,8 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-
-void funct_multianewarray(){
-    /* TODO implementar se der tempo */
+void funct_multianewarray() /* TODO implementar se der tempo */
+{
 	current_frame->pc++;
 }
 
@@ -3864,7 +3987,7 @@ void funct_goto_w()
 	branchbyte3 = current_frame->code[(current_frame->pc)+3];
 	branchbyte4 = current_frame->code[(current_frame->pc)+4];
 
-	offset = (branchbyte1<<24) | (branchbyte2<<16) | (branchbyte3<<8) | (branchbyte1);
+	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
 
 	current_frame->pc += offset;
 
@@ -3873,5 +3996,24 @@ void funct_goto_w()
 	#endif
 }
 
-void funct_jsr_w(){ current_frame->pc++;  }
+void funct_jsr_w()
+{
+	u4 offset;
+	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
+
+	push((current_frame->pc) + 5);
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+	branchbyte3 = current_frame->code[(current_frame->pc)+3];
+	branchbyte4 = current_frame->code[(current_frame->pc)+4];
+
+	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
+
+	current_frame->pc += offset;
+
+	#ifdef DEBUG
+		printf("jsr_w - novo PC = %d\n", current_frame->pc);
+	#endif
+}
 
