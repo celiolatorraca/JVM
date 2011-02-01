@@ -3446,11 +3446,24 @@ void funct_getfield()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 
-	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
-	name_index = current_frame->class->fields[field_index].name_index;
-
 	/* Pega a referencia do objeto que tera o field alterado de valor */
 	objeto = (struct Object *) pop();
+
+	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		if (type[0] == 'J' || type[0] == 'D') {
+			pushU8( 0 );
+		} else {
+			push( 0 );
+		}
+		return;
+	}
+
+
+	name_index = current_frame->class->fields[field_index].name_index;
 
 	/* Pega o valor do field */
 	if (type[0] == 'J' || type[0] == 'D') {
