@@ -3344,8 +3344,6 @@ void funct_getstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3354,6 +3352,26 @@ void funct_getstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pushU8( 0 );
+		} else {
+			push( 0 );
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
+	class_index = loadClass( class_name );
 
 	value = getStaticFieldValue( class_index , field_index );
 
@@ -3388,8 +3406,6 @@ void funct_putstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3398,6 +3414,25 @@ void funct_putstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
 
 	/* Pega o valor a ser inserido no field static */
 	if (type[0] == 'J' || type[0] == 'D') {
@@ -3408,6 +3443,8 @@ void funct_putstatic()
 	} else {
 		value = (u8) pop();
 	}
+
+	class_index = loadClass( class_name );
 
 	setStaticFieldValue( class_index , field_index , value );
 
@@ -3454,11 +3491,17 @@ void funct_getfield()
 
 	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
 	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
 		if (type[0] == 'J' || type[0] == 'D') {
 			pushU8( 0 );
 		} else {
 			push( 0 );
 		}
+
+		current_frame->pc++;
 		return;
 	}
 
@@ -3512,6 +3555,26 @@ void funct_putfield()
 
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
 	name_index = current_frame->class->fields[field_index].name_index;
 
 	/* Pega o valor a ser colocado no field */
