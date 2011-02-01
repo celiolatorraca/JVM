@@ -1095,7 +1095,7 @@ void funct_lstore_3()
 }
 void funct_fstore_0()
 {
-	u2  value;
+	u4  value;
 
 	value = pop();
 
@@ -1105,7 +1105,7 @@ void funct_fstore_0()
 }
 void funct_fstore_1()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1115,7 +1115,7 @@ void funct_fstore_1()
 }
 void funct_fstore_2()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1125,7 +1125,7 @@ void funct_fstore_2()
 }
 void funct_fstore_3()
 {
-	u2 value;
+	u4 value;
 
 	value = pop();
 
@@ -1620,6 +1620,7 @@ void funct_dsub()
 {
 	u4 high1, low1, high2, low2;
 	double value1, value2;
+	u8 result;
 
 	low1 = pop();
 	high1 = pop();
@@ -1629,10 +1630,12 @@ void funct_dsub()
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
+	value1 -= value2;
+	memcpy(&result, &value1, sizeof(u8));
 #ifdef DEBUG
 	printf("dsub %f\n", value1 - value2);
 #endif
-	pushU8(value1 - value2);
+	pushU8(result);
 	current_frame->pc++;
 }
 
@@ -1647,7 +1650,7 @@ void funct_imul()
 	printf("imul %d\n", value1 * value2);
 #endif
 
-	push(value1 * value2);
+	push((u4)(value1 * value2));
 
 	current_frame->pc++;
 }
@@ -1670,7 +1673,7 @@ void funct_lmul()
 #ifdef DEBUG
 	printf("lmul %ld\n", result);
 #endif
-	pushU8(result);
+	pushU8(((u8)result));
 
 	current_frame->pc++;
 }
