@@ -20,6 +20,10 @@ extern struct frame *current_frame;
 extern struct array *arrayLength = NULL;
 extern u4 numArrays = 0;
 
+/* Variaveis usadas para saber qual o retorno da funcao */
+extern u1 returnType;
+extern u8 returnValue;
+
 int next_is_wide = 0;
 
 extern opcode_info *op_info;
@@ -3105,14 +3109,74 @@ void funct_jsr(){ current_frame->pc++;  }
 void funct_ret(){ current_frame->pc++;  }
 void funct_tableswitch(){ current_frame->pc++;  }
 void funct_lookupswitch(){ current_frame->pc++;  }
-void funct_ireturn(){ current_frame->pc++;  }
-void funct_lreturn(){ current_frame->pc++;  }
-void funct_freturn(){ current_frame->pc++;  }
-void funct_dreturn(){ current_frame->pc++;  }
-void funct_areturn(){ current_frame->pc++;  }
+
+void funct_ireturn()
+{
+	u4 value;
+
+	value = pop();
+
+	returnType = RETURN_32bits;
+	returnValue = (u8)value;
+
+	current_frame->pc++;
+}
+
+void funct_lreturn()
+{
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+
+	returnType = RETURN_64bits;
+	returnValue = convert_2x32_to_64_bits(low, high);
+
+	current_frame->pc++;
+}
+
+void funct_freturn()
+{
+	u4 value;
+
+	value = pop();
+
+	returnType = RETURN_32bits;
+	returnValue = (u8)value;
+
+	current_frame->pc++;
+}
+
+void funct_dreturn()
+{
+	u4 low, high;
+
+	low = pop();
+	high = pop();
+
+	returnType = RETURN_64bits;
+	returnValue = convert_2x32_to_64_bits(low, high);
+
+	current_frame->pc++;
+}
+
+void funct_areturn()
+{
+	u4 value;
+
+	value = pop();
+
+	returnType = RETURN_32bits;
+	returnValue = (u8)value;
+
+	current_frame->pc++;
+}
 
 void funct_return()
 {
+	returnType = RETURN_none;
+	returnValue = 0;
+
 	current_frame->pc++;
 }
 
@@ -3206,13 +3270,62 @@ void funct_putstatic()
 	current_frame->pc++;
 }
 
-void funct_getfield(){ current_frame->pc++;  }
+void funct_getfield()
+{
+	u1 low, high;
+	u4 index;
+	int32_t class_index, field_index, name_index;
+	u2 name_type_index;
+	char *class_name, *name, *type;
+
+	struct Object *objeto;
+	u4 value_aux;
+	u8 value;
+
+	high = current_frame->code[++(current_frame->pc)];
+	low = current_frame->code[++(current_frame->pc)];
+
+	index = convert_2x8_to_32_bits(low, high);
+
+
+	class_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->class_index;
+
+	class_name = getName(current_frame->class,
+			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index-1]))->name_index);
+
+
+	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+	name = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index);
+	type = getName(current_frame->class,
+			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
+
+
+	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+	name_index = current_frame->class->fields[field_index].name_index;
+
+	/* Pega a referencia do objeto que tera o field alterado de valor */
+	objeto = (struct Object *) pop();
+
+	/* Pega o valor do field */
+	if (type[0] == 'J' || type[0] == 'D') {
+		value = getObjectFieldWide(objeto, name_index);
+		pushU8( value );
+
+	} else {
+		value_aux = getObjectField(objeto, name_index);
+		push( value_aux );
+	}
+
+	current_frame->pc++;
+}
 
 void funct_putfield()
 {
 	u1 low, high;
 	u4 index;
-	int32_t class_index, field_index, descriptor_index;
+	int32_t class_index, field_index, name_index;
 	u2 name_type_index;
 	char *class_name, *name, *type;
 
@@ -3242,7 +3355,7 @@ void funct_putfield()
 
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
-	descriptor_index = current_frame->class->fields[field_index].descriptor_index;
+	name_index = current_frame->class->fields[field_index].name_index;
 
 	/* Pega o valor a ser colocado no field */
 	if (type[0] == 'J' || type[0] == 'D') {
@@ -3253,7 +3366,7 @@ void funct_putfield()
 		objeto = (struct Object *) pop();
 
 		value = convert_2x32_to_64_bits(value1, value2);
-		setObjectFieldWide(objeto, descriptor_index, value);
+		setObjectFieldWide(objeto, name_index, value);
 
 	} else {
 		value1 = pop();
@@ -3261,7 +3374,7 @@ void funct_putfield()
 		/* Pega a referencia do objeto que tera o field alterado de valor */
 		objeto = (struct Object *) pop();
 
-		setObjectField(objeto, descriptor_index, value1);
+		setObjectField(objeto, name_index, value1);
 	}
 
 	current_frame->pc++;

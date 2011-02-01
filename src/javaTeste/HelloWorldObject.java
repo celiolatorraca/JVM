@@ -52,13 +52,15 @@ public class HelloWorldObject implements HelloWorldInterface {
 		cc = c+c;
 		cc = c*c;
 		cc = cc/c;
+		
+		privateMethod();
 	}
 	
-	private int privateMethod(){
+	private long privateMethod(){
 		int methodField = 11;
 		this.field = 10;
 		
-		return this.field;
+		return field4;
 	}
 
 }

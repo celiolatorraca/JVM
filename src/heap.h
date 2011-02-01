@@ -31,10 +31,10 @@ u4 numArrays;
 
 void newHeap();
 struct Object* newObject(struct ClassFile *this);
-u4 getObjectField(struct Object* object, u4 cp_index);
-u8 getObjectFieldWide(struct Object* object, u4 cp_index);
-void setObjectField(struct Object* object, u4 cp_index, u4 value);
-void setObjectFieldWide(struct Object* object, u4 cp_index, u8 value);
+u4 getObjectField(struct Object* object, u4 name_index);
+u8 getObjectFieldWide(struct Object* object, u4 name_index);
+void setObjectField(struct Object* object, u4 name_index, u4 value);
+void setObjectFieldWide(struct Object* object, u4 name_index, u8 value);
 void* newArray(u4 count, u1 type);
 
 #endif

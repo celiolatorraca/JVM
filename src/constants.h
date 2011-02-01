@@ -61,4 +61,12 @@
 #define CONSTANT_Null 0
 
 
+/*
+ * RETURN
+ */
+#define RETURN_none 	0
+#define RETURN_32bits 	1
+#define RETURN_64bits 	2
+
+
 #endif

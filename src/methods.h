@@ -10,6 +10,12 @@
 
 #include "classloader.h"
 
+
+/* Variaveis usadas para saber qual o retorno da funcao */
+u1 returnType;
+u8 returnValue;
+
+
 method_info * getMainMethod();
 method_info * getInitStaticMethod();
 method_info * getMethodByNameAndDescIndex(struct ClassFile *main_class, struct ClassFile *name_type_class, u2 name_type_index);

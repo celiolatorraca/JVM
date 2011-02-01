@@ -120,6 +120,18 @@ void runMethod(){
 
 	/* Finaliza o método chamado */
 	finishMethod();
+
+	/* Empilha o valor de retorno */
+	if (returnType == RETURN_32bits) {
+		push( (u4)returnValue );
+	} else if (returnType == RETURN_64bits) {
+		pushU8( returnValue );
+	}
+
+	/* Reseta as variaveis de retorno */
+	returnType = RETURN_none;
+	returnValue = 0;
+
 	#ifdef DEBUG
 	if (current_frame != NULL) {
 		printf("\nClass: %s\n", getClassName(current_frame->class));
@@ -159,7 +171,7 @@ int32_t getNumParameters(struct ClassFile *class, method_info *method){
 	bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
 	length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
 
-	for (i = 0; i < length; i++){
+	for (i = 0; i < length && bytes[i] != ')'; i++){
 
 		if (bytes[i] == 'L'){
 
