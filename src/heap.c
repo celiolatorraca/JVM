@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "heap.h"
 #include "carregador.h"
@@ -79,6 +80,7 @@ struct Object* newObject(struct ClassFile *this)
 		printf("%d ", object->fields_index[i]);
 	printf("\n\n");
 #endif
+
 	return object;
 }
 

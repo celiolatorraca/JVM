@@ -34,10 +34,10 @@ u4 convert_2x8_to_32_bits(u4 low, u4 high)
 void convert_64_bits_to_2x32(u8 value, u4 *low, u4 *high)
 {
 	/* 32 bits mais altos */
-	*low = value >> 32;
+	*high = value >> 32;
 
 	/* 32 bits mais baixos */
-	*high = value & 0xffffffff;
+	*low = value & 0xffffffff;
 }
 
 float convert_cast_32_bits_to_float(u4 bits)

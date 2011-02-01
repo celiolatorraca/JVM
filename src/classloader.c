@@ -78,7 +78,9 @@ struct ClassFile * read_class_file(char *nome_arq)
  */
 int open_file(char *file_name)
 {
-  if ((classfile = fopen(file_name, "rb")) == NULL)
+  classfile = fopen(file_name, "rb");
+
+  if ((classfile) == NULL)
   {
     perror("openfile");
     return -1;

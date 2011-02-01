@@ -138,10 +138,20 @@ void prepareMethod(struct ClassFile *class, method_info *method){
 			break;
 	}
 
-	if (((attribute_info *)method->attributes[i])->tag != ATTR_Code)
-		fatalErrorMsg(WHERE, "Nao encontrou atributo code no método.");
+	if (method->attributes_count != 0){
+		if (((attribute_info *)method->attributes[i])->tag != ATTR_Code)
+			fatalErrorMsg(WHERE, "Nao encontrou atributo code no método.");
+		newFrame(class, class->constant_pool, ((Code_attribute *)method->attributes[i]));
+	}
+	else {
 
-	newFrame(class, class->constant_pool, ((Code_attribute *)method->attributes[i]));
+		(method->attributes_count)++;
+		method->attributes = malloc(sizeof(void*));
+		method->attributes[0] = calloc(sizeof(Code_attribute),1);
+		((Code_attribute *)(method->attributes[0]))->code_length = 0;
+		newFrame(class, class->constant_pool, ((Code_attribute *)method->attributes[0]));
+
+	}
 
 }
 

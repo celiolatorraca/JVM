@@ -18,11 +18,11 @@
 #define WHERE "Loader"
 
 
-char *base_path = "/Users/celio/UnB/workspace/JVM/src/";
+char *base_path = "/home/lucas/workspace/jvm/JVM/src/";
 
 struct ClassFile **classArray = NULL;
 static_struct *classStaticArray = NULL;
-int numClasses = 0;
+int32_t numClasses = 0;
 
 
 /*!
@@ -32,7 +32,7 @@ int numClasses = 0;
  */
 int32_t loadClass(char *class_name){
 
-	int32_t i;
+	int32_t i, classIndex;
 	char *path;
 	method_info *staticMethod;
 
@@ -46,8 +46,9 @@ int32_t loadClass(char *class_name){
 
 	/* aumenta o vetor classArray */
 	numClasses++;
-	classArray = realloc(classArray, (numClasses*sizeof(struct ClassFile *)));
-	classStaticArray = realloc(classStaticArray, (numClasses*sizeof(static_struct)));
+	classIndex = numClasses;
+	classArray = realloc(classArray, (classIndex*sizeof(struct ClassFile *)));
+	classStaticArray = realloc(classStaticArray, (classIndex*sizeof(static_struct)));
 
 	/* cria o path completo para o arquivo da classe base_path + class_name + .class */
 	path = malloc(strlen(base_path) + strlen(class_name) + 7);
@@ -57,27 +58,27 @@ int32_t loadClass(char *class_name){
 	  sprintf(path, "%s%s.class", base_path, class_name);
 
 	/* lê a nova classe */
-	if ((classArray[numClasses-1] = read_class_file(path)) == NULL)
+	if ((classArray[classIndex-1] = read_class_file(path)) == NULL)
 		fatalErrorMsg(WHERE, "Não foi possível abrir arquivo informado.");
 
-	classStaticArray[numClasses-1].class_name = malloc(strlen(class_name)+1);
-	memcpy(classStaticArray[numClasses-1].class_name, class_name, strlen(class_name));
-	classStaticArray[numClasses-1].fields_count = classArray[numClasses-1]->fields_count;
-	classStaticArray[numClasses-1].value = malloc(classArray[numClasses-1]->fields_count * sizeof(u8));
+	classStaticArray[classIndex-1].class_name = malloc(strlen(class_name)+1);
+	memcpy(classStaticArray[classIndex-1].class_name, class_name, strlen(class_name));
+	classStaticArray[classIndex-1].fields_count = classArray[classIndex-1]->fields_count;
+	classStaticArray[classIndex-1].value = malloc(classArray[classIndex-1]->fields_count * sizeof(u8));
 
 	/* Executa o método de Init Static caso tenha */
-	if ((staticMethod = getInitStaticMethod(classArray[numClasses-1])) != NULL) {
+	if ((staticMethod = getInitStaticMethod(classArray[classIndex-1])) != NULL) {
 		#ifdef DEBUG
 		printf("\nClass: %s\n", class_name);
 		#endif
-		prepareMethod(classArray[numClasses-1], staticMethod);
+		prepareMethod(classArray[classIndex-1], staticMethod);
 		runMethod();
 	}
 
 	/* carrega a superclasse da classe carregada */
-	loadClass(getParentName(classArray[numClasses-1]));
+	loadClass(getParentName(classArray[classIndex-1]));
 
-	return numClasses-1;
+	return classIndex-1;
 }
 
 
