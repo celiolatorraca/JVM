@@ -286,6 +286,11 @@ typedef struct SourceFile_attribute
   u2 sourcefile_index;
 } SourceFile_attribute;
 
+typedef struct Synthetic_attribute
+{
+  u2 attribute_name_index;
+  u4 attribute_length;
+} Synthetic_attribute;
 
 /*
  * FUNÇÕES

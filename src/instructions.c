@@ -435,6 +435,7 @@ void funct_sipush()
 void funct_ldc()
 {
 	u1 indice, tag;
+	u2 string_index;
 
 	current_frame->pc++;
 	indice = current_frame->code[current_frame->pc];
@@ -450,7 +451,8 @@ void funct_ldc()
 			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
+			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
+			push ( ((struct CONSTANT_Utf8_info *)current_frame->constant_pool[string_index-1])->bytes );
 			break;
 	}
 
@@ -3532,6 +3534,9 @@ void funct_invokevirtual()
 	char *class_name;
 	u4 *fields_tmp;
 
+	u1 *bytes;
+	u2 length;
+
 	struct ClassFile *class;
 	method_info *method;
 
@@ -3566,13 +3571,37 @@ void funct_invokevirtual()
 		fields_tmp[i] = pop();
 	}
 
-	prepareMethod(class, method);
-
-	for (i = numParams; i >= 0; i--) {
-		current_frame->fields[i] = fields_tmp[i];
+#ifdef DEBUG
+	if (strcmp("println", getName(class, method->name_index)) == 0) {
+		printf("invokestatic Chamou println!\n");
 	}
+#endif
 
-	runMethod();
+	if (method->access_flags & ACC_NATIVE ||
+			strcmp("println", getName(class, method->name_index)) == 0) {
+
+		#ifdef DEBUG
+			printf("invokestatic Metodo nativo\n");
+		#endif
+
+		bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
+		length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+
+		if (bytes[length-1] == 'D' || bytes[length-1] == 'J') {
+			pushU8( 0 );
+		} else if (bytes[length-1] != 'V') {
+			push( 0 );
+		}
+
+	} else {
+		prepareMethod(class, method);
+
+		for (i = numParams; i >= 0; i--) {
+			current_frame->fields[i] = fields_tmp[i];
+		}
+
+		runMethod();
+	}
 
 	current_frame->pc++;
 }
@@ -3586,6 +3615,9 @@ void funct_invokespecial()
 	u2 name_type_index;
 	char *class_name;
 	u4 *fields_tmp;
+
+	u1 *bytes;
+	u2 length;
 
 	struct ClassFile *class;
 	method_info *method;
@@ -3620,13 +3652,29 @@ void funct_invokespecial()
 		fields_tmp[i] = pop();
 	}
 
-	prepareMethod(class, method);
+	if (method->access_flags & ACC_NATIVE) {
+		#ifdef DEBUG
+			printf("invokestatic Metodo nativo\n");
+		#endif
 
-	for (i = numParams; i >= 0; i--) {
-		current_frame->fields[i] = fields_tmp[i];
+		bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
+		length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+
+		if (bytes[length-1] == 'D' || bytes[length-1] == 'J') {
+			pushU8( 0 );
+		} else if (bytes[length-1] != 'V') {
+			push( 0 );
+		}
+
+	} else {
+		prepareMethod(class, method);
+
+		for (i = numParams; i >= 0; i--) {
+			current_frame->fields[i] = fields_tmp[i];
+		}
+
+		runMethod();
 	}
-
-	runMethod();
 
 	current_frame->pc++;
 }
@@ -3640,6 +3688,9 @@ void funct_invokestatic(){
 	u2 name_type_index;
 	char *class_name;
 	u4 *fields_tmp;
+
+	u1 *bytes;
+	u2 length;
 
 	struct ClassFile *class;
 	method_info *method;
@@ -3674,13 +3725,29 @@ void funct_invokestatic(){
 		fields_tmp[i] = pop();
 	}
 
-	prepareMethod(class, method);
+	if (method->access_flags & ACC_NATIVE) {
+		#ifdef DEBUG
+			printf("invokestatic Metodo nativo\n");
+		#endif
 
-	for (i = numParams-1; i >= 0; i--) {
-		current_frame->fields[i] = fields_tmp[i];
+		bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
+		length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+
+		if (bytes[length-1] == 'D' || bytes[length-1] == 'J') {
+			pushU8( 0 );
+		} else if (bytes[length-1] != 'V') {
+			push( 0 );
+		}
+
+	} else {
+		prepareMethod(class, method);
+
+		for (i = numParams-1; i >= 0; i--) {
+			current_frame->fields[i] = fields_tmp[i];
+		}
+
+		runMethod();
 	}
-
-	runMethod();
 
 	current_frame->pc++;
 
@@ -3776,14 +3843,14 @@ void funct_new()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[index-1]))->name_index);
 
-#ifdef DEBUG
-	printf("new %s\n", class_name);
-#endif
-
 	class_index = loadClass(class_name);
 	class = getClassByIndex(class_index);
 
 	objeto = newObject(class);
+
+#ifdef DEBUG
+	printf("new %s (%p)\n", class_name, objeto);
+#endif
 
 	push( (u4)objeto );
 

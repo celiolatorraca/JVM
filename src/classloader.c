@@ -19,6 +19,8 @@
 #include "classloader.h"
 #include "mnemonics.h"
 
+#define WHERE "Classloader"
+
 extern int errno;
 
 FILE* classfile;
@@ -453,7 +455,14 @@ void * read_attribute_info()
     ((SourceFile_attribute *) attribute)->sourcefile_index = read_u2();
   }
 
+  else if (strcmp("Synthetic", nome) == 0) {
+	  attribute = (Synthetic_attribute *) calloc(sizeof (Synthetic_attribute), 1);
+	  ((Synthetic_attribute *) attribute)->attribute_name_index = name_index;
+	  ((Synthetic_attribute *) attribute)->attribute_length = length;
+  }
+
   else {
+	  errorMsg(WHERE, "Attributo nao reconhecido.");
   }
 
   return attribute;
