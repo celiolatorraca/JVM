@@ -241,7 +241,7 @@ void  initializeInstr()
 	instr[0xc4] = funct_wide;
 	instr[0xc5] = funct_multianewarray;
 	instr[0xc6] = funct_ifnull;
-	/*instr[0xc7] = funct_ifnonull;*/
+	instr[0xc7] = funct_ifnonull;
 	instr[0xc8] = funct_goto_w;
 	instr[0xc9] = funct_jsr_w;
 }
@@ -565,7 +565,8 @@ void funct_lload()
 }
 
 
-void funct_fload(){
+void funct_fload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -589,7 +590,8 @@ void funct_fload(){
 	current_frame->pc++;
 }
 
-void funct_dload(){
+void funct_dload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -609,7 +611,8 @@ void funct_dload(){
 	current_frame->pc++;
 }
 
-void funct_aload(){
+void funct_aload()
+{
 
 	u2 index;
 	current_frame->pc++;
@@ -807,7 +810,8 @@ void funct_aload_3()
 	current_frame->pc++;
 }
 
-void funct_iaload(){
+void funct_iaload()
+{
 
 	u4 index;
 	void *ref;
@@ -820,7 +824,8 @@ void funct_iaload(){
 	current_frame->pc++;
 }
 
-void funct_laload(){
+void funct_laload()
+{
 
 	u4 index;
 	void *ref;
@@ -837,7 +842,8 @@ void funct_laload(){
 	current_frame->pc++;
 }
 
-void funct_faload(){
+void funct_faload()
+{
 
 	u4 index, res;
 	void *ref;
@@ -851,7 +857,8 @@ void funct_faload(){
 	current_frame->pc++;
 }
 
-void funct_daload(){
+void funct_daload()
+{
 
 	u4 index;
 	void *ref;
@@ -864,7 +871,8 @@ void funct_daload(){
 	current_frame->pc++;
 }
 
-void funct_aaload(){
+void funct_aaload()
+{
 
 	u4 index;
 	void *ref;
@@ -877,7 +885,8 @@ void funct_aaload(){
 	current_frame->pc++;
 }
 
-void funct_baload(){
+void funct_baload()
+{
 
 	u4 index;
 	void *ref;
@@ -890,7 +899,8 @@ void funct_baload(){
 	current_frame->pc++;
 }
 
-void funct_caload(){
+void funct_caload()
+{
 
 	u4 index;
 	void *ref;
@@ -904,7 +914,8 @@ void funct_caload(){
 
 }
 
-void funct_saload(){
+void funct_saload()
+{
 
 	u4 index;
 	void *ref;
@@ -1261,7 +1272,8 @@ void funct_astore_3()
 	current_frame->pc++;
 }
 
-void funct_iastore(){
+void funct_iastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1275,7 +1287,8 @@ void funct_iastore(){
 	current_frame->pc++;
 }
 
-void funct_lastore(){
+void funct_lastore()
+{
 
 	u4 index, low, high;
 	u8 value;
@@ -1293,7 +1306,8 @@ void funct_lastore(){
 	current_frame->pc++;
 }
 
-void funct_fastore(){
+void funct_fastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1307,7 +1321,8 @@ void funct_fastore(){
 	current_frame->pc++;
 }
 
-void funct_dastore(){
+void funct_dastore()
+{
 
 	u4 index, low, high;
 	u8 value;
@@ -1325,7 +1340,8 @@ void funct_dastore(){
 	current_frame->pc++;
 }
 
-void funct_aastore(){
+void funct_aastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1339,7 +1355,8 @@ void funct_aastore(){
 	current_frame->pc++;
 }
 
-void funct_bastore(){
+void funct_bastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1353,7 +1370,8 @@ void funct_bastore(){
 	current_frame->pc++;
 }
 
-void funct_castore(){
+void funct_castore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -1367,7 +1385,8 @@ void funct_castore(){
 	current_frame->pc++;
 }
 
-void funct_sastore(){
+void funct_sastore()
+{
 
 	u4 index, value;
 	void *ref;
@@ -3547,7 +3566,9 @@ void funct_invokestatic(){
 	current_frame->pc++;
 
 }
+
 void funct_invokeinterface(){ current_frame->pc++;  }
+
 /*void funct_nao_utilizada;*/
 
 void funct_new()
