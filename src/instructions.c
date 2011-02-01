@@ -3160,14 +3160,97 @@ void funct_ret()
 		next_is_wide = 0;
 	}
 
-	current_frame->pc = current_frame->fields[i]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
+	current_frame->pc = current_frame->fields[index]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
 
 #ifdef DEBUG
 	printf("ret - novo PC: %d\n", current_frame->pc);
 #endif
 }
-void funct_tableswitch(){ current_frame->pc++;  }
-void funct_lookupswitch(){ current_frame->pc++;  }
+
+void funct_tableswitch()
+{
+	int32_t default_, high, low, index;
+	int32_t *tableswitch;
+	u4 byte1, byte2, byte3, byte4, tableswitch_address, target, table_size, i, offset;
+
+	index = (int32_t)pop();
+	tableswitch_address = current_frame->pc;
+
+	/* pula os padding bytes */
+	while ((current_frame->pc + 1) % 4 != 0)
+		current_frame->pc++;
+	current_frame->pc++;
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	default_ = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	low = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	high = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	table_size = high - low + 1;
+	tableswitch = calloc(sizeof(u4), table_size);
+
+#ifdef DEBUG
+	printf("TABLESWITCH\n-----------\n");
+	printf("table size: %d\n", table_size);
+#endif
+	for (i = 0; i < table_size; i++)
+	{
+		byte1 = current_frame->code[current_frame->pc++];
+		byte2 = current_frame->code[current_frame->pc++];
+		byte3 = current_frame->code[current_frame->pc++];
+		byte4 = current_frame->code[current_frame->pc++];
+
+		tableswitch[i] = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+#ifdef DEBUG
+	printf("table %d: %d\n", i, tableswitch[i]);
+#endif
+	}
+
+	if (index < low || index > high)
+		target = tableswitch_address + default_;
+	else
+	{
+		offset = tableswitch[index - low];
+		target = tableswitch_address + offset;
+	}
+
+	current_frame->pc = target;
+#ifdef DEBUG
+	printf("new PC: %d\n", current_frame->pc);
+#endif
+}
+
+void funct_lookupswitch()
+{
+	int32_t default_, npairs, key;
+	int32_t *match, *offset;
+	u4 target, lookupswitch_address;
+
+	key = (int32_t)pop();
+	lookupswitch_address = current_frame->pc;
+
+	/* pula os padding bytes */
+	while ((current_frame->pc + 1) % 4 != 0)
+		current_frame->pc++;
+	current_frame->pc++;
+}
+
 
 void funct_ireturn()
 {
