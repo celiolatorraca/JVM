@@ -3757,7 +3757,54 @@ void funct_ifnull()
 	}
 }
 
-void funct_ifnonnull(){ current_frame->pc++;  }
-void funct_goto_w(){ current_frame->pc++;  }
+void funct_ifnonnull()
+{
+	int32_t aux;
+	u4 offset;
+	u1 branchbyte1, branchbyte2;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+
+	aux = (signed) pop();
+
+	if ( aux != CONSTANT_Null )
+	{
+		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		current_frame->pc += offset;
+
+		#ifdef DEBUG
+			printf("ifnonnull fez o branch para o PC = %d\n", current_frame->pc);
+		#endif
+	}
+	else
+	{
+		current_frame->pc += 3;
+
+		#ifdef DEBUG
+			printf("ifnonnull NAO fez o branch PC = %d\n", current_frame->pc);
+		#endif
+	}
+}
+
+void funct_goto_w()
+{
+	u4 offset;
+	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
+
+	branchbyte1 = current_frame->code[(current_frame->pc)+1];
+	branchbyte2 = current_frame->code[(current_frame->pc)+2];
+	branchbyte3 = current_frame->code[(current_frame->pc)+3];
+	branchbyte4 = current_frame->code[(current_frame->pc)+4];
+
+	offset = (branchbyte1<<24) | (branchbyte2<<16) | (branchbyte3<<8) | (branchbyte1);
+
+	current_frame->pc += offset;
+
+	#ifdef DEBUG
+		printf("goto_w - novo PC = %d\n", current_frame->pc);
+	#endif
+}
+
 void funct_jsr_w(){ current_frame->pc++;  }
 
