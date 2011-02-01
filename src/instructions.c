@@ -3525,20 +3525,20 @@ void funct_invokestatic(){
 
 	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
 
-#ifdef DEBUG
-	printf("invokestatic %s -> %s\n", class_name, getName(class, method->name_index));
-#endif
-
 	numParams = getNumParameters( class , method );
 
+#ifdef DEBUG
+	printf("invokestatic %s -> %s (%d)\n", class_name, getName(class, method->name_index), numParams);
+#endif
+
 	fields_tmp = calloc(sizeof(u4),numParams+1);
-	for (i = numParams; i > 0; i--) { /* única diferença pra invokespecial */
+	for (i = numParams-1; i >= 0; i--) { /* única diferença pra invokespecial */
 		fields_tmp[i] = pop();
 	}
 
 	prepareMethod(class, method);
 
-	for (i = numParams; i >= 0; i--) {
+	for (i = numParams-1; i >= 0; i--) {
 		current_frame->fields[i] = fields_tmp[i];
 	}
 
