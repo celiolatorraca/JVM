@@ -3242,7 +3242,8 @@ void funct_lookupswitch()
 {
 	int32_t default_, npairs, key;
 	int32_t *match, *offset;
-	u4 target, lookupswitch_address;
+	u4 byte1, byte2, byte3, byte4, target, lookupswitch_address, i;
+	u1 found;
 
 	key = (int32_t)pop();
 	lookupswitch_address = current_frame->pc;
@@ -3251,6 +3252,66 @@ void funct_lookupswitch()
 	while ((current_frame->pc + 1) % 4 != 0)
 		current_frame->pc++;
 	current_frame->pc++;
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	default_ = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	byte1 = current_frame->code[current_frame->pc++];
+	byte2 = current_frame->code[current_frame->pc++];
+	byte3 = current_frame->code[current_frame->pc++];
+	byte4 = current_frame->code[current_frame->pc++];
+
+	npairs = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+	match = calloc(sizeof(int32_t), npairs);
+	offset = calloc(sizeof(int32_t), npairs);
+#ifdef DEBUG
+	printf("TABLESWITCH\n-----------\n");
+	printf("npairs : %d\n", npairs);
+#endif
+	for (i = 0; i < npairs; i++)
+	{
+		byte1 = current_frame->code[current_frame->pc++];
+		byte2 = current_frame->code[current_frame->pc++];
+		byte3 = current_frame->code[current_frame->pc++];
+		byte4 = current_frame->code[current_frame->pc++];
+
+		match[i] = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+
+		byte1 = current_frame->code[current_frame->pc++];
+		byte2 = current_frame->code[current_frame->pc++];
+		byte3 = current_frame->code[current_frame->pc++];
+		byte4 = current_frame->code[current_frame->pc++];
+
+		offset[i] = ((byte1 & 0xFF) << 24) | ((byte2 & 0xFF) << 16) | ((byte3 & 0xFF) << 8) | (byte4 & 0xFF);
+#ifdef DEBUG
+	printf("match-offset %d: %d-%d\n", i, match[i], offset[i]);
+#endif
+	}
+
+	i = 0;
+	found = 0;
+	while ((i < npairs) && (!found))
+	{
+		if (match[i] == key)
+			found = 1;
+		i++;
+	}
+	i--;
+
+	if (found)
+		target = offset[i] + lookupswitch_address;
+	else
+		target = default_ + lookupswitch_address;
+
+	current_frame->pc = target;
+#ifdef DEBUG
+	printf("new PC: %d\n", current_frame->pc);
+#endif
 }
 
 
