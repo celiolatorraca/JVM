@@ -3444,11 +3444,14 @@ void funct_getstatic()
 	type = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
-	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
 
+	/* -1 informa que nao encontrou o field na casse corrente */
+	while ((field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type))) == -1) {
+		class_name = getParentName(getClassByName(class_name));
+	}
 
-	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
-	if (field_index == -1) {
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field (-2) */
+	if (field_index == -2) {
 		#ifdef DEBUG
 			printf("getstatic Classe nao reconhecida (%s)\n", class_name);
 		#endif
@@ -3506,11 +3509,14 @@ void funct_putstatic()
 	type = getName(current_frame->class,
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
-	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+	/* -1 informa que nao encontrou o field na casse corrente */
+	while ((field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type))) == -1) {
+		class_name = getParentName(getClassByName(class_name));
+	}
 
 
-	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
-	if (field_index == -1) {
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field (-2) */
+	if (field_index == -2) {
 		#ifdef DEBUG
 			printf("putstatic Classe nao reconhecida (%s)\n", class_name);
 		#endif
@@ -3579,11 +3585,14 @@ void funct_getfield()
 	/* Pega a referencia do objeto que tera o field alterado de valor */
 	objeto = (struct Object *) pop();
 
-	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
 
+	/* -1 informa que nao encontrou o field na casse corrente */
+	while ((field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type))) == -1) {
+		class_name = getParentName(getClassByName(class_name));
+	}
 
-	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
-	if (field_index == -1) {
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field (-2) */
+	if (field_index == -2) {
 		#ifdef DEBUG
 			printf("getfield Classe nao reconhecida (%s)\n", class_name);
 		#endif
@@ -3647,11 +3656,14 @@ void funct_putfield()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 
-	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+	/* -1 informa que nao encontrou o field na casse corrente */
+	while ((field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type))) == -1) {
+		class_name = getParentName(getClassByName(class_name));
+	}
 
 
-	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
-	if (field_index == -1) {
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field (-2) */
+	if (field_index == -2) {
 		#ifdef DEBUG
 			printf("putfield Classe nao reconhecida (%s)\n", class_name);
 		#endif
@@ -3809,7 +3821,18 @@ void funct_invokevirtual()
 		class_index = loadClass( class_name );
 		class = getClassByIndex( class_index );
 
-		method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+		while (class != NULL && (method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index)) == NULL) {
+			class_name = getParentName(class);
+
+			class_index = loadClass( class_name );
+			class = getClassByIndex( class_index );
+		}
+
+		if (class == NULL) {
+			fatalErrorMsg(WHERE,"Metodo nao encontrando. Nem mesmo nas classes pai.");
+		}
+
 
 	#ifdef DEBUG
 		printf("invokevirtual %s->%s\n", class_name, getName(class, method->name_index));
@@ -3892,7 +3915,16 @@ void funct_invokespecial()
 
 	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
-	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+	while (class != NULL && (method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index)) == NULL) {
+		class_name = getParentName(class);
+
+		class_index = loadClass( class_name );
+		class = getClassByIndex( class_index );
+	}
+
+	if (class == NULL) {
+		fatalErrorMsg(WHERE,"Metodo nao encontrando. Nem mesmo nas classes pai.");
+	}
 
 #ifdef DEBUG
 	printf("invokespecial %s -> %s\n", class_name, getName(class, method->name_index));
@@ -4044,30 +4076,15 @@ void funct_invokeinterface()
 
 	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
-	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
-
-	/* Se o metodo nao for encontrado, procura nas superclasses */
-	while ( method == NULL )
-	{
-		class_name = getParentName( class );
-
-		/* Interrompe, se nao encontrar o metodo em nenhuma superclasse */
-		if ( class == NULL )
-		{
-			#ifdef DEBUG
-				printf("invokeinterface lancaria uma excecao aqui!");
-			#endif
-			current_frame->pc++;
-			return;
-		}
+	while (class != NULL && (method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index)) == NULL) {
+		class_name = getParentName(class);
 
 		class_index = loadClass( class_name );
 		class = getClassByIndex( class_index );
+	}
 
-		name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
-
-		method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
-
+	if (class == NULL) {
+		fatalErrorMsg(WHERE,"Metodo nao encontrando. Nem mesmo nas classes pai.");
 	}
 
 	/* Prepara e executa o metodo */

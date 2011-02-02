@@ -18,7 +18,7 @@
 #define WHERE "Loader"
 
 
-char *base_path = "";
+char *base_path = "/Users/celio/UnB/workspace/JVM/src/";
 
 
 struct ClassFile **classArray = NULL;
@@ -145,6 +145,9 @@ struct ClassFile * getClassByName(char *class_name){
  * Entao tive q fazer esses dois getters.
  */
 struct ClassFile * getClassByIndex(int index){
+	if (index >= numClasses) {
+		return NULL;
+	}
 	return classArray[index];
 }
 
@@ -160,6 +163,10 @@ int32_t getFieldIndexByNameAndDesc(char *class_name, char *name, u2 name_len, ch
 	u2 m_name_len, m_desc_len;
 
 	main_class = getClassByName(class_name);
+
+	if (!main_class) {
+		return -2;
+	}
 
 	/* Procura pelo Field de acordo com o nome e o desc */
 	for (i = 0; main_class && i < main_class->fields_count; i++){

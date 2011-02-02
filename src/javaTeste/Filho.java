@@ -6,5 +6,6 @@
 
 	protected int methodFilho()
 	{
+		return 0;
 	}
  }
