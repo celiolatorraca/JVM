@@ -27,7 +27,7 @@ FILE* classfile;
 
 struct ClassFile *read_class_file(char *nome_arq)
 {
-
+  //printf("nome_arq (vai abrir): %s\n", nome_arq);
   if (open_file(nome_arq) < 0)
     return NULL;
 

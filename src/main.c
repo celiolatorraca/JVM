@@ -18,6 +18,7 @@
 
 #define WHERE "Initialization"
 
+
 int main(int argc, char **argv)
 {
 	int possuiNome = 0, printScreen = 0, printFile = 0, i;
@@ -32,11 +33,11 @@ int main(int argc, char **argv)
 
 	for ( i = 1 ; i < argc ; i++ )
 	{
-		if ( !strncmp(argv[i], "-v", 2))
+		if ( !strcmp(argv[i], "-v"))
 		{
 			printScreen = 1;
 		}
-		else if ( !strncmp(argv[i], "-f", 2) )
+		else if ( !strcmp(argv[i], "-f") )
 		{
 			printFile = 1;
 		}
@@ -45,8 +46,6 @@ int main(int argc, char **argv)
 			memcpy(main_class, argv[i], (strlen(argv[i]) + 1));
 			possuiNome = 1;
 		}
-		fflush(stdout);
-
 	}
 
 	if ( !possuiNome )
@@ -64,8 +63,9 @@ int main(int argc, char **argv)
 
 	if ( printScreen )
 	{
-		fp = fopen( "output.txt", "r");
+		printf("vai rodar o -v \n");
 		printClassloader(main_class, stdout);
+		printf("terminou de rodar o -v \n"); fflush(stdout);
 	}
 
 	/* Popula array de instrucoes */

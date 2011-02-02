@@ -17,6 +17,8 @@
 
 FILE *fp;
 
+char *base_path2 = "/home/daniel/workspace/JVM/src/";
+
 void get_access_flags(u2 flags, char* string);
 void show_class_file(char* class_name);
 void show_attributes(void ** attributes, u2 attributes_count);
@@ -28,23 +30,24 @@ void print_name(u1 *string, u2 length);
 void print_mnemonics(u1 *bytecode, u2 size);
 
 
-int printClassloader(char *nome_arq, FILE *file)
+int printClassloader(char *class_name, FILE *file)
 {
 	fp = file;
-	char new_name[200] ;
+	char new_name[250] ;
 
-	if (strstr(nome_arq,".class") == NULL)
-		sprintf(new_name, "/home/daniel/workspace/JVM/src/%s", nome_arq);
+	/* cria o path completo para o arquivo da classe base_path + class_name + .class */
+	if (strstr(class_name,".class") != NULL)
+		sprintf(new_name, "%s%s", base_path2, class_name);
 	else
-		sprintf(new_name, "/home/daniel/workspace/JVM/src/%s.class", nome_arq);
+		sprintf(new_name, "%s%s.class", base_path2, class_name);
 
-	read_class_file(nome_arq);
+	read_class_file(new_name);
 
 	/* Carrega o opcode info para usar o mnemonicos */
 	populate_opcode_info();
 
 	/*Imprime o ClassFile carregado na tela*/
-	show_class_file(nome_arq);
+	show_class_file(class_name);
 
 	fflush(fp);
 
