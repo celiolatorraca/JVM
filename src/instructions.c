@@ -609,8 +609,8 @@ void funct_dload()
 	}
 
 	/* push high first */
-	push (current_frame->fields[index+1]);
 	push (current_frame->fields[index]);
+	push (current_frame->fields[index+1]);
 
 	current_frame->pc++;
 }
@@ -754,16 +754,16 @@ void funct_fload_3()
 
 void funct_dload_0()
 {
-	push( current_frame->fields[1] );
 	push( current_frame->fields[0] );
+	push( current_frame->fields[1] );
 
 	current_frame->pc++;
 }
 
 void funct_dload_1()
 {
-	push( current_frame->fields[2] );
 	push( current_frame->fields[1] );
+	push( current_frame->fields[2] );
 
 #ifdef DEBUG
 	printf("dload_1 %f\n", convert_2x32_to_64_bits(current_frame->fields[1],current_frame->fields[2]));
@@ -773,8 +773,8 @@ void funct_dload_1()
 }
 void funct_dload_2()
 {
-	push( current_frame->fields[3] );
 	push( current_frame->fields[2] );
+	push( current_frame->fields[3] );
 
 #ifdef DEBUG
 	printf("dload_2 %f\n", convert_2x32_to_64_bits(current_frame->fields[2],current_frame->fields[3]));
@@ -785,8 +785,8 @@ void funct_dload_2()
 
 void funct_dload_3()
 {
-	push( current_frame->fields[4] );
 	push( current_frame->fields[3] );
+	push( current_frame->fields[4] );
 
 #ifdef DEBUG
 	printf("dload_3 %f\n", convert_2x32_to_64_bits(current_frame->fields[3],current_frame->fields[4]));
@@ -1968,11 +1968,11 @@ void funct_lneg()
 
 	low = pop();
 	high = pop();
-	aux = (signed) convert_2x32_to_64_bits( low , high );
+	aux = (int64_t) convert_2x32_to_64_bits( low , high );
 
 	aux = -aux;
 
-	push( (u8)aux );
+	pushU8( (u8)aux );
 
 	current_frame->pc++;
 }
@@ -3979,7 +3979,8 @@ void funct_invokestatic(){
 
 	fields_tmp = calloc(sizeof(u4),numParams+1);
 	for (i = numParams-1; i >= 0; i--) { /* única diferença pra invokespecial */
-		fields_tmp[i] = pop();
+		index = pop();
+		fields_tmp[i] = index;
 	}
 
 	if (method->access_flags & ACC_NATIVE) {
