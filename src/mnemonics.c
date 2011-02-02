@@ -3,7 +3,7 @@
 void populate_opcode_info() {
 	int i;
 
-	op_info = malloc(sizeof(opcode_info)*255);
+	op_info = malloc(sizeof(opcode_info)*256);
 
 	strcpy(op_info[0x32].desc, "aaload");
 	strcpy(op_info[0x53].desc, "aastore");

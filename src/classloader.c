@@ -27,7 +27,6 @@ FILE* classfile;
 
 struct ClassFile *read_class_file(char *nome_arq)
 {
-  //printf("nome_arq (vai abrir): %s\n", nome_arq);
   if (open_file(nome_arq) < 0)
     return NULL;
 
@@ -307,7 +306,6 @@ char * getName(struct ClassFile *class_file, u2 name_index) {
   int i;
 
   char *dest = malloc(((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length + 1);
-  /*TODO Usar  msmcpy */
   for (i = 0; i < ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->length; i++) {
     dest[i] = (char) ((struct CONSTANT_Utf8_info*) class_file->constant_pool[name_index - 1])->bytes[i];
   }

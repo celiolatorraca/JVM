@@ -17,8 +17,8 @@
 #define WHERE "INTRUCTIONS"
 
 extern struct frame *current_frame;
-extern struct array *arrayLength = NULL;
-extern u4 numArrays = 0;
+extern struct array *arrayLength;
+extern u4 numArrays;
 
 /* Variaveis usadas para saber qual o retorno da funcao */
 extern u1 returnType;
@@ -407,11 +407,11 @@ void funct_dconst_1()
 	current_frame->pc++;
 }
 
-
 void funct_bipush()
 {
-	current_frame->pc++;
-	push( (u4) current_frame->code[current_frame->pc] );
+	int8_t aux = (int8_t) current_frame->code[(++current_frame->pc)];
+
+	push( (u4)aux );
 
 	current_frame->pc++;
 }
@@ -419,15 +419,15 @@ void funct_bipush()
 void funct_sipush()
 {
 	u1 low, high;
-	u4 aux;
+	int16_t aux;
 
-	current_frame->pc++;
-	low = current_frame->code[current_frame->pc];
 	current_frame->pc++;
 	high = current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	low = current_frame->code[current_frame->pc];
 
-	aux = convert_2x8_to_32_bits( low, high );
-	push( aux );
+	aux = (int16_t)convert_2x8_to_32_bits( low, high );
+	push( (u4)aux );
 
 	current_frame->pc++;
 }
@@ -452,7 +452,7 @@ void funct_ldc()
 			break;
 		case (CONSTANT_String):
 			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
-			push ( getName(current_frame->class, string_index) );
+			push ( (u4)getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -486,7 +486,7 @@ void funct_ldc_w()
 			break;
 		case (CONSTANT_String):
 			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
-			push ( getName(current_frame->class, string_index) );
+			push ( (u4)getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -1647,14 +1647,13 @@ void funct_lsub()
 	current_frame->pc++;
 }
 
-/* TODO verificar se funciona, se nao usar memcpy pra pegar resultado */
 void funct_fsub()
 {
 	u4 aux1, aux2, result;
 	float value1, value2;
 
-	aux1 = pop();
 	aux2 = pop();
+	aux1 = pop();
 
 	memcpy(&value1, &aux1, sizeof(u4));
 	memcpy(&value2, &aux2, sizeof(u4));
@@ -1664,7 +1663,7 @@ void funct_fsub()
 	memcpy(&result, &value1, sizeof(u4));
 
 #ifdef DEBUG
-	printf("fsub %f result %X\n", value1, result);
+	printf("fsub %X\n", value1);
 #endif
 
 	push(result);
@@ -2051,28 +2050,19 @@ void funct_lshl()
 void funct_ishr()
 {
 	u4 mask = 0x1f;  /* ... 0001 1111 */
-	u4 aux1 = 0xffffffff;  /* 1111 1111 ... */
-	u4 aux4 = 0x80000000;  /* 1000 0000 ... */
-	u4 aux2, aux3;
+	u4 aux1, i;
+	int32_t aux2;
 
-	aux2 = pop();
-	aux2 &= mask;
+	aux1 = pop();
+	aux1 &= mask;
 
-	/* Deixa os (32-aux2) bits iniciais com 1 */
-	aux1 <<= (32-aux2);
+	aux2 = (int32_t)pop();
 
-	aux3 = pop();
-
-	/* Verifica qual é o primeiro bit */
-	aux4 = aux3 & aux4;
-
-	aux3 >>= aux2;
-
-	if (aux4) {
-		aux3 |= aux1;
+	for (i = 0; i < aux1; i++) {
+		aux2 /= 2;
 	}
 
-	push( aux3 );
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 }
@@ -2294,15 +2284,16 @@ void funct_i2l()
 
 void funct_i2f()
 {
-	u4 aux;
+	u4 aux2;
+	int32_t aux;
 	float f;
 
-	aux = pop();
-	f = convert_cast_32_bits_to_float( aux );
+	aux = (int32_t)pop();
+	f = (float)aux;
 
-	memcpy(&aux, &f, sizeof(u4));
+	memcpy(&aux2, &f, sizeof(u4));
 
-	push( aux );
+	push( aux2 );
 
 	current_frame->pc++;
 
@@ -2314,10 +2305,10 @@ void funct_i2f()
 void funct_i2d()
 {
 	double d;
-	u4 aux1;
+	int32_t aux1;
 	u8 aux2;
 
-	aux1 = pop();
+	aux1 = (int32_t)pop();
 
 	d = (double)aux1;
 
@@ -2348,7 +2339,6 @@ void funct_l2i()
 	#endif
 }
 
-/*TODO Testar para ver se funciona a conversao para double*/
 void funct_l2f()
 {
 	u4 low, high, *aux;
@@ -2397,7 +2387,7 @@ void funct_l2d()
 	#endif
 }
 
-void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2i()
 {
 	u4 aux;
 	float f;
@@ -2415,7 +2405,7 @@ void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	#endif
 }
 
-void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2l()
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2434,7 +2424,7 @@ void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	#endif
 }
 
-void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2d()
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2444,7 +2434,7 @@ void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	aux_4 = pop();
 	memcpy(&f, &aux_4, sizeof(u4));
 
-	d = (u8) f;
+	d = (double) f;
 	memcpy(&aux_8, &d, 2*sizeof(u4));
 	pushU8( aux_8 );
 
@@ -2455,9 +2445,10 @@ void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	#endif
 }
 
-void funct_d2i() /* TODO - Conferir caso do signed */
+void funct_d2i()
 {
-	u4 low, high, resp;
+	u4 low, high;
+	int32_t resp;
 	u8 aux;
 	double d;
 
@@ -2466,8 +2457,8 @@ void funct_d2i() /* TODO - Conferir caso do signed */
 	aux = convert_2x32_to_64_bits(low, high);
 	memcpy(&d, &aux, 2*sizeof(u4));
 
-	resp = (u4) d;
-	push( resp );
+	resp = (int32_t) d;
+	push( (u4)resp );
 
 	current_frame->pc++;
 
@@ -2523,10 +2514,13 @@ void funct_d2f()
 
 void funct_i2b()
 {
-	u1 aux;
+	int8_t aux;
+	int32_t aux2;
 
-	aux = (u1) pop();
-	push(aux);
+	aux = (int8_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -2537,10 +2531,13 @@ void funct_i2b()
 
 void funct_i2c()
 {
-	u2 aux;
+	int16_t aux;
+	int32_t aux2;
 
-	aux = (u2) pop();
-	push( (u4) aux);
+	aux = (int16_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -2551,10 +2548,13 @@ void funct_i2c()
 
 void funct_i2s()
 {
-	u2 aux;
+	int16_t aux;
+	int32_t aux2;
 
-	aux = (u2) pop();
-	push( (u4) aux);
+	aux = (int16_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -2593,7 +2593,7 @@ void funct_lcmp()
 	#endif
 }
 
-void funct_fcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_fcmpl()
 {
 	int32_t resp;
 	u4 aux;
@@ -2621,7 +2621,7 @@ void funct_fcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_fcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_fcmpg()
 {
 	int32_t resp;
 	u4 aux;
@@ -2649,7 +2649,7 @@ void funct_fcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_dcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_dcmpl()
 {
 	int32_t resp;
 	u4 low, high;
@@ -2682,7 +2682,7 @@ void funct_dcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_dcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_dcmpg()
 {
 	int32_t resp;
 	u4 low, high;
@@ -3195,7 +3195,7 @@ void funct_ret()
 		next_is_wide = 0;
 	}
 
-	current_frame->pc = current_frame->fields[index]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
+	current_frame->pc = current_frame->fields[index];
 
 #ifdef DEBUG
 	printf("ret - novo PC: %d\n", current_frame->pc);
@@ -3772,12 +3772,12 @@ void funct_invokevirtual()
 				}
 
 				for (j = 0; j < arrayLength[i].size; j++){
-					printf("%c", (char)array_ref +i);
+					printf("%c", (int16_t)array_ref +i);
 				}
 
 			/* CHAR */
 			} else {
-				printf("%c", (char)pop());
+				printf("%c", (int16_t)pop());
 			}
 
 		/* INTEIRO */
@@ -4028,7 +4028,7 @@ void funct_invokeinterface()
 	zero = current_frame->code[++(current_frame->pc)];
 
 	/* pega da pilha os argumentos e o objectref */
-	args_count = calloc(sizeof(u4),args_count+1);
+	fields_tmp = calloc(sizeof(u4),args_count+1);
 	for (i = args_count; i >= 0; i--) {
 		fields_tmp[i] = pop();
 	}
@@ -4123,8 +4123,7 @@ void funct_newarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	u4 teste = (u4)newArray(count, type);
-	push (teste);
+	push ((u4)newArray(count, type));
 
 	current_frame->pc++;
 }
@@ -4206,7 +4205,7 @@ void funct_checkcast()
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
 	}
 
-	/*TODO Verificar a subclasses*/
+
 	push((u4)ref);
 	current_frame->pc++;
 }
@@ -4250,7 +4249,7 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-void funct_multianewarray() /* TODO implementar se der tempo */
+void funct_multianewarray()
 {
 	u2 indexbyte1, indexbyte2, index, type, atype;
 	u1 dimensions;
@@ -4273,7 +4272,7 @@ void funct_multianewarray() /* TODO implementar se der tempo */
 
 	dimension = pop();
 	arrayref = newArray(dimension, TYPE_reference);
-	array_type = getName(current_frame->class, ((struct CONSTANT_Class_info*)current_frame->constant_pool[index])->name_index);
+	array_type = getName(current_frame->class, ((struct CONSTANT_Class_info*)current_frame->constant_pool[index -1])->name_index);
 
 	i = 0;
 	while (array_type[i] == '[')
@@ -4330,13 +4329,13 @@ void funct_multianewarray() /* TODO implementar se der tempo */
 			break;
 
 		if (atype == 1)
-			((u1*)arrayref)[i] = newArray(type, size);
+			((u1**)arrayref)[i] = (u1*)newArray(type, size);
 		else if(atype == 2)
-			((u2*)arrayref)[i] = newArray(type, size);
+			((u2**)arrayref)[i] = (u2*)newArray(type, size);
 		else if(atype == 4)
-			((u4*)arrayref)[i] = newArray(type, size);
+			((u4**)arrayref)[i] = (u4*)newArray(type, size);
 		else
-			((u8*)arrayref)[i] = newArray(type, size);
+			((u8**)arrayref)[i] = (u8*)newArray(type, size);
 
 	}
 
