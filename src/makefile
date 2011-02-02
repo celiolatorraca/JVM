@@ -1,8 +1,8 @@
 .PHONY: all, apple, java, debug, debug_apple, clean
 
 CC = gcc
-FLAGS = -Wall -ansi -pedantic -error -lm -g
-AFLAGS = -Wall -ansi -pedantic -lm -g 
+FLAGS = -Wall -ansi -pedantic -error -lm -g -m32
+AFLAGS = -Wall -ansi -pedantic -lm -g -m32
 OBJS = classloader.o methods.o jvmerr.o carregador.o mnemonics.o stack.o heap.o instructions.o types.o frame.o
 
 all: main.c $(OBJS)
@@ -24,4 +24,4 @@ clean:
 	rm *.o jvm
 
 %.o: %.c %.h
-	$(CC) $< -o $@ -c $(AFLAGS) -DDEBUG
+	$(CC) $< -o $@ -c $(AFLAGS)
