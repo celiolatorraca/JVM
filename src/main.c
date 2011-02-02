@@ -20,23 +20,52 @@
 
 int main(int argc, char **argv)
 {
-
+	int possuiNome = 0, printScreen = 0, printFile = 0, i;
 	char main_class[200];
 	method_info *main_method;
+	FILE *fp;
 
-	if (argc == 1)
+	if ( argc > 4 )
+	{
+		fatalErrorMsg(WHERE, "Argumentos errados.");
+	}
+
+	for ( i = 1 ; i < argc ; i++ )
+	{
+		if ( !strncmp(argv[i], "-v", 2))
+		{
+			printScreen = 1;
+		}
+		else if ( !strncmp(argv[i], "-f", 2) )
+		{
+			printFile = 1;
+		}
+		else if ( !possuiNome  )
+		{
+			memcpy(main_class, argv[i], (strlen(argv[i]) + 1));
+			possuiNome = 1;
+		}
+		fflush(stdout);
+
+	}
+
+	if ( !possuiNome )
 	{
 		printf("\nDigite o nome do arquivo: ");
 		scanf("%s", main_class);
 		getchar();
 	}
-	else if (argc == 2)
+
+	if ( printFile )
 	{
-		memcpy(main_class, argv[1], (strlen(argv[1]) + 1));
+		fp = fopen( "output.txt", "r");
+		printClassloader(main_class, fp);
 	}
-	else
+
+	if ( printScreen )
 	{
-		fatalErrorMsg(WHERE, "Argumentos errados.");
+		fp = fopen( "output.txt", "r");
+		printClassloader(main_class, stdout);
 	}
 
 	/* Popula array de instrucoes */
