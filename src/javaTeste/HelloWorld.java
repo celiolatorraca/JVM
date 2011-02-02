@@ -19,7 +19,7 @@ public class HelloWorld {
 
       HelloWorldObject a = new HelloWorldObject();
       a.executeMethod(1, 2.0f, 3l);
-      int[] b = new int[30];
+      int[][][] b = new int[30][20][10];
 
     }
 
