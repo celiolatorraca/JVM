@@ -20,6 +20,7 @@
 
 char *base_path = "/Users/celio/UnB/workspace/JVM/src/";
 
+
 struct ClassFile **classArray = NULL;
 static_struct *classStaticArray = NULL;
 int32_t numClasses = 0;
