@@ -3314,7 +3314,6 @@ void funct_lookupswitch()
 #endif
 }
 
-
 void funct_ireturn()
 {
 	u4 value;
@@ -4211,6 +4210,96 @@ void funct_wide(){
 
 void funct_multianewarray() /* TODO implementar se der tempo */
 {
+	u2 indexbyte1, indexbyte2, index, type, atype;
+	u1 dimensions;
+	u4 i, dimension, size;
+	void *arrayref;
+	char *array_type;
+
+	current_frame->pc++;
+	indexbyte1 = current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	indexbyte1 = current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	indexbyte1 = current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	dimensions = current_frame->code[current_frame->pc];
+
+	index = ((indexbyte1 & 0xFF) << 8) | (indexbyte2 & 0xFF);
+
+
+
+	dimension = pop();
+	arrayref = newArray(dimension, TYPE_reference);
+	array_type = getName(current_frame->class, ((struct CONSTANT_Class_info*)current_frame->constant_pool[index])->name_index);
+
+	i = 0;
+	while (array_type[i] == '[')
+		i++;
+#ifdef DEBUG
+		printf("multiarray: type %c\n", array_type[i]);
+#endif
+	switch (array_type[i])
+	{
+	case 'L':
+		type = TYPE_reference;
+		atype = TYPE_reference;
+		break;
+	case 'Z':
+		type = TYPE_boolean;
+		atype = TYPE_boolean_size;
+		break;
+	case 'C':
+		type = TYPE_char;
+		atype = TYPE_char_size;
+		break;
+	case 'F':
+		type = TYPE_float;
+		atype = TYPE_float_size;
+		break;
+	case 'D':
+		type = TYPE_double;
+		atype = TYPE_double_size;
+		break;
+	case 'B':
+		type = TYPE_byte;
+		atype = TYPE_byte_size;
+		break;
+	case 'S':
+		type = TYPE_short;
+		atype = TYPE_short_size;
+		break;
+	case 'I':
+		type = TYPE_int;
+		atype = TYPE_int_size;
+		break;
+	case 'J':
+		type = TYPE_long;
+		atype = TYPE_long_size;
+		break;
+	default:
+		type = TYPE_reference;
+		atype = TYPE_reference_size;
+	}
+	for (i = 0; i < dimensions; i++)
+	{
+		size = pop();
+		if (size == 0)
+			break;
+
+		if (atype == 1)
+			((u1*)arrayref)[i] = newArray(type, size);
+		else if(atype == 2)
+			((u2*)arrayref)[i] = newArray(type, size);
+		else if(atype == 4)
+			((u4*)arrayref)[i] = newArray(type, size);
+		else
+			((u8*)arrayref)[i] = newArray(type, size);
+
+	}
+
+	push((u4)arrayref);
+
 	current_frame->pc++;
 }
 

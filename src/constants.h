@@ -54,7 +54,28 @@
 #define ATTR_LocalVariableTable		6
 #define ATTR_SourceFile				7
 
+/*
+ * Variable types
+ */
+#define TYPE_reference 	0
+#define	TYPE_boolean 	4
+#define	TYPE_char 		5
+#define	TYPE_float 		6
+#define	TYPE_double 	7
+#define	TYPE_byte 		8
+#define	TYPE_short 		9
+#define	TYPE_int 		10
+#define	TYPE_long 		11
 
+#define TYPE_reference_size	4
+#define	TYPE_boolean_size	1
+#define	TYPE_char_size		2
+#define	TYPE_float_size		4
+#define	TYPE_double_size	8
+#define	TYPE_byte_size		1
+#define	TYPE_short_size		2
+#define	TYPE_int_size 		4
+#define	TYPE_long_size		8
 /*
  * NULL
  */
