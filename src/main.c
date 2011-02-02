@@ -19,6 +19,16 @@
 
 #define WHERE "Initialization"
 
+/* número de arrays alocados e vetor com o tamanho dos arrays */
+struct array *arrayLength;
+u4 numArrays;
+
+
+void initExternVariables() {
+	arrayLength = NULL;
+	numArrays = 0;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -26,6 +36,8 @@ int main(int argc, char **argv)
 	char main_class[200];
 	method_info *main_method;
 	FILE *fp;
+
+	initExternVariables();
 
 	if ( argc > 4 )
 	{

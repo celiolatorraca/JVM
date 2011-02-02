@@ -17,8 +17,8 @@
 #define WHERE "INTRUCTIONS"
 
 extern struct frame *current_frame;
-extern struct array *arrayLength = NULL;
-extern u4 numArrays = 0;
+extern struct array *arrayLength;
+extern u4 numArrays;
 
 /* Variaveis usadas para saber qual o retorno da funcao */
 extern u1 returnType;
@@ -452,7 +452,7 @@ void funct_ldc()
 			break;
 		case (CONSTANT_String):
 			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
-			push ( getName(current_frame->class, string_index) );
+			push ( (u4)getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -486,7 +486,7 @@ void funct_ldc_w()
 			break;
 		case (CONSTANT_String):
 			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
-			push ( getName(current_frame->class, string_index) );
+			push ( (u4)getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -4030,7 +4030,7 @@ void funct_invokeinterface()
 	zero = current_frame->code[++(current_frame->pc)];
 
 	/* pega da pilha os argumentos e o objectref */
-	args_count = calloc(sizeof(u4),args_count+1);
+	fields_tmp = calloc(sizeof(u4),args_count+1);
 	for (i = args_count; i >= 0; i--) {
 		fields_tmp[i] = pop();
 	}
@@ -4125,8 +4125,7 @@ void funct_newarray(){
 
 	if (count < 0) errorMsg(WHERE, "NegativeArraySizeException");
 
-	u4 teste = (u4)newArray(count, type);
-	push (teste);
+	push ((u4)newArray(count, type));
 
 	current_frame->pc++;
 }
@@ -4332,13 +4331,13 @@ void funct_multianewarray() /* TODO implementar se der tempo */
 			break;
 
 		if (atype == 1)
-			((u1*)arrayref)[i] = newArray(type, size);
+			((u1**)arrayref)[i] = (u1*)newArray(type, size);
 		else if(atype == 2)
-			((u2*)arrayref)[i] = newArray(type, size);
+			((u2**)arrayref)[i] = (u2*)newArray(type, size);
 		else if(atype == 4)
-			((u4*)arrayref)[i] = newArray(type, size);
+			((u4**)arrayref)[i] = (u4*)newArray(type, size);
 		else
-			((u8*)arrayref)[i] = newArray(type, size);
+			((u8**)arrayref)[i] = (u8*)newArray(type, size);
 
 	}
 
