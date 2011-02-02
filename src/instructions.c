@@ -3405,8 +3405,6 @@ void funct_getstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3415,6 +3413,26 @@ void funct_getstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pushU8( 0 );
+		} else {
+			push( 0 );
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
+	class_index = loadClass( class_name );
 
 	value = getStaticFieldValue( class_index , field_index );
 
@@ -3449,8 +3467,6 @@ void funct_putstatic()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-	class_index = loadClass( class_name );
-
 	name_type_index = ((struct CONSTANT_Fieldref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	name = getName(current_frame->class,
@@ -3459,6 +3475,25 @@ void funct_putstatic()
 			((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index);
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putstatic Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
 
 	/* Pega o valor a ser inserido no field static */
 	if (type[0] == 'J' || type[0] == 'D') {
@@ -3469,6 +3504,8 @@ void funct_putstatic()
 	} else {
 		value = (u8) pop();
 	}
+
+	class_index = loadClass( class_name );
 
 	setStaticFieldValue( class_index , field_index , value );
 
@@ -3515,11 +3552,17 @@ void funct_getfield()
 
 	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
 	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("getfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
 		if (type[0] == 'J' || type[0] == 'D') {
 			pushU8( 0 );
 		} else {
 			push( 0 );
 		}
+
+		current_frame->pc++;
 		return;
 	}
 
@@ -3573,6 +3616,26 @@ void funct_putfield()
 
 
 	field_index = getFieldIndexByNameAndDesc(class_name, name, strlen(name), type, strlen(type));
+
+
+	/* Verifica se deu algum erro (ou classe nao aceita) ao buscar o field */
+	if (field_index == -1) {
+		#ifdef DEBUG
+			printf("putfield Classe nao reconhecida (%s)\n", class_name);
+		#endif
+
+		if (type[0] == 'J' || type[0] == 'D') {
+			pop();
+			pop();
+		} else {
+			pop();
+		}
+
+		current_frame->pc++;
+		return;
+	}
+
+
 	name_index = current_frame->class->fields[field_index].name_index;
 
 	/* Pega o valor a ser colocado no field */
@@ -3600,13 +3663,15 @@ void funct_putfield()
 
 void funct_invokevirtual()
 {
-	u4 index;
+	u4 index, value_high, value_low, vU4, array_ref;
+	u8 value;
 	u1 low, high;
-	int32_t numParams, i;
+	int32_t numParams, i, j;
 	int32_t class_index, class_index_tmp;
-	u2 name_type_index;
-	char *class_name;
+	u2 name_type_index, method_name_index, method_desc_index;
+	char *class_name, *method_name, *method_desc;
 	u4 *fields_tmp;
+	float vfloat;
 
 	u1 *bytes;
 	u2 length;
@@ -3626,55 +3691,128 @@ void funct_invokevirtual()
 	class_name = getName(current_frame->class,
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
-
-	class_index = loadClass( class_name );
-	class = getClassByIndex( class_index );
-
 	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
-	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+	method_name_index = ((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->name_index;
+	method_desc_index = ((struct CONSTANT_NameAndType_info *)(current_frame->constant_pool[name_type_index-1]))->descriptor_index;
 
-#ifdef DEBUG
-	printf("invokevirtual %s->%s\n", class_name, getName(class, method->name_index));
-#endif
+	method_desc = getName(current_frame->class, method_desc_index);
+	method_name = getName(current_frame->class, method_name_index);
 
-	numParams = getNumParameters( class , method );
+	/* se for print ou println */
+	if ( (strcmp(class_name, "java/io/PrintStream") == 0)
+			&& ((strcmp(method_name,"print") == 0) || (strcmp(method_name,"println") == 0) )
+	   ){
 
-	fields_tmp = calloc(sizeof(u4),numParams+1);
-	for (i = numParams; i >= 0; i--) {
-		fields_tmp[i] = pop();
-	}
+		if (strstr(method_desc, "J") != NULL){
+			value_low = pop();
+			value_high = pop();
+			value = convert_2x32_to_64_bits(value_low, value_high);
+			printf("%"PRIi64, (int64_t)value);
 
-#ifdef DEBUG
-	if (strcmp("println", getName(class, method->name_index)) == 0) {
-		printf("invokestatic Chamou println!\n");
-	}
-#endif
+		} else if(strstr(method_desc, "D") != NULL) {
+			value_low = pop();
+			value_high = pop();
+			value = convert_2x32_to_64_bits(value_low, value_high);
+			printf("%f", (double)value);
 
-	if (method->access_flags & ACC_NATIVE ||
-			strcmp("println", getName(class, method->name_index)) == 0) {
+		} else if(strstr(method_desc, "Z") != NULL) {
+			/* boolean*/
+			if (pop())
+				printf("true");
+			else
+				printf("false");
 
-		#ifdef DEBUG
-			printf("invokestatic Metodo nativo\n");
-		#endif
+		} else if(strstr(method_desc, "C") != NULL) {
 
-		bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
-		length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+			if(strstr(method_desc, "[C") != NULL){
+				/*array de char */
+				array_ref = pop();
 
-		if (bytes[length-1] == 'D' || bytes[length-1] == 'J') {
-			pushU8( 0 );
-		} else if (bytes[length-1] != 'V') {
-			push( 0 );
+				for (i = 0; i < numArrays; i++){
+					if (arrayLength[i].ref == array_ref)
+						break;
+				}
+
+				for (j = 0; j < arrayLength[i].size; j++){
+					printf("%c", (char)array_ref +i);
+				}
+
+
+			} else {
+				/*char */
+				printf("%c", (char)pop());
+			}
+
+		}else if(strstr(method_desc, "I") != NULL) {
+			/* inteiro */
+			printf("%"PRIi32, (int32_t)pop());
+
+		}else if(strstr(method_desc, "F") != NULL) {
+			/* float */
+			vU4 = pop();
+			memcpy(&vfloat, &vU4, sizeof(u4));
+			printf("%f", vfloat);
+		}else if(strstr(method_desc, "Ljava/lang/String") != NULL) {
+			printf("%s",getName(current_frame->class, (pop() -1)));
+		}else if(strstr(method_desc, "Ljava/lang/Object") != NULL) {
+			printf("%p", (void *)pop());
+			/* chamar método toString do object e depois toCharArray()*/
 		}
+
+		if (strcmp(method_name,"println") == 0)
+			printf("\n");
 
 	} else {
-		prepareMethod(class, method);
 
+		class_index = loadClass( class_name );
+		class = getClassByIndex( class_index );
+
+		method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
+
+	#ifdef DEBUG
+		printf("invokevirtual %s->%s\n", class_name, getName(class, method->name_index));
+	#endif
+
+		numParams = getNumParameters( class , method );
+
+		fields_tmp = calloc(sizeof(u4),numParams+1);
 		for (i = numParams; i >= 0; i--) {
-			current_frame->fields[i] = fields_tmp[i];
+			fields_tmp[i] = pop();
 		}
 
-		runMethod();
+	#ifdef DEBUG
+		if (strcmp("println", getName(class, method->name_index)) == 0) {
+			printf("invokestatic Chamou println!\n");
+		}
+	#endif
+
+		if (method->access_flags & ACC_NATIVE ||
+				strcmp("println", getName(class, method->name_index)) == 0) {
+
+			#ifdef DEBUG
+				printf("invokestatic Metodo nativo\n");
+			#endif
+
+			bytes = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->bytes;
+			length = ((struct CONSTANT_Utf8_info *)(class->constant_pool[(method->descriptor_index-1)]))->length;
+
+			if (bytes[length-1] == 'D' || bytes[length-1] == 'J') {
+				pushU8( 0 );
+			} else if (bytes[length-1] != 'V') {
+				push( 0 );
+			}
+
+		} else {
+			prepareMethod(class, method);
+
+			for (i = numParams; i >= 0; i--) {
+				current_frame->fields[i] = fields_tmp[i];
+			}
+
+			runMethod();
+		}
+
 	}
 
 	current_frame->pc++;
@@ -3781,10 +3919,12 @@ void funct_invokestatic(){
 			((struct CONSTANT_Class_info *)(current_frame->constant_pool[class_index_tmp-1]))->name_index);
 
 
+	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
+
+
 	class_index = loadClass( class_name );
 	class = getClassByIndex( class_index );
 
-	name_type_index = ((struct CONSTANT_Methodref_info *)(current_frame->constant_pool[index-1]))->name_and_type_index;
 
 	method = getMethodByNameAndDescIndex(class, current_frame->class, name_type_index);
 
