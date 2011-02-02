@@ -1653,8 +1653,8 @@ void funct_fsub()
 	u4 aux1, aux2, result;
 	float value1, value2;
 
-	aux1 = pop();
 	aux2 = pop();
+	aux1 = pop();
 
 	memcpy(&value1, &aux1, sizeof(u4));
 	memcpy(&value2, &aux2, sizeof(u4));
@@ -1664,7 +1664,7 @@ void funct_fsub()
 	memcpy(&result, &value1, sizeof(u4));
 
 #ifdef DEBUG
-	printf("fsub %f result %X\n", value1, result);
+	printf("fsub %X\n", value1);
 #endif
 
 	push(result);

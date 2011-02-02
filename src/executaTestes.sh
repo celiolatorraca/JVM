@@ -58,9 +58,17 @@ if [ `ls *.class | wc -l` -gt "0" ]; then
 		echo "Executando [ $PROGRAMA ]"		 															>> $ARQUIVO_LOG
 		echo ""																									>> $ARQUIVO_LOG
 
+		# Escreve o nome do arquivo que esta sendo executado
+		echo ""                                         >> ourOut
+		echo "$PROGRAMA" | cut -d'.' -f1		>> ourOut
+		echo ""						>> ourOut
+		echo ""	                                        >> theirOut
+		echo "$PROGRAMA" | cut -d'.' -f1		>> theirOut
+		echo ""                                         >> theirOut
+
 		# Altere essa linha para refletir a forma como a sua JVM e executada.
-		./jvm $PROGRAMA 																					>> ourOut
-		java `echo "$PROGRAMA" | cut -d'.' -f1`																>> theirOut 
+		./jvm $PROGRAMA 				>> ourOut
+		java `echo "$PROGRAMA" | cut -d'.' -f1`		>> theirOut 
 		
 		RESULTADO_EXECUCAO="$?"
 
