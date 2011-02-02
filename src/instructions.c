@@ -452,7 +452,7 @@ void funct_ldc()
 			break;
 		case (CONSTANT_String):
 			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
-			push ( ((struct CONSTANT_Utf8_info *)current_frame->constant_pool[string_index-1])->bytes );
+			push ( getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -464,6 +464,7 @@ void funct_ldc_w()
 	u1 tag;
 	u4 indice;
 	u4 high, low;
+	u2 string_index;
 
 	current_frame->pc++;
 	high = current_frame->code[current_frame->pc];
@@ -484,7 +485,8 @@ void funct_ldc_w()
 			push ( ((struct CONSTANT_Float_info *) current_frame->constant_pool[indice-1])->bytes);
 			break;
 		case (CONSTANT_String):
-			push ( ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index);
+			string_index = ((struct CONSTANT_String_info *) current_frame->constant_pool[indice-1])->string_index;
+			push ( getName(current_frame->class, string_index) );
 			break;
 	}
 
@@ -763,12 +765,20 @@ void funct_dload_1()
 	push( current_frame->fields[2] );
 	push( current_frame->fields[1] );
 
+#ifdef DEBUG
+	printf("dload_1 %f\n", convert_2x32_to_64_bits(current_frame->fields[1],current_frame->fields[2]));
+#endif
+
 	current_frame->pc++;
 }
 void funct_dload_2()
 {
 	push( current_frame->fields[3] );
 	push( current_frame->fields[2] );
+
+#ifdef DEBUG
+	printf("dload_2 %f\n", convert_2x32_to_64_bits(current_frame->fields[2],current_frame->fields[3]));
+#endif
 
 	current_frame->pc++;
 }
@@ -777,6 +787,10 @@ void funct_dload_3()
 {
 	push( current_frame->fields[4] );
 	push( current_frame->fields[3] );
+
+#ifdef DEBUG
+	printf("dload_3 %f\n", convert_2x32_to_64_bits(current_frame->fields[3],current_frame->fields[4]));
+#endif
 
 	current_frame->pc++;
 }
@@ -1594,7 +1608,7 @@ void funct_dadd()
 	aux1 += aux2;
 
 	memcpy(&aux, &aux1, sizeof(u8));
-	convert_64_bits_to_2x32(aux1, &low, &high);
+	convert_64_bits_to_2x32(aux, &low, &high);
 
 	push(high);
 	push(low);
@@ -1664,18 +1678,19 @@ void funct_dsub()
 	double value1, value2;
 	u8 result;
 
-	low1 = pop();
-	high1 = pop();
 	low2 = pop();
 	high2 = pop();
+	low1 = pop();
+	high1 = pop();
 
 	value1 = convert_cast_2x32_bits_to_double(low1, high1);
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
 	value1 -= value2;
 	memcpy(&result, &value1, sizeof(u8));
+
 #ifdef DEBUG
-	printf("dsub %f\n", value1 - value2);
+	printf("dsub %f\n", value1);
 #endif
 
 	pushU8(result);
@@ -1749,6 +1764,7 @@ void funct_dmul()
 {
 	u4 high1, low1, high2, low2;
 	double value1, value2;
+	u8 value;
 
 	low1 = pop();
 	high1 = pop();
@@ -1759,10 +1775,13 @@ void funct_dmul()
 	value2 = convert_cast_2x32_bits_to_double(low2, high2);
 
 #ifdef DEBUG
-	printf("dsub %f\n", value1 * value2);
+	printf("dmul %f\n", value1 * value2);
 #endif
 
-	pushU8(value1 * value2);
+	value1 *= value2;
+	memcpy(&value, &value1, sizeof(u8));
+
+	pushU8( value );
 
 	current_frame->pc++;
 }
@@ -1833,6 +1852,7 @@ void funct_ddiv()
 {
 	u4 high1, low1, high2, low2;
 	double value1, value2;
+	u8 aux;
 
 	low2 = pop();
 	high2 = pop();
@@ -1846,7 +1866,9 @@ void funct_ddiv()
 	printf("ddiv %f\n", value1 / value2);
 #endif
 
-	pushU8(value1 / value2);
+	value1 /= value2;
+	memcpy(&aux, &value1, sizeof(u8));
+	pushU8( aux );
 
 	current_frame->pc++;
 }
@@ -1858,7 +1880,7 @@ void funct_irem()
 	value2 = pop();
 	value1 = pop();
 
-	push( value2 % value1 );
+	push( value1 % value2 );
 
 	current_frame->pc++;
 
@@ -1910,17 +1932,19 @@ void funct_drem()
 
 	low = pop();
 	high = pop();
-	d2 = (double) convert_2x32_to_64_bits( low , high );
+	aux = convert_2x32_to_64_bits( low , high );
+	memcpy(&d2, &aux, sizeof(u8));
 
 	low = pop();
 	high = pop();
-	d1 = (double) convert_2x32_to_64_bits( low , high );
+	aux = convert_2x32_to_64_bits( low , high );
+	memcpy(&d1, &aux, sizeof(u8));
 
 	d1 = fmod( d1 , d2 );
 
 	memcpy(&aux, &d1, sizeof(u8));
 
-	push( aux );
+	pushU8( aux );
 
 	current_frame->pc++;
 }
@@ -1973,14 +1997,17 @@ void funct_dneg()
 {
 	double d;
 	u4 low, high;
+	u8 aux;
 
 	low = pop();
 	high = pop();
-	d = (double) convert_2x32_to_64_bits( low , high );
+	aux = convert_2x32_to_64_bits( low , high );
+	memcpy(&d, &aux, sizeof(u8));
 
 	d = -d;
 
-	push( (u8)d );
+	memcpy(&aux, &d, sizeof(u8));
+	pushU8( aux );
 
 	current_frame->pc++;
 }
@@ -2225,11 +2252,12 @@ void funct_lxor()
 
 void funct_iinc()
 {
-	u4 field_index = current_frame->code[++(current_frame->pc)];
-	u4 aux = current_frame->fields[field_index];
-	u4 aux2 = current_frame->fields[current_frame->code[++(current_frame->pc)]];
+	u1 field_index = current_frame->code[++(current_frame->pc)];
 
-	u1 index = (u1) aux;
+	u4 aux = current_frame->fields[field_index];
+	u1 aux2 = current_frame->code[++(current_frame->pc)];
+
+	int8_t index = (int8_t) aux;
 	int8_t constant = (int8_t) aux2;
 
 	index += constant;
@@ -2283,7 +2311,7 @@ void funct_i2f()
 	#endif
 }
 
-void funct_i2d() /* TODO - vai dar pau no sinal negativo */
+void funct_i2d()
 {
 	double d;
 	u4 aux1;
@@ -2291,7 +2319,7 @@ void funct_i2d() /* TODO - vai dar pau no sinal negativo */
 
 	aux1 = pop();
 
-	d = convert_cast_2x32_bits_to_double( aux1 , 0 );
+	d = (double)aux1;
 
 	memcpy(&aux2, &d, sizeof(u8));
 
@@ -2320,6 +2348,7 @@ void funct_l2i()
 	#endif
 }
 
+/*TODO Testar para ver se funciona a conversao para double*/
 void funct_l2f()
 {
 	u4 low, high, *aux;
@@ -2689,7 +2718,7 @@ void funct_dcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
 void funct_ifeq()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2699,7 +2728,7 @@ void funct_ifeq()
 
 	if ( aux == 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2719,7 +2748,7 @@ void funct_ifeq()
 void funct_ifne()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2729,7 +2758,7 @@ void funct_ifne()
 
 	if ( aux != 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2749,7 +2778,7 @@ void funct_ifne()
 void funct_iflt()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2759,7 +2788,7 @@ void funct_iflt()
 
 	if ( aux < 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2779,7 +2808,7 @@ void funct_iflt()
 void funct_ifge()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2789,7 +2818,7 @@ void funct_ifge()
 
 	if ( aux >= 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2809,7 +2838,7 @@ void funct_ifge()
 void funct_ifgt()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2819,7 +2848,7 @@ void funct_ifgt()
 
 	if ( aux > 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2839,7 +2868,7 @@ void funct_ifgt()
 void funct_ifle()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2849,7 +2878,7 @@ void funct_ifle()
 
 	if ( aux <= 0 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2869,7 +2898,7 @@ void funct_ifle()
 void funct_if_icmpeq()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2880,7 +2909,7 @@ void funct_if_icmpeq()
 
 	if ( aux1 == aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2900,7 +2929,7 @@ void funct_if_icmpeq()
 void funct_if_icmpne()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2911,7 +2940,7 @@ void funct_if_icmpne()
 
 	if ( aux1 != aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2931,7 +2960,7 @@ void funct_if_icmpne()
 void funct_if_icmplt()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2942,7 +2971,7 @@ void funct_if_icmplt()
 
 	if ( aux1 < aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2962,7 +2991,7 @@ void funct_if_icmplt()
 void funct_if_icmpge()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -2973,7 +3002,7 @@ void funct_if_icmpge()
 
 	if ( aux1 >= aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -2993,7 +3022,7 @@ void funct_if_icmpge()
 void funct_if_icmpgt()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -3002,9 +3031,13 @@ void funct_if_icmpgt()
 	aux2 = (signed) pop();
 	aux1 = (signed) pop();
 
+#ifdef DEBUG
+			printf("if_icmpgt %d > %d?\n", aux1, aux2);
+		#endif
+
 	if ( aux1 > aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -3024,7 +3057,7 @@ void funct_if_icmpgt()
 void funct_if_icmple()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -3035,7 +3068,7 @@ void funct_if_icmple()
 
 	if ( aux1 <= aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -3055,7 +3088,7 @@ void funct_if_icmple()
 void funct_if_acmpeq()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -3066,7 +3099,7 @@ void funct_if_acmpeq()
 
 	if ( aux1 == aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -3086,7 +3119,7 @@ void funct_if_acmpeq()
 void funct_if_acmpne()
 {
 	int32_t aux1, aux2;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -3097,7 +3130,7 @@ void funct_if_acmpne()
 
 	if ( aux1 != aux2 )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -3116,13 +3149,13 @@ void funct_if_acmpne()
 
 void funct_goto()
 {
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
 	branchbyte2 = current_frame->code[(current_frame->pc)+2];
 
-	offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+	offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 	current_frame->pc += offset;
 
 	#ifdef DEBUG
@@ -3132,7 +3165,7 @@ void funct_goto()
 
 void funct_jsr()
 {
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	push((current_frame->pc) + 3); /* pc da proxima instrucao */
@@ -3140,7 +3173,7 @@ void funct_jsr()
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
 	branchbyte2 = current_frame->code[(current_frame->pc)+2];
 
-	offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+	offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 	current_frame->pc += offset;
 
 #ifdef DEBUG
@@ -3703,29 +3736,34 @@ void funct_invokevirtual()
 			&& ((strcmp(method_name,"print") == 0) || (strcmp(method_name,"println") == 0) )
 	   ){
 
+		/* LONG */
 		if (strstr(method_desc, "J") != NULL){
 			value_low = pop();
 			value_high = pop();
 			value = convert_2x32_to_64_bits(value_low, value_high);
 			printf("%"PRIi64, (int64_t)value);
 
+		/* DOUBLE */
 		} else if(strstr(method_desc, "D") != NULL) {
 			value_low = pop();
 			value_high = pop();
 			value = convert_2x32_to_64_bits(value_low, value_high);
-			printf("%f", (double)value);
+			printf("%.15f", value);
 
+		/* BOOLEAN */
 		} else if(strstr(method_desc, "Z") != NULL) {
-			/* boolean*/
+
 			if (pop())
 				printf("true");
 			else
 				printf("false");
 
+		/* CHAR */
 		} else if(strstr(method_desc, "C") != NULL) {
 
+			/* ARRAY */
 			if(strstr(method_desc, "[C") != NULL){
-				/*array de char */
+
 				array_ref = pop();
 
 				for (i = 0; i < numArrays; i++){
@@ -3737,23 +3775,27 @@ void funct_invokevirtual()
 					printf("%c", (char)array_ref +i);
 				}
 
-
+			/* CHAR */
 			} else {
-				/*char */
 				printf("%c", (char)pop());
 			}
 
+		/* INTEIRO */
 		}else if(strstr(method_desc, "I") != NULL) {
-			/* inteiro */
 			printf("%"PRIi32, (int32_t)pop());
 
+		/* FLOAT */
 		}else if(strstr(method_desc, "F") != NULL) {
-			/* float */
 			vU4 = pop();
 			memcpy(&vfloat, &vU4, sizeof(u4));
 			printf("%f", vfloat);
+
+		/* STRING */
 		}else if(strstr(method_desc, "Ljava/lang/String") != NULL) {
-			printf("%s",getName(current_frame->class, (pop() -1)));
+			vU4 = pop();
+			printf("%s", (char *)vU4);
+
+		/* OBJECT */
 		}else if(strstr(method_desc, "Ljava/lang/Object") != NULL) {
 			printf("%p", (void *)pop());
 			/* chamar método toString do object e depois toCharArray()*/
@@ -4336,7 +4378,7 @@ void funct_ifnull()
 void funct_ifnonnull()
 {
 	int32_t aux;
-	u4 offset;
+	int16_t offset;
 	u1 branchbyte1, branchbyte2;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -4346,7 +4388,7 @@ void funct_ifnonnull()
 
 	if ( aux != CONSTANT_Null )
 	{
-		offset = convert_2x8_to_32_bits(branchbyte2, branchbyte1);
+		offset = (int16_t)convert_2x8_to_32_bits(branchbyte2, branchbyte1);
 		current_frame->pc += offset;
 
 		#ifdef DEBUG
@@ -4365,7 +4407,7 @@ void funct_ifnonnull()
 
 void funct_goto_w()
 {
-	u4 offset;
+	int32_t offset;
 	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
 
 	branchbyte1 = current_frame->code[(current_frame->pc)+1];
@@ -4373,7 +4415,7 @@ void funct_goto_w()
 	branchbyte3 = current_frame->code[(current_frame->pc)+3];
 	branchbyte4 = current_frame->code[(current_frame->pc)+4];
 
-	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
+	offset = (int32_t)(((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF));
 
 	current_frame->pc += offset;
 
@@ -4384,7 +4426,7 @@ void funct_goto_w()
 
 void funct_jsr_w()
 {
-	u4 offset;
+	int32_t offset;
 	u4 branchbyte1, branchbyte2, branchbyte3, branchbyte4;
 
 	push((current_frame->pc) + 5);
@@ -4394,7 +4436,7 @@ void funct_jsr_w()
 	branchbyte3 = current_frame->code[(current_frame->pc)+3];
 	branchbyte4 = current_frame->code[(current_frame->pc)+4];
 
-	offset = ((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF);
+	offset = (int32_t)(((branchbyte1 & 0xFF)<<24) | ((branchbyte2 & 0xFF)<<16) | ((branchbyte3 & 0xFF)<<8) | (branchbyte1 & 0xFF));
 
 	current_frame->pc += offset;
 
