@@ -1647,7 +1647,6 @@ void funct_lsub()
 	current_frame->pc++;
 }
 
-/* TODO verificar se funciona, se nao usar memcpy pra pegar resultado */
 void funct_fsub()
 {
 	u4 aux1, aux2, result;
@@ -2340,7 +2339,6 @@ void funct_l2i()
 	#endif
 }
 
-/*TODO Testar para ver se funciona a conversao para double*/
 void funct_l2f()
 {
 	u4 low, high, *aux;
@@ -2389,7 +2387,7 @@ void funct_l2d()
 	#endif
 }
 
-void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2i()
 {
 	u4 aux;
 	float f;
@@ -2407,7 +2405,7 @@ void funct_f2i() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	#endif
 }
 
-void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2l()
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2447,7 +2445,7 @@ void funct_f2d()
 	#endif
 }
 
-void funct_d2i() /* TODO - Conferir caso do signed */
+void funct_d2i()
 {
 	u4 low, high;
 	int32_t resp;
@@ -2595,7 +2593,7 @@ void funct_lcmp()
 	#endif
 }
 
-void funct_fcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_fcmpl()
 {
 	int32_t resp;
 	u4 aux;
@@ -2623,7 +2621,7 @@ void funct_fcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_fcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_fcmpg()
 {
 	int32_t resp;
 	u4 aux;
@@ -2651,7 +2649,7 @@ void funct_fcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_dcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_dcmpl()
 {
 	int32_t resp;
 	u4 low, high;
@@ -2684,7 +2682,7 @@ void funct_dcmpl() /* TODO - Falta fazer o caso de um operando ser NaN*/
 	#endif
 }
 
-void funct_dcmpg() /* TODO - Falta fazer o caso de um operando ser NaN*/
+void funct_dcmpg()
 {
 	int32_t resp;
 	u4 low, high;
@@ -3197,7 +3195,7 @@ void funct_ret()
 		next_is_wide = 0;
 	}
 
-	current_frame->pc = current_frame->fields[index]; /* TODO verificar se e' o indice direto ou se é o n-th elemento */
+	current_frame->pc = current_frame->fields[index];
 
 #ifdef DEBUG
 	printf("ret - novo PC: %d\n", current_frame->pc);
@@ -4207,7 +4205,7 @@ void funct_checkcast()
 		errorMsg(WHERE,"Objeto não é do tipo informado (deveria lançar exceção)");
 	}
 
-	/*TODO Verificar a subclasses*/
+
 	push((u4)ref);
 	current_frame->pc++;
 }
@@ -4251,7 +4249,7 @@ void funct_wide(){
 	current_frame->pc++;
 }
 
-void funct_multianewarray() /* TODO implementar se der tempo */
+void funct_multianewarray()
 {
 	u2 indexbyte1, indexbyte2, index, type, atype;
 	u1 dimensions;
@@ -4274,7 +4272,7 @@ void funct_multianewarray() /* TODO implementar se der tempo */
 
 	dimension = pop();
 	arrayref = newArray(dimension, TYPE_reference);
-	array_type = getName(current_frame->class, ((struct CONSTANT_Class_info*)current_frame->constant_pool[index])->name_index);
+	array_type = getName(current_frame->class, ((struct CONSTANT_Class_info*)current_frame->constant_pool[index -1])->name_index);
 
 	i = 0;
 	while (array_type[i] == '[')
