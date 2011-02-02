@@ -15,6 +15,7 @@
 #include "classloader.h"
 #include "instructions.h"
 #include "mnemonics.h"
+#include "printclass.h"
 
 #define WHERE "Initialization"
 
@@ -30,6 +31,10 @@ int main(int argc, char **argv)
 	{
 		fatalErrorMsg(WHERE, "Argumentos errados.");
 	}
+
+	/* Popula array de instrucoes */
+	initializeInstr();
+	populate_opcode_info();
 
 	for ( i = 1 ; i < argc ; i++ )
 	{
@@ -57,20 +62,15 @@ int main(int argc, char **argv)
 
 	if ( printFile )
 	{
-		fp = fopen( "output.txt", "r");
+		fp = fopen( "output.txt", "w");
 		printClassloader(main_class, fp);
+		fclose(fp);
 	}
 
 	if ( printScreen )
 	{
-		printf("vai rodar o -v \n");
 		printClassloader(main_class, stdout);
-		printf("terminou de rodar o -v \n"); fflush(stdout);
 	}
-
-	/* Popula array de instrucoes */
-	initializeInstr();
-	populate_opcode_info();
 
 	loadClass(main_class);
 

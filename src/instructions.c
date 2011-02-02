@@ -407,11 +407,11 @@ void funct_dconst_1()
 	current_frame->pc++;
 }
 
-
 void funct_bipush()
 {
-	current_frame->pc++;
-	push( (u4) current_frame->code[current_frame->pc] );
+	int8_t aux = (int8_t) current_frame->code[(++current_frame->pc)];
+
+	push( (u4)aux );
 
 	current_frame->pc++;
 }
@@ -419,15 +419,15 @@ void funct_bipush()
 void funct_sipush()
 {
 	u1 low, high;
-	u4 aux;
+	int16_t aux;
 
-	current_frame->pc++;
-	low = current_frame->code[current_frame->pc];
 	current_frame->pc++;
 	high = current_frame->code[current_frame->pc];
+	current_frame->pc++;
+	low = current_frame->code[current_frame->pc];
 
-	aux = convert_2x8_to_32_bits( low, high );
-	push( aux );
+	aux = (int16_t)convert_2x8_to_32_bits( low, high );
+	push( (u4)aux );
 
 	current_frame->pc++;
 }
@@ -2051,28 +2051,19 @@ void funct_lshl()
 void funct_ishr()
 {
 	u4 mask = 0x1f;  /* ... 0001 1111 */
-	u4 aux1 = 0xffffffff;  /* 1111 1111 ... */
-	u4 aux4 = 0x80000000;  /* 1000 0000 ... */
-	u4 aux2, aux3;
+	u4 aux1, i;
+	int32_t aux2;
 
-	aux2 = pop();
-	aux2 &= mask;
+	aux1 = pop();
+	aux1 &= mask;
 
-	/* Deixa os (32-aux2) bits iniciais com 1 */
-	aux1 <<= (32-aux2);
+	aux2 = (int32_t)pop();
 
-	aux3 = pop();
-
-	/* Verifica qual é o primeiro bit */
-	aux4 = aux3 & aux4;
-
-	aux3 >>= aux2;
-
-	if (aux4) {
-		aux3 |= aux1;
+	for (i = 0; i < aux1; i++) {
+		aux2 /= 2;
 	}
 
-	push( aux3 );
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 }
@@ -2294,15 +2285,16 @@ void funct_i2l()
 
 void funct_i2f()
 {
-	u4 aux;
+	u4 aux2;
+	int32_t aux;
 	float f;
 
-	aux = pop();
-	f = convert_cast_32_bits_to_float( aux );
+	aux = (int32_t)pop();
+	f = (float)aux;
 
-	memcpy(&aux, &f, sizeof(u4));
+	memcpy(&aux2, &f, sizeof(u4));
 
-	push( aux );
+	push( aux2 );
 
 	current_frame->pc++;
 
@@ -2314,10 +2306,10 @@ void funct_i2f()
 void funct_i2d()
 {
 	double d;
-	u4 aux1;
+	int32_t aux1;
 	u8 aux2;
 
-	aux1 = pop();
+	aux1 = (int32_t)pop();
 
 	d = (double)aux1;
 
@@ -2434,7 +2426,7 @@ void funct_f2l() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	#endif
 }
 
-void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos especiais) ta dando certo*/
+void funct_f2d()
 {
 	u4 aux_4;
 	u8 aux_8;
@@ -2444,7 +2436,7 @@ void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 	aux_4 = pop();
 	memcpy(&f, &aux_4, sizeof(u4));
 
-	d = (u8) f;
+	d = (double) f;
 	memcpy(&aux_8, &d, 2*sizeof(u4));
 	pushU8( aux_8 );
 
@@ -2457,7 +2449,8 @@ void funct_f2d() /* TODO - Testar os casos de conversao de NaN (e outros casos e
 
 void funct_d2i() /* TODO - Conferir caso do signed */
 {
-	u4 low, high, resp;
+	u4 low, high;
+	int32_t resp;
 	u8 aux;
 	double d;
 
@@ -2466,8 +2459,8 @@ void funct_d2i() /* TODO - Conferir caso do signed */
 	aux = convert_2x32_to_64_bits(low, high);
 	memcpy(&d, &aux, 2*sizeof(u4));
 
-	resp = (u4) d;
-	push( resp );
+	resp = (int32_t) d;
+	push( (u4)resp );
 
 	current_frame->pc++;
 
@@ -2523,10 +2516,13 @@ void funct_d2f()
 
 void funct_i2b()
 {
-	u1 aux;
+	int8_t aux;
+	int32_t aux2;
 
-	aux = (u1) pop();
-	push(aux);
+	aux = (int8_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -2537,10 +2533,13 @@ void funct_i2b()
 
 void funct_i2c()
 {
-	u2 aux;
+	int16_t aux;
+	int32_t aux2;
 
-	aux = (u2) pop();
-	push( (u4) aux);
+	aux = (int16_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -2551,10 +2550,13 @@ void funct_i2c()
 
 void funct_i2s()
 {
-	u2 aux;
+	int16_t aux;
+	int32_t aux2;
 
-	aux = (u2) pop();
-	push( (u4) aux);
+	aux = (int16_t) pop();
+	aux2 = (int32_t)aux;
+
+	push( (u4)aux2 );
 
 	current_frame->pc++;
 
@@ -3772,12 +3774,12 @@ void funct_invokevirtual()
 				}
 
 				for (j = 0; j < arrayLength[i].size; j++){
-					printf("%c", (char)array_ref +i);
+					printf("%c", (int16_t)array_ref +i);
 				}
 
 			/* CHAR */
 			} else {
-				printf("%c", (char)pop());
+				printf("%c", (int16_t)pop());
 			}
 
 		/* INTEIRO */

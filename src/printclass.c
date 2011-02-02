@@ -18,20 +18,13 @@
 
 FILE *fp;
 
-char *base_path2 = "/home/daniel/workspace/JVM/src/";
+char *base_path2 = "/Users/celio/UnB/workspace/JVM/src/";
 
 void printClassloader(char *class_name, FILE *file)
 {
 	fp = file;
-	char new_name[250] ;
 
-	/* cria o path completo para o arquivo da classe base_path + class_name + .class */
-	if (strstr(class_name,".class") != NULL)
-		sprintf(new_name, "%s%s", base_path2, class_name);
-	else
-		sprintf(new_name, "%s%s.class", base_path2, class_name);
-
-	read_class_file(new_name);
+	loadClass(class_name);
 
 	/* Carrega o opcode info para usar o mnemonicos */
 	populate_opcode_info();
@@ -41,10 +34,10 @@ void printClassloader(char *class_name, FILE *file)
 
 	fflush(fp);
 
-	printf("\nEscrita do classloader completa");
+	printf("\n\nEscrita do classloader completa");
 	if ( fp != stdout )
 		printf("(em arquivo)");
-	printf(". Pressione <enter> para continuar.\n");
+	printf(".\nPressione <enter> para continuar com a execucao do .class\n");
 	getchar();
 
 }
@@ -223,11 +216,11 @@ void show_interfaces() {
  */
 void show_methods() {
   int i;
-  char string[200], nome[200];
+  char string[200], *nome;
 
   for ( i = 0 ; i < class->methods_count; i++ ) {
     get_access_flags(class->methods[i].access_flags, string);
-	getName(getClassByName(nome), class->methods[i].name_index);
+	nome = getName(class, class->methods[i].name_index);
 
     fprintf( fp, "\n\n\t[%d] %s", i+1, nome);
 	fprintf( fp, "\n\t\tName index: %hu", class->methods[i].name_index );
