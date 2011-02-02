@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "types.h"
+#include "constants.h"
 #include "heap.h"
 #include "carregador.h"
 #include "jvmerr.h"
@@ -143,23 +144,23 @@ void* newArray(u4 count, u1 type){
 
 	switch (type){
 
-		case 0: size = 4; /*reference*/
+		case TYPE_reference: size = 4; /*reference*/
 				break;
-		case 4: size = 1;/*boolean*/
+		case TYPE_boolean: size = 1;/*boolean*/
 				break;
-		case 5: size = 2;/*char*/
+		case TYPE_char: size = 2;/*char*/
 				break;
-		case 6: size= 4;/*float*/
+		case TYPE_float: size= 4;/*float*/
 				break;
-		case 7: size = 8;/*double*/
+		case TYPE_double: size = 8;/*double*/
 				break;
-		case 8: size = 1;/*byte*/
+		case TYPE_byte: size = 1;/*byte*/
 				break;
-		case 9: size = 2;/*short*/
+		case TYPE_short: size = 2;/*short*/
 				break;
-		case 10: size = 4;/*int*/
+		case TYPE_int: size = 4;/*int*/
 				 break;
-		case 11: size = 8;/*long*/
+		case TYPE_long: size = 8;/*long*/
 				 break;
 
 	}
