@@ -25,7 +25,7 @@ extern int errno;
 
 FILE* classfile;
 
-struct ClassFile * read_class_file(char *nome_arq)
+struct ClassFile *read_class_file(char *nome_arq)
 {
 
   if (open_file(nome_arq) < 0)
